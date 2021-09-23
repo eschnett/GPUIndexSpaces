@@ -1,3 +1,4 @@
+using CUDA
 using GPUIndexSpaces
 using Test
 
@@ -13,13 +14,13 @@ memmap = Mapping(Dict(Dish(0) => Memory(0), Dish(1) => Memory(1), Dish(2) => Mem
 
 ################################################################################
 
-step_constant = constant("r", mapping, "42")
+step_constant = constant(:r, mapping, 42)
 print(step_constant)
 
-step_assign = assign("r", "s", mapping)
+step_assign = assign(:r, :s, mapping)
 print(step_assign)
 
-step_clamp = apply("s", "t", expr -> "min(127, max(-127, ($expr)))", mapping)
+step_clamp = apply(:s, :t, expr -> :(min(127, max(-127, $expr))), mapping)
 print(step_clamp)
 
 allsteps = Seq(Seq(step_constant, step_assign), step_clamp)
@@ -27,8 +28,8 @@ print(allsteps)
 
 ################################################################################
 
-step_load = load("m", "r", memmap, mapping)
+step_load = load(:m, :r, memmap, mapping)
 print(step_load)
 
-step_store = store("r", "m", mapping, memmap)
+step_store = store(:r, :m, mapping, memmap)
 print(step_store)
