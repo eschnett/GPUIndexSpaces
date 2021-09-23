@@ -5,8 +5,8 @@ using OrderedCollections
 ################################################################################
 
 # Bit access helpers
-getbit(expr::AbstractString, i::Int) = "(($expr) >> $i) & 1"
-setbit(expr::AbstractString, i::Int) = "($expr) << $i"
+getbit(expression::AbstractString, i::Int) = "(($expression) >> $i) & 1"
+setbit(expression::AbstractString, i::Int) = "($expression) << $i"
 
 ################################################################################
 
@@ -50,52 +50,57 @@ Base.inv(inmap::Mapping) = Mapping(Dict(v => k for (k, v) in mapping.mapping))
 
 ################################################################################
 
-export AbstractStep, inname, outname, inmap, outmap, expr
+export AbstractStep, inname, outname, inmap, outmap, expression
 abstract type AbstractStep end
+description(::AbstractStep) = error("undefined")
 inname(::AbstractStep) = error("undefined")
 outname(::AbstractStep) = error("undefined")
 inmap(::AbstractStep) = error("undefined")
 outmap(::AbstractStep) = error("undefined")
-expr(::AbstractStep) = error("undefined")
+expression(::AbstractStep) = error("undefined")
 
 function Base.show(io::IO, step::AbstractStep)
-    println(io, "# Input mapping:")
+    println(io, "// $(description(step))")
+    println(io, "//   Input: $(inname(step))")
+    println(io, "//   Output: $(outname(step))")
+    println(io, "//   Input mapping:")
     for (k, v) in sort!(OrderedDict(inmap(step).mapping))
-        println(io, "#   $k => $v")
+        println(io, "//     $k => $v")
     end
-    println(io, "# Output mapping:")
+    println(io, "//   Output mapping:")
     for (k, v) in sort!(OrderedDict(outmap(step).mapping))
-        println(io, "#   $k => $v")
+        println(io, "//     $k => $v")
     end
-    println(io, "# Input: $(inname(step))")
-    println(io, "# Output: $(outname(step))")
-    return println(io, join(expr(step), "\n"))
+    return println(io, join(expression(step), "\n"))
 end
 
 export Step
 struct Step <: AbstractStep
+    description::String
     inname::String
     outname::String
     inmap::Mapping
     outmap::Mapping
-    expr::Vector{String}
+    expression::Vector{String}
 end
+description(step::Step) = step.description
 inname(step::Step) = step.inname
 outname(step::Step) = step.outname
 inmap(step::Step) = step.inmap
 outmap(step::Step) = step.outmap
-expr(step::Step) = step.expr
+expression(step::Step) = step.expression
 
 export Id
 struct Id <: AbstractStep
     mapping::Mapping
     name::String
 end
+description(step::Id) = "No-op"
 inname(step::Id) = step.name
 outname(step::Id) = step.name
 inmap(step::Id) = step.mapping
 outmap(step::Id) = step.mapping
-expr(step::Id) = String[]
+expression(step::Id) = String[]
 
 export Seq
 struct Seq <: AbstractStep
@@ -104,14 +109,15 @@ struct Seq <: AbstractStep
     function Seq(step1::AbstractStep, step2::AbstractStep)
         @assert outname(step1) == inname(step2)
         @assert outmap(step1) == inmap(step2)
-        return new(step1, steep2)
+        return new(step1, step2)
     end
 end
+description(step::Seq) = join([description(step.step1), description(step.step2)], "; ")
 inname(step::Seq) = inname(step.step1)
 outname(step::Seq) = outname(step.step2)
 inmap(step::Seq) = inmap(step.step1)
-outmap(step::Seq) = outmap(step.steep2)
-expr(step::Seq) = String[step.step1; step.step2]
+outmap(step::Seq) = outmap(step.step2)
+expression(step::Seq) = String[expression(step.step1); expression(step.step2)]
 
 ################################################################################
 
@@ -153,24 +159,26 @@ function constant(outname::String, outmap::Mapping, value::String)
             @assert false
         end
     end
-    return Step("(nothing)", outname, Mapping(Dict()), outmap, stmts)
+    return Step("Set to constant", "(nothing)", outname, Mapping(Dict()), outmap, stmts)
 end
 
+export assign
 function assign(inname::String, outname::String, inmap::Mapping)
-    registers = [v for (k, v) in inmap if v isa Register]
+    registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
     stmts = String[]
     for r in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$r"
         push!(stmts, "const int $outname$rname = $inname$rname;")
     end
-    return Step(inname, outname, inmap, inmap, stmts)
+    return Step("Assign to variable", inname, outname, inmap, inmap, stmts)
 end
 
+export apply
 function apply(inname::String, outname::String, fun::Function, inmap::Mapping)
-    registers = [v for (k, v) in inmap if v isa Register]
+    registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
-    simds = [v for (k, v) in inmap if v isa SIMD]
+    simds = [v.bits for (k, v) in inmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
     stmts = String[]
     for r in 0:((1 << register_bits) - 1)
@@ -205,7 +213,7 @@ function apply(inname::String, outname::String, fun::Function, inmap::Mapping)
             @assert false
         end
     end
-    return Step(inname, outname, inmap, inmap, stmts)
+    return Step("Apply function", inname, outname, inmap, inmap, stmts)
 end
 
 function load(memname::String, outname::String, memmap::Mapping, outmap::Mapping, value::String)
@@ -223,27 +231,27 @@ function load(memname::String, outname::String, memmap::Mapping, outmap::Mapping
     for r in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$r"
         if simd_bits == 0
-            exprs = String[]
+            expressions = String[]
             # TODO: Convert to `size_t`
             # TODO: This assumes a memory layout in `int`s, not bytes
             # TODO:
             for w in 0:(warp_bits - 1)
                 m = (memmap[Warp(w)]::Memory).bit
-                push!(exprs, setbit(getbit("blockIdx.x", w), m))
+                push!(expressions, setbit(getbit("blockIdx.x", w), m))
             end
             for t in 0:(thread_bits - 1)
                 m = (memmap[Thread(t)]::Memory).bit
-                push!(exprs, setbit(getbit("threadIdx.x", w), m))
+                push!(expressions, setbit(getbit("threadIdx.x", w), m))
             end
             m = (memmap[Register(r)]::Memory).bit
-            push!(exprs, setbit("$r", m))
-            expr = "(" * join(exprs, ") | (") * ")"
-            push!(stmts, "const int $outname$rname = $inmap[$expr];")
+            push!(expressions, setbit("$r", m))
+            expression = "(" * join(expressions, ") | (") * ")"
+            push!(stmts, "const int $outname$rname = $inmap[$expression];")
         else
             @assert false
         end
     end
-    return Step(outname, outname, outmap, outmap, stmts)
+    return Step("Load from memory", outname, outname, outmap, outmap, stmts)
 end
 
 function permute_simd(inmap::Mapping, perm::Mapping)
@@ -266,7 +274,7 @@ function permute_simd(inmap::Mapping, perm::Mapping)
     end
     s = sum(bytes[i + 1] << (4 * i) for i in 0:3)
     @assert s ∈ [0x3210, 0x3120]
-    return Step(inmap, outmap, ["__byte_perm(r, 0, 0x$(string(s; base=16)));"])
+    return Step("Permute SIMD entries", inmap, outmap, ["__byte_perm(r, 0, 0x$(string(s; base=16)));"])
 end
 
 function permute_thread(inmap::Mapping, perm::Mapping)
@@ -287,7 +295,7 @@ function permute_thread(inmap::Mapping, perm::Mapping)
         push!(sources, setbit(getbit("threadIdx.x", i), j))
     end
     source = "(" * join(sources, ") | (") * ")"
-    return Step(inmap, outmap, ["__shfl_sync(~0U, r, $source);"])
+    return Step("Permute threads", inmap, outmap, ["__shfl_sync(~0U, r, $source);"])
 end
 
 # convert_int8_to_int16 (with more registers)
@@ -310,7 +318,7 @@ function permute_thread_register(inmap::Mapping, thread::Int, register::Int)
     outmap = copy(inmap)
     outmap[Thread(thread)] = inmap[Register(register)]
     outmap[Register(register)] = inmap[Thread(thread)]
-    return Step(inmap, outmap,
+    return Step("Permute thread and regsiter", inmap, outmap,
                 ["{";
                  "  const int bit = 1 << thread;";
                  "  const bool flag = (threadIdx.x & bit) != 0;";
