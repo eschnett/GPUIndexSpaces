@@ -120,7 +120,9 @@ struct Mapping
         return new(mapping)
     end
 end
+Base.copy(f::Mapping) = Mapping(copy(f.mapping))
 Base.getindex(f::Mapping, i::Index) = f.mapping[i]
+Base.setindex!(f::Mapping, value::Index, i::Index) = (f.mapping[i] = value)
 
 Base.inv(f::Mapping) = Mapping(Dict(v => k for (k, v) in f.mapping))
 Base.:(∘)(g::Mapping, f::Mapping) = Mapping(Dict(k => g[v] for (k, v) in f.mapping))
@@ -289,7 +291,7 @@ function assign(inname::Symbol, outname::Symbol, inmap::Mapping)
 end
 
 export apply
-function apply(inname::Symbol, outname::Symbol, fun::Function, inmap::Mapping)
+function apply(inname::Symbol, outname::Symbol, inmap::Mapping, fun::Function)
     registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
     simds = [v.bits for (k, v) in inmap.mapping if v isa SIMD]
@@ -507,26 +509,49 @@ end
 # convert_int32_to_int8 (with fewer registers)
 # TODO: Implement the 8- and 16-bit `apply` above this way.
 
-function permute_thread_register(inmap::Mapping, thread::Int, register::Int)
-    @assert 0 ≤ thread < 5
-    @assert 0 ≤ register < 1
-    for (k, v) in inmap
-        k isa Thread && @assert 0 ≤ k.bit < 5
-        v isa Thread && @assert 0 ≤ v.bit < 5
-        k isa Register && @assert 0 ≤ k.bit < 1
-        v isa Register && @assert 0 ≤ v.bit < 1
+export permute_thread_register
+function permute_thread_register(inname::Symbol, outname::Symbol, inmap::Mapping, thread::Int, register::Int)
+    threads = [v.bit for (k, v) in inmap.mapping if v isa Thread]
+    thread_bits = isempty(threads) ? 0 : maximum(threads) + 1
+    registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
+    register_bits = isempty(registers) ? 0 : maximum(registers) + 1
+    @assert 0 ≤ thread < thread_bits
+    @assert 0 ≤ register < register_bits
+    stmts = Code[]
+    push!(stmts, quote
+              mask = $(UInt32(1 << thread))
+              # Thread 0: exchange register 1
+              # Thread 1: exchange register 0
+              isthread1 = (Int32(threadIdx().x - 1) & mask) ≠ 0
+          end)
+    for reg in 0:((1 << register_bits) - 1)
+        if reg & (1 << register) == 0
+            reg0 = reg
+            reg1 = reg | (1 << register)
+            rname0 = register_bits == 0 ? "" : "$reg0"
+            rname1 = register_bits == 0 ? "" : "$reg1"
+            result = push!(stmts, quote
+                               $(Symbol(outname, rname0)) = $(Symbol(inname, rname0))
+                               $(Symbol(outname, rname1)) = $(Symbol(inname, rname1))
+                               src = isthread1 ? $(Symbol(inname, rname0)) : $(Symbol(inname, rname1))
+                               dst = shfl_xor_sync($(~UInt32(0)), src, mask)
+                               if isthread1
+                                   $(Symbol(outname, rname0)) = dst
+                               else
+                                   $(Symbol(outname, rname1)) = dst
+                               end
+                           end)
+        end
     end
+    inv_inmap = inv(inmap)
+    register_dual = inv_inmap[Register(register)]
+    thread_dual = inv_inmap[Thread(thread)]
     outmap = copy(inmap)
-    outmap[Thread(thread)] = inmap[Register(register)]
-    outmap[Register(register)] = inmap[Thread(thread)]
-    return Step("Permute thread and regsiter", inmap, outmap,
-                ["{";
-                 "  const int bit = 1 << thread;";
-                 "  const bool flag = (threadIdx.x & bit) != 0;";
-                 "  const int src = flag ? r[0] : r[1];";
-                 "  const int dst = __shfl_xor_sync(~0U, src, bit);";
-                 "  flag ? r[0] = dst : r[1] = dst;";
-                 "}"])
+    outmap[register_dual] = Thread(thread)
+    outmap[thread_dual] = Register(register)
+    return Step("Permute thread and register", inname, outname, inmap, outmap, quote
+                    $(stmts...)
+                end)
 end
 
 end

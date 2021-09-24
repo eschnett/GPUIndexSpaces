@@ -24,7 +24,7 @@ print(step_constant)
 step_assign = assign(:r, :s, mapping)
 print(step_assign)
 
-step_clamp = apply(:s, :t, expr -> :(min(Int32(127), max(Int32(-127), $expr))), mapping)
+step_clamp = apply(:s, :t, mapping, expr -> :(min(Int32(127), max(Int32(-127), $expr))))
 print(step_clamp)
 
 allsteps = step_constant |> step_assign |> step_clamp
@@ -35,13 +35,17 @@ print(allsteps)
 step_load = load(:m, :r, memmap, mapping)
 print(step_load)
 
-step_clamp = apply(:r, :s, expr -> :(min(Int32(127), max(Int32(-127), $expr))), mapping)
+step_clamp = apply(:r, :s, mapping, expr -> :(min(Int32(127), max(Int32(-127), $expr))))
 print(step_clamp)
 
-step_store = store(:s, :m, mapping, memmap)
+step_permute = permute_thread_register(:s, :t, mapping, 0, 0)
+print(step_permute)
+mapping = outmap(step_permute)
+
+step_store = store(:t, :m, mapping, memmap)
 print(step_store)
 
-allsteps = step_load |> step_clamp |> step_store
+allsteps = step_load |> step_clamp |> step_permute |> step_store
 print(allsteps)
 
 ################################################################################
