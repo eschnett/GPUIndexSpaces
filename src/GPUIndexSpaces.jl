@@ -4,11 +4,22 @@ using OrderedCollections
 
 ################################################################################
 
+const SizeT = Int32              # Int32 (faster) or Int64 (for large arrays)
+
 const Code = Union{Expr,Number,Symbol}
 
 # Bit access helpers
 getbit(expression::AbstractString, i::Int) = "(($expression) >> $i) & 1"
 setbit(expression::AbstractString, i::Int) = "($expression) << $i"
+
+function make_uint(i::Integer)
+    @assert i ≥ 0
+    i ≤ typemax(UInt8) && return UInt8(i)
+    i ≤ typemax(UInt16) && return UInt16(i)
+    i ≤ typemax(UInt32) && return UInt32(i)
+    i ≤ typemax(UInt64) && return UInt64(i)
+    @assert false
+end
 
 struct BitMap
     srcbit::Int
@@ -26,25 +37,39 @@ function movebits(expression::Code, bitmap::Vector{BitMap}, expression_mask::Int
         expr = expression
         bits = Int[bm.srcbit for bm in bitmap if bm.dist == distance]
         @assert !isempty(bits)
-        mask = sum(UInt(1) << bit for bit in bits)
+        mask = make_uint(sum(UInt(1) << bit for bit in bits))
         @assert mask ≠ 0
         if expression_mask ≠ 0
             @assert mask | expression_mask == expression_mask
         end
-        if mask ≠ expression_mask
-            expr = :($expr & $mask)
-        end
-        if distance < 0
-            expr = :($expr >>> $(UInt(-distance)))
-        elseif distance > 0
-            expr = :($expr << $(UInt(distance)))
+        if expr isa Number
+            expr = expr & mask
         else
-            # do nothing
+            if mask ≠ expression_mask
+                expr = :($expr & $mask)
+            end
+        end
+        if expr isa Number
+            expr = expr << distance
+        else
+            if distance < 0
+                expr = :($expr >>> $(make_uint(-distance)))
+            elseif distance > 0
+                expr = :($expr << $(make_uint(distance)))
+            else
+                # do nothing
+            end
         end
         push!(exprs, expr)
     end
+    # Optimize expression
+    filter!(≠(0), exprs)
+    # Convert constants to `Int` to produce more efficient PTX code,
+    # where offsets can be included in the load/store instructions and
+    # don't require explicit add instructions
+    exprs = map(expr -> expr isa Integer ? Int(expr) : expr, exprs)
     if length(exprs) == 0
-        expr = 0
+        expr = make_uint(0)
     elseif length(exprs) == 1
         expr = exprs[1]
     else
@@ -208,14 +233,14 @@ get_int8_2(x::Int32) = (x >>> 16) % Int8
 get_int8_3(x::Int32) = (x >>> 24) % Int8
 
 function assemble_int8(x0::Int8, x1::Int8, x2::Int8, x3::Int8)
-    return ((x0 % Uint8 % UInt32) | ((x1 % Uint8 % UInt32) << 8) | ((x2 % Uint8 % UInt32) << 16) | ((x3 % Uint8 % UInt32) << 32)) %
+    return ((x0 % UInt8 % UInt32) | ((x1 % UInt8 % UInt32) << 8) | ((x2 % UInt8 % UInt32) << 16) | ((x3 % UInt8 % UInt32) << 32)) %
            Int32
 end
 
 get_int16_0(x::Int32) = x % Int16
 get_int16_1(x::Int32) = (x >>> 16) % Int16
 
-assemble_int16(x0::Int16, x1::Int16) = ((x0 % Uint16 % UInt32) | ((x1 % Uint16 % UInt32) << 16)) % Int32
+assemble_int16(x0::Int16, x1::Int16) = ((x0 % UInt16 % UInt32) | ((x1 % UInt16 % UInt32) << 16)) % Int32
 
 export constant
 function constant(outname::Symbol, outmap::Mapping, value::Code)
@@ -330,26 +355,33 @@ function load(memname::Symbol, outname::Symbol, memmap::Mapping, outmap::Mapping
             expressions = Code[]
             # TODO: Convert to `size_t`
             # TODO: This assumes a memory layout in `int`s, not bytes
+            # TODO: Check for bank conflicts
             push!(expressions,
-                  movebits(:(blockIdx().x - 1), [BitMap(b, (memmap_inv_inmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
+                  movebits(:($SizeT(blockIdx().x - 1)),
+                           [BitMap(b, (memmap_inv_inmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
                            (1 << max_block_bits) - 1))
             push!(expressions,
-                  movebits(:(threadIdx().y - 1), [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
+                  movebits(:($SizeT(threadIdx().y - 1)),
+                           [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
                            (1 << max_warp_bits) - 1))
             push!(expressions,
-                  movebits(:(threadIdx().x - 1),
+                  movebits(:($SizeT(threadIdx().x - 1)),
                            [BitMap(t, (memmap_inv_inmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
                            (1 << max_thread_bits) - 1))
             push!(expressions,
-                  movebits(reg, [BitMap(r, (memmap_inv_inmap[Register(r)]::Memory).bit) for r in 0:(register_bits - 1)]))
+                  movebits(SizeT(reg), [BitMap(r, (memmap_inv_inmap[Register(r)]::Memory).bit) for r in 0:(register_bits - 1)]))
             @assert !isempty(expressions)
+            filter!(≠(0), expressions)
             if length(expressions) == 0
-                expression = 0
+                expression = make_uint(0)
             elseif length(expressions) == 1
                 expression = expressions[1]
             else
                 expression = :(+($(expressions...)))
             end
+            # It is important to write `1 + $expression` instead of
+            # `$expression + 1`, so that the added `1` can be combined
+            # with the subtracted `1` in the `getindex` function.
             push!(stmts, quote
                       @inbounds $(Symbol(outname, rname)) = $memname[1 + $expression]
                   end)
@@ -384,23 +416,33 @@ function store(inname::Symbol, memname::Symbol, inmap::Mapping, memmap::Mapping)
             expressions = Code[]
             # TODO: Convert to `size_t`
             # TODO: This assumes a memory layout in `int`s, not bytes
+            # TODO: Check for bank conflicts
             push!(expressions,
-                  movebits(:(blockIdx().x - 1), [BitMap(b, (memmap_inv_inmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
+                  movebits(:($SizeT(blockIdx().x - 1)),
+                           [BitMap(b, (memmap_inv_inmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
                            (1 << max_block_bits) - 1))
             push!(expressions,
-                  movebits(:(threadIdx().y - 1), [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
+                  movebits(:($SizeT(threadIdx().y - 1)),
+                           [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
                            (1 << max_warp_bits) - 1))
             push!(expressions,
-                  movebits(:(threadIdx().x - 1),
+                  movebits(:($SizeT(threadIdx().x - 1)),
                            [BitMap(t, (memmap_inv_inmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
                            (1 << max_thread_bits) - 1))
             push!(expressions,
-                  movebits(reg, [BitMap(r, (memmap_inv_inmap[Register(r)]::Memory).bit) for r in 0:(register_bits - 1)]))
-            if length(expressions) == 1
+                  movebits(SizeT(reg), [BitMap(r, (memmap_inv_inmap[Register(r)]::Memory).bit) for r in 0:(register_bits - 1)]))
+            @assert !isempty(expressions)
+            filter!(≠(0), expressions)
+            if length(expressions) == 0
+                expression = make_uint(0)
+            elseif length(expressions) == 1
                 expression = expressions[1]
             else
                 expression = :(+($(expressions...)))
             end
+            # It is important to write `1 + $expression` instead of
+            # `$expression + 1`, so that the added `1` can be combined
+            # with the subtracted `1` in the `getindex` function.
             push!(stmts, quote
                       @inbounds $memname[1 + $expression] = $(Symbol(inname, rname))
                   end)

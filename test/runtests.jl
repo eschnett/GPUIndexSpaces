@@ -6,10 +6,10 @@ using Test
 
 const Dish = Index{:Dish}
 
-mapping = Mapping(Dict(Dish(0) => Register(0), Dish(1) => Register(1), Dish(2) => Thread(0), Dish(3) => Thread(1),
-                       Dish(4) => Thread(2), Dish(5) => Thread(3), Dish(6) => Thread(4), Dish(7) => Warp(0), Dish(8) => Warp(1),
-                       Dish(9) => Warp(2), Dish(10) => Warp(3), Dish(11) => Warp(4), Dish(12) => Block(0), Dish(13) => Block(1),
-                       Dish(14) => Block(2), Dish(15) => Block(3), Dish(16) => Block(4), Dish(17) => Block(5)))
+mapping = Mapping(Dict(Dish(0) => Thread(0), Dish(1) => Thread(1), Dish(2) => Thread(2), Dish(3) => Thread(3), Dish(4) => Thread(4),
+                       Dish(5) => Register(0), Dish(6) => Register(1), Dish(7) => Warp(0), Dish(8) => Warp(1), Dish(9) => Warp(2),
+                       Dish(10) => Warp(3), Dish(11) => Warp(4), Dish(12) => Block(0), Dish(13) => Block(1), Dish(14) => Block(2),
+                       Dish(15) => Block(3), Dish(16) => Block(4), Dish(17) => Block(5)))
 
 memmap = Mapping(Dict(Dish(0) => Memory(0), Dish(1) => Memory(1), Dish(2) => Memory(2), Dish(3) => Memory(3), Dish(4) => Memory(4),
                       Dish(5) => Memory(5), Dish(6) => Memory(6), Dish(7) => Memory(7), Dish(8) => Memory(8), Dish(9) => Memory(9),
