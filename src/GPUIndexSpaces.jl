@@ -21,7 +21,7 @@ function movebits(expression::Code, bitmap::Vector{BitMap}, expression_mask::Int
     # Assert all sources are unique
     @assert length(Set(bm.srcbit for bm in bitmap)) == length(bitmap)
     distances = Set(bm.dist for bm in bitmap)
-    exprs = Expr[]
+    exprs = Code[]
     for distance in sort!(collect(distances))
         expr = expression
         bits = Int[bm.srcbit for bm in bitmap if bm.dist == distance]
@@ -32,7 +32,7 @@ function movebits(expression::Code, bitmap::Vector{BitMap}, expression_mask::Int
             @assert mask | expression_mask == expression_mask
         end
         if mask ≠ expression_mask
-            expr = :(expr & $mask)
+            expr = :($expr & $mask)
         end
         if distance < 0
             expr = :($expr >>> $(UInt(-distance)))
@@ -43,13 +43,14 @@ function movebits(expression::Code, bitmap::Vector{BitMap}, expression_mask::Int
         end
         push!(exprs, expr)
     end
-    @assert !isempty(exprs)
-    if length(exprs) == 1
+    if length(exprs) == 0
+        expr = 0
+    elseif length(exprs) == 1
         expr = exprs[1]
     else
         expr = :(+($(exprs...)))
     end
-    return expr::Expr
+    return expr::Code
 end
 
 ################################################################################
@@ -70,15 +71,17 @@ bit(i::Index) = i.bit
 
 Base.show(io::IO, i::Index) = print(io, tag(i), ".", bit(i))
 
-export SIMD, Register, Thread, Warp
+export SIMD, Register, Thread, Warp, Block
 const SIMD = Index{:SIMD}
 const Register = Index{:Register}
 const Thread = Index{:Thread}
 const Warp = Index{:Warp}
+const Block = Index{:Block}
 # const Loop = Index{:Loop}
 
-const max_warp_bits = 5
 const max_thread_bits = 5
+const max_warp_bits = 5
+const max_block_bits = 6
 
 export Memory
 const Memory = Index{:Memory}
@@ -132,7 +135,7 @@ struct Step <: AbstractStep
     inmap::Mapping
     outmap::Mapping
     #STRING expression::Vector{String}
-    expression::Expr
+    expression::Code
 end
 description(step::Step) = step.description
 inname(step::Step) = step.inname
@@ -174,6 +177,9 @@ expression(step::Seq) = quote
     $(expression(step.step1))
     $(expression(step.step2))
 end
+
+Base.:(∘)(step2::AbstractStep, step1::AbstractStep) = Seq(step1, step2)
+Base.:|>(step1::AbstractStep, step2::AbstractStep) = Seq(step1, step2)
 
 ################################################################################
 
@@ -217,7 +223,7 @@ function constant(outname::Symbol, outmap::Mapping, value::Code)
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
     simds = [v.bit for (k, v) in outmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
-    stmts = Expr[]
+    stmts = Code[]
     for r in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$r"
         if simd_bits == 0
@@ -245,7 +251,7 @@ export assign
 function assign(inname::Symbol, outname::Symbol, inmap::Mapping)
     registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
-    stmts = Expr[]
+    stmts = Code[]
     for r in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$r"
         push!(stmts, quote
@@ -263,7 +269,7 @@ function apply(inname::Symbol, outname::Symbol, fun::Function, inmap::Mapping)
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
     simds = [v.bits for (k, v) in inmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
-    stmts = Expr[]
+    stmts = Code[]
     for r in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$r"
         if simd_bits == 0
@@ -306,6 +312,8 @@ export load
 function load(memname::Symbol, outname::Symbol, memmap::Mapping, outmap::Mapping)
     memories = [v.bit for (k, v) in outmap.mapping if v isa Memory]
     memory_bits = isempty(memories) ? 0 : maximum(memories) + 1
+    blocks = [v.bit for (k, v) in outmap.mapping if v isa Block]
+    block_bits = isempty(blocks) ? 0 : maximum(blocks) + 1
     warps = [v.bit for (k, v) in outmap.mapping if v isa Warp]
     warp_bits = isempty(warps) ? 0 : maximum(warps) + 1
     threads = [v.bit for (k, v) in outmap.mapping if v isa Thread]
@@ -315,28 +323,35 @@ function load(memname::Symbol, outname::Symbol, memmap::Mapping, outmap::Mapping
     simds = [v.bit for (k, v) in outmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
     memmap_inv_inmap = memmap ∘ inv(outmap)
-    stmts = Expr[]
+    stmts = Code[]
     for reg in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$reg"
         if simd_bits == 0
-            expressions = Expr[]
+            expressions = Code[]
             # TODO: Convert to `size_t`
             # TODO: This assumes a memory layout in `int`s, not bytes
             push!(expressions,
-                  movebits(:(threadIdx.y), [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
+                  movebits(:(blockIdx().x - 1), [BitMap(b, (memmap_inv_inmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
+                           (1 << max_block_bits) - 1))
+            push!(expressions,
+                  movebits(:(threadIdx().y - 1), [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
                            (1 << max_warp_bits) - 1))
             push!(expressions,
-                  movebits(:(threadIdx.x), [BitMap(t, (memmap_inv_inmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
+                  movebits(:(threadIdx().x - 1),
+                           [BitMap(t, (memmap_inv_inmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
                            (1 << max_thread_bits) - 1))
             push!(expressions,
                   movebits(reg, [BitMap(r, (memmap_inv_inmap[Register(r)]::Memory).bit) for r in 0:(register_bits - 1)]))
-            if length(expressions) == 1
+            @assert !isempty(expressions)
+            if length(expressions) == 0
+                expression = 0
+            elseif length(expressions) == 1
                 expression = expressions[1]
             else
                 expression = :(+($(expressions...)))
             end
             push!(stmts, quote
-                      $(Symbol(outname, rname)) = $memname[$expression]
+                      @inbounds $(Symbol(outname, rname)) = $memname[1 + $expression]
                   end)
         else
             @assert false
@@ -349,6 +364,8 @@ end
 
 export store
 function store(inname::Symbol, memname::Symbol, inmap::Mapping, memmap::Mapping)
+    blocks = [v.bit for (k, v) in inmap.mapping if v isa Block]
+    block_bits = isempty(blocks) ? 0 : maximum(blocks) + 1
     warps = [v.bit for (k, v) in inmap.mapping if v isa Warp]
     warp_bits = isempty(warps) ? 0 : maximum(warps) + 1
     threads = [v.bit for (k, v) in inmap.mapping if v isa Thread]
@@ -360,18 +377,22 @@ function store(inname::Symbol, memname::Symbol, inmap::Mapping, memmap::Mapping)
     memories = [v.bit for (k, v) in memmap.mapping if v isa Memory]
     memory_bits = isempty(memories) ? 0 : maximum(memories) + 1
     memmap_inv_inmap = memmap ∘ inv(inmap)
-    stmts = Expr[]
+    stmts = Code[]
     for reg in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$reg"
         if simd_bits == 0
-            expressions = Expr[]
+            expressions = Code[]
             # TODO: Convert to `size_t`
             # TODO: This assumes a memory layout in `int`s, not bytes
             push!(expressions,
-                  movebits(:(threadIdx.y), [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
+                  movebits(:(blockIdx().x - 1), [BitMap(b, (memmap_inv_inmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
+                           (1 << max_block_bits) - 1))
+            push!(expressions,
+                  movebits(:(threadIdx().y - 1), [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
                            (1 << max_warp_bits) - 1))
             push!(expressions,
-                  movebits(:(threadIdx.x), [BitMap(t, (memmap_inv_inmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
+                  movebits(:(threadIdx().x - 1),
+                           [BitMap(t, (memmap_inv_inmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
                            (1 << max_thread_bits) - 1))
             push!(expressions,
                   movebits(reg, [BitMap(r, (memmap_inv_inmap[Register(r)]::Memory).bit) for r in 0:(register_bits - 1)]))
@@ -381,7 +402,7 @@ function store(inname::Symbol, memname::Symbol, inmap::Mapping, memmap::Mapping)
                 expression = :(+($(expressions...)))
             end
             push!(stmts, quote
-                      $memname[$expression] = $(Symbol(outname, rname))
+                      @inbounds $memname[1 + $expression] = $(Symbol(inname, rname))
                   end)
         else
             @assert false
