@@ -4,13 +4,70 @@ using OrderedCollections
 
 ################################################################################
 
-const SizeT = Int32              # Int32 (faster) or Int64 (for large arrays)
-
 const Code = Union{Expr,Number,Symbol}
 
-# Bit access helpers
-getbit(expression::AbstractString, i::Int) = "(($expression) >> $i) & 1"
-setbit(expression::AbstractString, i::Int) = "($expression) << $i"
+# # See <https://discourse.julialang.org/t/code-generation-unnecessary-comment-lines-when-using-quote/398/2>
+# filter_out_lineno(x) = x
+# filter_out_lineno(::LineNumberNode) = nothing
+# function filter_out_lineno(ex::Expr)
+#     args = []
+#     for arg in ex.args
+#         arg′ = filter_out_lineno(arg)
+#         arg′ ≢ nothing && push!(args, arg′)
+#     end
+#     return Expr(ex.head, args...)
+# end
+
+################################################################################
+
+const SizeT = Int32              # Int32 (faster) or Int64 (for large arrays)
+
+# # Bit access helpers
+# getbit(expression::AbstractString, i::Int) = "(($expression) >> $i) & 1"
+# setbit(expression::AbstractString, i::Int) = "($expression) << $i"
+
+const lomask4 = 0x0f0f0f0f
+get_lo4(r0::UInt32, r1::UInt32) = (r0 & lomask4) | ((r1 << 0x04) & ~lomask4)
+get_hi4(r0::UInt32, r1::UInt32) = ((r0 >> 0x04) & lomask4) | (r1 & ~lomask4)
+get_lo4(r0::Int32, r1::Int32) = get_lo4(r0 % UInt32, r1 % UInt32) % Int32
+get_hi4(r0::Int32, r1::Int32) = get_hi4(r0 % UInt32, r1 % UInt32) % Int32
+
+# const lomask8 = 0x00ff00ff
+# get_lo8(r0::UInt32, r1::UInt32) = (r0 & lomask8) | ((r1 << 0x08) & ~lomask8)
+# get_hi8(r0::UInt32, r1::UInt32) = ((r0 >> 0x08) & lomask8) | (r1 & ~lomask8)
+# get_lo8(r0::Int32, r1::Int32) = get_lo8(r0 % UInt32, r1 % UInt32) % Int32
+# get_hi8(r0::Int32, r1::Int32) = get_hi8(r0 % UInt32, r1 % UInt32) % Int32
+get_lo8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x6420)
+get_hi8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x7531)
+
+# const lomask16 = 0x0000ffff
+# get_lo16(r0::UInt32, r1::UInt32) = (r0 & lomask16) | ((r1 << 0x10) & ~lomask16)
+# get_hi16(r0::UInt32, r1::UInt32) = ((r0 >> 0x10) & lomask16) | (r1 & ~lomask16)
+# get_lo16(r0::Int32, r1::Int32) = get_lo16(r0 % UInt32, r1 % UInt32) % Int32
+# get_hi16(r0::Int32, r1::Int32) = get_hi16(r0 % UInt32, r1 % UInt32) % Int32
+get_lo16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x5410)
+get_hi16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x7632)
+
+# TODO: ES: Each call is translated to 1 shift and 2 logical
+# operations. I think 1 shift and 1 logical operation should suffice.
+get_lo4u(r0::Code, r1::Code) = :(($r0 & $lomask4) | (($r1 << 0x04) & ~$lomask4))
+get_hi4u(r0::Code, r1::Code) = :((($r0 >> 0x04) & $lomask4) | ($r1 & ~$lomask4))
+get_lo4(r0::Code, r1::Code) = :($(get_lo4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+get_hi4(r0::Code, r1::Code) = :($(get_hi4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+
+# get_lo8u(r0::Code, r1::Code) = :(($r0 & $lomask8) | (($r1 << 0x08) & ~$lomask8))
+# get_hi8u(r0::Code, r1::Code) = :((($r0 >> 0x08) & $lomask8) | ($r1 & ~$lomask8))
+# get_lo8(r0::Code, r1::Code) = :($(get_lo8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+# get_hi8(r0::Code, r1::Code) = :($(get_hi8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+get_lo8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
+get_hi8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
+
+# get_lo16u(r0::Code, r1::Code) = :(($r0 & $lomask16) | (($r1 << 0x10) & ~$lomask16))
+# get_hi16u(r0::Code, r1::Code) = :((($r0 >> 0x10) & $lomask16) | ($r1 & ~$lomask16))
+# get_lo16(r0::Code, r1::Code) = :($(get_lo16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+# get_hi16(r0::Code, r1::Code) = :($(get_hi16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+get_lo16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x5410 % UInt32) % Int32)
+get_hi16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7632 % UInt32) % Int32)
 
 function make_uint(i::Integer)
     @assert i ≥ 0
@@ -294,7 +351,7 @@ export apply
 function apply(inname::Symbol, outname::Symbol, inmap::Mapping, fun::Function)
     registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
-    simds = [v.bits for (k, v) in inmap.mapping if v isa SIMD]
+    simds = [v.bit for (k, v) in inmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
     stmts = Code[]
     for r in 0:((1 << register_bits) - 1)
@@ -326,6 +383,11 @@ function apply(inname::Symbol, outname::Symbol, inmap::Mapping, fun::Function)
             push!(stmts, "const int8_t $outname$(rname)_out3 = $funcall3;")
             push!(stmts,
                   "const int $outname$rname = assemble_int8($outname$(rname)_out0, $outname$(rname)_out1, $outname$(rname)_out2, $outname$(rname)_out3);")
+        elseif simd_bits == 3
+            # TODO
+            result = push!(stmts, quote
+                               $(Symbol(outname, rname)) = $(fun(Symbol(inname, rname))::Code)
+                           end)
         else
             @assert false
         end
@@ -337,8 +399,6 @@ end
 
 export load
 function load(memname::Symbol, outname::Symbol, memmap::Mapping, outmap::Mapping)
-    memories = [v.bit for (k, v) in outmap.mapping if v isa Memory]
-    memory_bits = isempty(memories) ? 0 : maximum(memories) + 1
     blocks = [v.bit for (k, v) in outmap.mapping if v isa Block]
     block_bits = isempty(blocks) ? 0 : maximum(blocks) + 1
     warps = [v.bit for (k, v) in outmap.mapping if v isa Warp]
@@ -349,25 +409,33 @@ function load(memname::Symbol, outname::Symbol, memmap::Mapping, outmap::Mapping
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
     simds = [v.bit for (k, v) in outmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
+
+    mem_simds = [v.bit for (k, v) in memmap.mapping if v isa SIMD]
+    mem_simd_bits = isempty(mem_simds) ? 0 : maximum(mem_simds) + 1
+    @assert mem_simd_bits == simd_bits
+    all_simd_bits_equal = Dict(k => v for (k, v) in outmap.mapping if v isa SIMD) ==
+                          Dict(k => v for (k, v) in memmap.mapping if v isa SIMD)
+
     memmap_inv_inmap = memmap ∘ inv(outmap)
+
     stmts = Code[]
     for reg in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$reg"
-        if simd_bits == 0
+        if all_simd_bits_equal
             expressions = Code[]
             # TODO: Convert to `size_t`
             # TODO: This assumes a memory layout in `int`s, not bytes
             # TODO: Check for bank conflicts
             push!(expressions,
-                  movebits(:($SizeT(blockIdx().x - 1)),
+                  movebits(:((blockIdx().x - 1) % $SizeT),
                            [BitMap(b, (memmap_inv_inmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
                            (1 << max_block_bits) - 1))
             push!(expressions,
-                  movebits(:($SizeT(threadIdx().y - 1)),
+                  movebits(:((threadIdx().y - 1) % $SizeT),
                            [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
                            (1 << max_warp_bits) - 1))
             push!(expressions,
-                  movebits(:($SizeT(threadIdx().x - 1)),
+                  movebits(:((threadIdx().x - 1) % $SizeT),
                            [BitMap(t, (memmap_inv_inmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
                            (1 << max_thread_bits) - 1))
             push!(expressions,
@@ -408,27 +476,33 @@ function store(inname::Symbol, memname::Symbol, inmap::Mapping, memmap::Mapping)
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
     simds = [v.bit for (k, v) in inmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
-    memories = [v.bit for (k, v) in memmap.mapping if v isa Memory]
-    memory_bits = isempty(memories) ? 0 : maximum(memories) + 1
+
+    mem_simds = [v.bit for (k, v) in memmap.mapping if v isa SIMD]
+    mem_simd_bits = isempty(mem_simds) ? 0 : maximum(mem_simds) + 1
+    @assert mem_simd_bits == simd_bits
+    all_simd_bits_equal = Dict(k => v for (k, v) in inmap.mapping if v isa SIMD) ==
+                          Dict(k => v for (k, v) in memmap.mapping if v isa SIMD)
+
     memmap_inv_inmap = memmap ∘ inv(inmap)
+
     stmts = Code[]
     for reg in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$reg"
-        if simd_bits == 0
+        if all_simd_bits_equal
             expressions = Code[]
             # TODO: Convert to `size_t`
             # TODO: This assumes a memory layout in `int`s, not bytes
             # TODO: Check for bank conflicts
             push!(expressions,
-                  movebits(:($SizeT(blockIdx().x - 1)),
+                  movebits(:((blockIdx().x - 1) % $SizeT),
                            [BitMap(b, (memmap_inv_inmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
                            (1 << max_block_bits) - 1))
             push!(expressions,
-                  movebits(:($SizeT(threadIdx().y - 1)),
+                  movebits(:((threadIdx().y - 1) % $SizeT),
                            [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
                            (1 << max_warp_bits) - 1))
             push!(expressions,
-                  movebits(:($SizeT(threadIdx().x - 1)),
+                  movebits(:((threadIdx().x - 1) % $SizeT),
                            [BitMap(t, (memmap_inv_inmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
                            (1 << max_thread_bits) - 1))
             push!(expressions,
@@ -457,77 +531,65 @@ function store(inname::Symbol, memname::Symbol, inmap::Mapping, memmap::Mapping)
                 end)
 end
 
-function permute_simd(inmap::Mapping, perm::Mapping)
-    simd03(i) = i isa SIMD && 0 ≤ i.bit < 2
-    @assert length(perm) == 4
-    @assert all(simd03(k) && simd03(v) for (k, v) in perm)
-    for (k, v) in inmap
-        k isa SIMD && @assert 0 ≤ k.bit < 2
-        v isa SIMD && @assert 0 ≤ v.bit < 2
+export permute
+function permute(inname::Symbol, outname::Symbol, inmap::Mapping, register::Register, simd::SIMD)
+    registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
+    register_bits = isempty(registers) ? 0 : maximum(registers) + 1
+    simds = [v.bit for (k, v) in inmap.mapping if v isa SIMD]
+    simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
+    @assert 0 ≤ register.bit < register_bits
+    @assert 0 ≤ simd.bit < simd_bits
+    stmts = Code[]
+    for reg in 0:((1 << register_bits) - 1)
+        if reg & (1 << register.bit) == 0
+            reg0 = reg
+            reg1 = reg | (1 << register.bit)
+            rname0 = register_bits == 0 ? "" : "$reg0"
+            rname1 = register_bits == 0 ? "" : "$reg1"
+            if simd_bits == 3 && simd.bit == 0
+                push!(stmts, quote
+                          $(Symbol(outname, rname0)) = $(get_lo4(Symbol(inname, rname0), Symbol(inname, rname1)))
+                          $(Symbol(outname, rname1)) = $(get_hi4(Symbol(inname, rname0), Symbol(inname, rname1)))
+                      end)
+            elseif simd_bits == 3 && simd.bit == 1
+                push!(stmts, quote
+                          $(Symbol(outname, rname0)) = $(get_lo8(Symbol(inname, rname0), Symbol(inname, rname1)))
+                          $(Symbol(outname, rname1)) = $(get_hi8(Symbol(inname, rname0), Symbol(inname, rname1)))
+                      end)
+            else
+                error("not implemented")
+            end
+        end
     end
+    inv_inmap = inv(inmap)
+    simd_dual = inv_inmap[simd]
+    register_dual = inv_inmap[register]
     outmap = copy(inmap)
-    for i in 0:3
-        outmap[SIMD(i)] = inmap[SIMD(perm[SIMD(i)])]
-    end
-    bytes = Array{Int}(undef, 4)
-    for i in 0:3
-        bits = [(i >> n) & 1 for n in 0:1]
-        newbits = [bits[perm[SIMD(n)].bit + 1] for n in 0:1]
-        bytes[i + 1] = sum(newbits[n + 1] << n for n in 0:1)
-    end
-    s = sum(bytes[i + 1] << (4 * i) for i in 0:3)
-    @assert s ∈ [0x3210, 0x3120]
-    return Step("Permute SIMD entries", inmap, outmap, ["__byte_perm(r, 0, 0x$(string(s; base=16)));"])
+    outmap[simd_dual] = register
+    outmap[register_dual] = simd
+    return Step("Permute Register($(register.bit)) and SIMD($(simd.bit))", inname, outname, inmap, outmap, quote
+                    $(stmts...)
+                end)
 end
 
-function permute_thread(inmap::Mapping, perm::Mapping)
-    thread04(i) = i isa Thread && 0 ≤ i.bit < 5
-    @assert length(perm) == 5
-    @assert all(thread04(k) && thread04(v) for (k, v) in perm)
-    for (k, v) in inmap
-        k isa Thread && @assert 0 ≤ k.bit < 5
-        v isa Thread && @assert 0 ≤ v.bit < 5
-    end
-    outmap = copy(inmap)
-    for i in 0:4
-        outmap[Thread(i)] = inmap[Thread(perm[Thread(i)])]
-    end
-    sources = String[]
-    for i in 0:4
-        j = perm[Thread(i)].bit
-        push!(sources, setbit(getbit("threadIdx.x", i), j))
-    end
-    source = "(" * join(sources, ") | (") * ")"
-    return Step("Permute threads", inmap, outmap, ["__shfl_sync(~0U, r, $source);"])
-end
-
-# convert_int8_to_int16 (with more registers)
-# convert_int16_to_int32 (with more registers)
-# convert_int8_to_int32 (with more registers)
-# convert_int16_to_int8 (with fewer registers)
-# convert_int32_to_int16 (with fewer registers)
-# convert_int32_to_int8 (with fewer registers)
-# TODO: Implement the 8- and 16-bit `apply` above this way.
-
-export permute_thread_register
-function permute_thread_register(inname::Symbol, outname::Symbol, inmap::Mapping, thread::Int, register::Int)
+function permute(inname::Symbol, outname::Symbol, inmap::Mapping, thread::Thread, register::Register)
     threads = [v.bit for (k, v) in inmap.mapping if v isa Thread]
     thread_bits = isempty(threads) ? 0 : maximum(threads) + 1
     registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
-    @assert 0 ≤ thread < thread_bits
-    @assert 0 ≤ register < register_bits
+    @assert 0 ≤ thread.bit < thread_bits
+    @assert 0 ≤ register.bit < register_bits
     stmts = Code[]
     push!(stmts, quote
-              mask = $(UInt32(1 << thread))
+              mask = $(UInt32(1 << thread.bit))
               # Thread 0: exchange register 1
               # Thread 1: exchange register 0
-              isthread1 = (Int32(threadIdx().x - 1) & mask) ≠ 0
+              isthread1 = ((threadIdx().x - 1) % Int32) & mask ≠ 0
           end)
     for reg in 0:((1 << register_bits) - 1)
-        if reg & (1 << register) == 0
+        if reg & (1 << register.bit) == 0
             reg0 = reg
-            reg1 = reg | (1 << register)
+            reg1 = reg | (1 << register.bit)
             rname0 = register_bits == 0 ? "" : "$reg0"
             rname1 = register_bits == 0 ? "" : "$reg1"
             result = push!(stmts, quote
@@ -544,14 +606,66 @@ function permute_thread_register(inname::Symbol, outname::Symbol, inmap::Mapping
         end
     end
     inv_inmap = inv(inmap)
-    register_dual = inv_inmap[Register(register)]
-    thread_dual = inv_inmap[Thread(thread)]
+    register_dual = inv_inmap[register]
+    thread_dual = inv_inmap[thread]
     outmap = copy(inmap)
-    outmap[register_dual] = Thread(thread)
-    outmap[thread_dual] = Register(register)
-    return Step("Permute thread and register", inname, outname, inmap, outmap, quote
+    outmap[register_dual] = thread
+    outmap[thread_dual] = register
+    return Step("Permute Thread($(thread.bit)) and Register($(register.bit))", inname, outname, inmap, outmap, quote
                     $(stmts...)
                 end)
 end
+
+# function permute_simd(inmap::Mapping, perm::Mapping)
+#     simd03(i) = i isa SIMD && 0 ≤ i.bit < 2
+#     @assert length(perm) == 4
+#     @assert all(simd03(k) && simd03(v) for (k, v) in perm)
+#     for (k, v) in inmap
+#         k isa SIMD && @assert 0 ≤ k.bit < 2
+#         v isa SIMD && @assert 0 ≤ v.bit < 2
+#     end
+#     outmap = copy(inmap)
+#     for i in 0:3
+#         outmap[SIMD(i)] = inmap[SIMD(perm[SIMD(i)])]
+#     end
+#     bytes = Array{Int}(undef, 4)
+#     for i in 0:3
+#         bits = [(i >> n) & 1 for n in 0:1]
+#         newbits = [bits[perm[SIMD(n)].bit + 1] for n in 0:1]
+#         bytes[i + 1] = sum(newbits[n + 1] << n for n in 0:1)
+#     end
+#     s = sum(bytes[i + 1] << (4 * i) for i in 0:3)
+#     @assert s ∈ [0x3210, 0x3120]
+#     return Step("Permute SIMD entries", inmap, outmap, ["__byte_perm(r, 0, 0x$(string(s; base=16)));"])
+# end
+# 
+# function permute_thread(inmap::Mapping, perm::Mapping)
+#     thread04(i) = i isa Thread && 0 ≤ i.bit < 5
+#     @assert length(perm) == 5
+#     @assert all(thread04(k) && thread04(v) for (k, v) in perm)
+#     for (k, v) in inmap
+#         k isa Thread && @assert 0 ≤ k.bit < 5
+#         v isa Thread && @assert 0 ≤ v.bit < 5
+#     end
+#     outmap = copy(inmap)
+#     for i in 0:4
+#         outmap[Thread(i)] = inmap[Thread(perm[Thread(i)])]
+#     end
+#     sources = String[]
+#     for i in 0:4
+#         j = perm[Thread(i)].bit
+#         push!(sources, setbit(getbit("threadIdx.x", i), j))
+#     end
+#     source = "(" * join(sources, ") | (") * ")"
+#     return Step("Permute threads", inmap, outmap, ["__shfl_sync(~0U, r, $source);"])
+# end
+
+# convert_int8_to_int16 (with more registers)
+# convert_int16_to_int32 (with more registers)
+# convert_int8_to_int32 (with more registers)
+# convert_int16_to_int8 (with fewer registers)
+# convert_int32_to_int16 (with fewer registers)
+# convert_int32_to_int8 (with fewer registers)
+# TODO: Implement the 8- and 16-bit `apply` above this way.
 
 end

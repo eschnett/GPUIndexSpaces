@@ -38,7 +38,7 @@ print(step_load)
 step_clamp = apply(:r, :s, mapping, expr -> :(min(Int32(127), max(Int32(-127), $expr))))
 print(step_clamp)
 
-step_permute = permute_thread_register(:s, :t, mapping, 0, 0)
+step_permute = permute(:s, :t, mapping, Thread(0), Register(0))
 print(step_permute)
 mapping = outmap(step_permute)
 
