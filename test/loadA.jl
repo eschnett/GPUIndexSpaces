@@ -76,23 +76,23 @@ const map_A2_global = Mapping(Dict([Dish′(0) => SIMD(0);
                                     Frequency(3) => Memory(17)]))
 
 # Layout of A in registers
-const map_A_register = Mapping(Dict([Dish′(0) => SIMD(0);
-                                     Dish′(1) => SIMD(1);
-                                     Dish′(2) => SIMD(2);
-                                     Dish′(3) => Thread(0);
-                                     Dish′(4) => Thread(1);
-                                     Dish′(5) => Register(0);
-                                     Dish′(6) => Warp(0);
-                                     Dish′(7) => Warp(1);
-                                     Dish′(8) => Warp(2);
-                                     Beam(0) => Thread(2);
-                                     Beam(1) => Thread(3);
-                                     Beam(2) => Thread(4);
-                                     Beam(3) => Warp(3);
-                                     Beam(4) => Warp(4);
-                                     Beam(5) => Register(1);
-                                     Beam(6) => Register(2);
-                                     Complex(0) => Register(3)]))
+const map_A_registers = Mapping(Dict([Dish′(0) => SIMD(0);
+                                      Dish′(1) => SIMD(1);
+                                      Dish′(2) => SIMD(2);
+                                      Dish′(3) => Thread(0);
+                                      Dish′(4) => Thread(1);
+                                      Dish′(5) => Register(0);
+                                      Dish′(6) => Warp(0);
+                                      Dish′(7) => Warp(1);
+                                      Dish′(8) => Warp(2);
+                                      Beam(0) => Thread(2);
+                                      Beam(1) => Thread(3);
+                                      Beam(2) => Thread(4);
+                                      Beam(3) => Warp(3);
+                                      Beam(4) => Warp(4);
+                                      Beam(5) => Register(1);
+                                      Beam(6) => Register(2);
+                                      Complex(0) => Register(3)]))
 
 # Layout of E in global memory
 const map_E_global = Mapping(Dict([Complex(0) => SIMD(0);
@@ -162,49 +162,72 @@ const map_E_shared = Mapping(Dict([Dish(6) => SIMD(0);
 
 ################################################################################
 
-# step_load_A = load(:memA, :regA, map_A2_global, map_A_register)
+# step_load_A = load(:A_mem, :A_reg, map_A2_global, map_A_registers)
 # print(step_load_A)
 # 
-# step_inc = apply(:regA, :regA′, map_A_register, expr -> :($expr + Int32(1)))
+# step_inc = apply(:A_reg, :A_reg′, map_A_register, expr -> :($expr + Int32(1)))
 # print(step_inc)
 # 
-# step_store_A = store(:regA′, :memA, map_A_register, map_A2_global)
+# step_store_A = store(:A_reg′, :A_mem, map_A_register, map_A2_global)
 # print(step_store_A)
 # 
 # allsteps = step_load_A |> step_inc |> step_store_A
 
 ################################################################################
 
-step_load_E = load(:memE, :regE, map_E_global, map_E_registers)
+step_load_E = load(:E_mem, :E_reg, map_E_global, map_E_registers)
 print(step_load_E)
 
-step_shuffle1_E = permute(:regE, :regE′, outmap(step_load_E), Register(0), SIMD(0))
+step_shuffle1_E = permute(:E_reg, :E_reg′, outmap(step_load_E), Register(0), SIMD(0))
 print(step_shuffle1_E)
-step_shuffle2_E = permute(:regE′, :regE″, outmap(step_shuffle1_E), Register(1), SIMD(1))
+step_shuffle2_E = permute(:E_reg′, :E_reg″, outmap(step_shuffle1_E), Register(1), SIMD(1))
 print(step_shuffle2_E)
 
-step_store_E = store(:regE″, :sharedE, outmap(step_shuffle2_E), map_E_shared)
+step_store_E = store(:E_reg″, :E_shared, outmap(step_shuffle2_E), map_E_shared)
 print(step_store_E)
 
 allsteps = step_load_E |> step_shuffle1_E |> step_shuffle2_E |> step_store_E
 
 ################################################################################
 
-@eval function runsteps(memA, memE, sharedE)
+# # matrix A: A  m-by-k row-major [m * stride + k]
+# # matrix B: E  k-by-n col-major [n * stride + k]
+# # matrix C: Ju m-by-n
+# # m=8 (beams)   n=8 (times)   k=32 (dishes)
+# 
+# step_load_A = load(:A_mem, :A_reg, map_A2_global, map_A_registers)
+# print(step_load_A)
+# 
+# step_load_E = load(:E_shared, :E_reg, map_E_shared, map_E_registers)
+# print(step_load_E)
+# 
+# step_constant_Ju_re_pos = constant(:Ju_re_pos_reg, map_Ju_registers, :(Int32(0)))
+# step_constant_Ju_re_neg = constant(:Ju_re_neg_reg, map_Ju_registers, :(Int32(0)))
+# step_constant_Ju_im_pos = constant(:Ju_im_pos_reg, map_Ju_registers, :(Int32(0)))
+# 
+# # Note: 4-bit WMMA operations are not implemented in CUDA.jl; abandoning this experiment here
+
+################################################################################
+
+@eval function runsteps(A_mem, E_mem, E_shared)
     $(expression(allsteps))
     return nothing
 end
 
 function runcuda()
-    neltsA = 2^18
-    neltsE = 2^12
-    memA = CuArray(Int32[i for i in 0:(neltsA - 1)])
-    memE = CuArray(Int32[i for i in 0:(neltsE - 1)])
-    sharedE = CuArray{Int32}(undef, neltsE)
-    @cuda blocks = 64 threads = (32, 32) runsteps(memA, memE, sharedE)
+    A_nelts = 2^18
+    E_nelts = 2^12
+    A_mem = CuArray(rand(Int32, A_nelts))
+    E_mem = CuArray(rand(Int32, A_nelts))
+    E_shared = CuArray{Int32}(undef, E_nelts)
+    @cuda blocks = 64 threads = (32, 32) runsteps(A_mem, E_mem, E_shared)
     synchronize()
-    println(memE[1:16])
-    println(memE[(end - 15):end])
+    E_mem = Array(E_mem)
+    E_shared = Array(E_shared)
+    println(E_mem[1:16] .% UInt32)
+    println(E_mem[(end - 15):end] .% UInt32)
+    println(E_shared[1:16] .% UInt32)
+    println(E_shared[(end - 15):end] .% UInt32)
     return nothing
 end
 
