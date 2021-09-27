@@ -616,6 +616,51 @@ function permute(inname::Symbol, outname::Symbol, inmap::Mapping, thread::Thread
                 end)
 end
 
+export wmma
+function wmma(inname_A::Symbol, inname_B::Symbol, inname_C::Symbol, outname_D::Symbol, inmap::Mapping)
+    quote
+        tid = Int32(threadIdx().x - 1)
+        @inbounds a0 = A_mem[1 + 2 * tid + 0] % UInt32
+        @inbounds a1 = A_mem[1 + 2 * tid + 1] % UInt32
+        @inbounds b0 = B_mem[1 + 2 * tid + 0] % UInt32
+        @inbounds b1 = B_mem[1 + 2 * tid + 1] % UInt32
+        c0 = Int32(0)
+        c1 = Int32(0)
+        c2 = Int32(0)
+        c3 = Int32(0)
+        c4 = Int32(0)
+        c5 = Int32(0)
+        c6 = Int32(0)
+        c7 = Int32(0)
+        #
+        # A_frag = ($([Symbol(inname_A, i) for i in 0:1]...,))
+        # B_frag = ($([Symbol(inname_B, i) for i in 0:1]...,))
+        # C_frag = ($([Symbol(inname_C, i) for i in 0:7]...,))
+        A_frag = (a0, a1)::NTuple{2,UInt32}
+        B_frag = (b0, b1)::NTuple{2,UInt32}
+        C_frag = (c0, c1, c2, c3, c4, c5, c6, c7)::NTuple{8,Int32}
+        D_frag = WMMA.llvm_wmma_mma_row_col_m16n16k16_s8(A_frag, B_frag, C_frag)::NTuple{8,Int32}
+        # $([:($(Symbol(inname_D, i)) = D_frag[$i+1]) for i in 0:7]...)
+        d0 = D_frag[1]
+        d1 = D_frag[2]
+        d2 = D_frag[3]
+        d3 = D_frag[4]
+        d4 = D_frag[5]
+        d5 = D_frag[6]
+        d6 = D_frag[7]
+        d7 = D_frag[8]
+        #
+        @inbounds D_mem[1 + 8 * tid + 0] = d0
+        @inbounds D_mem[1 + 8 * tid + 1] = d1
+        @inbounds D_mem[1 + 8 * tid + 2] = d2
+        @inbounds D_mem[1 + 8 * tid + 3] = d3
+        @inbounds D_mem[1 + 8 * tid + 4] = d4
+        @inbounds D_mem[1 + 8 * tid + 5] = d5
+        @inbounds D_mem[1 + 8 * tid + 6] = d6
+        @inbounds D_mem[1 + 8 * tid + 7] = d7
+    end
+end
+
 # function permute_simd(inmap::Mapping, perm::Mapping)
 #     simd03(i) = i isa SIMD && 0 ≤ i.bit < 2
 #     @assert length(perm) == 4
