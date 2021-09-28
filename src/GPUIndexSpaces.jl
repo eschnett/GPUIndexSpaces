@@ -708,6 +708,51 @@ function wmma_mma_row_col_m16n16k16_s8!(env::Environment, D::Symbol, A::Symbol, 
     @assert register_bits_C == 3
     @assert simd_bits_C == 0
 
+    inv_Amap = inv(Amap)
+    dual_A_col0 = inv_Amap[SIMD(0)]
+    dual_A_col1 = inv_Amap[SIMD(1)]
+    dual_A_col2 = inv_Amap[Thread(0)]
+    dual_A_col3 = inv_Amap[Thread(1)]
+    dual_A_row0 = inv_Amap[Thread(2)]
+    dual_A_row1 = inv_Amap[Thread(3)]
+    dual_A_row2 = inv_Amap[Thread(4)]
+    dual_A_row3 = inv_Amap[Register(0)]
+
+    inv_Bmap = inv(Bmap)
+    dual_B_row0 = inv_Bmap[SIMD(0)]
+    dual_B_row1 = inv_Bmap[SIMD(1)]
+    dual_B_row2 = inv_Bmap[Thread(0)]
+    dual_B_row3 = inv_Bmap[Thread(1)]
+    dual_B_col0 = inv_Bmap[Thread(2)]
+    dual_B_col1 = inv_Bmap[Thread(3)]
+    dual_B_col2 = inv_Bmap[Thread(4)]
+    dual_B_col3 = inv_Bmap[Register(0)]
+
+    inv_Cmap = inv(Cmap)
+    dual_C_col0 = inv_Cmap[Register(0)]
+    dual_C_col1 = inv_Cmap[Thread(0)]
+    dual_C_col2 = inv_Cmap[Thread(1)]
+    dual_C_col3 = inv_Cmap[Register(2)]
+    dual_C_row0 = inv_Cmap[Thread(2)]
+    dual_C_row1 = inv_Cmap[Thread(3)]
+    dual_C_row2 = inv_Cmap[Thread(4)]
+    dual_C_row3 = inv_Cmap[Register(1)]
+
+    @assert dual_C_row0 == dual_A_row0
+    @assert dual_C_row1 == dual_A_row1
+    @assert dual_C_row2 == dual_A_row2
+    @assert dual_C_row3 == dual_A_row3
+
+    @assert dual_A_col0 == dual_B_row0
+    @assert dual_A_col1 == dual_B_row1
+    @assert dual_A_col2 == dual_B_row2
+    @assert dual_A_col3 == dual_B_row3
+
+    @assert dual_C_col0 == dual_C_col0
+    @assert dual_C_col1 == dual_C_col1
+    @assert dual_C_col2 == dual_C_col2
+    @assert dual_C_col3 == dual_C_col3
+
     stmt = quote
         A_frag = ($([:($(Symbol(A, i)) % UInt32) for i in 0:1]...),)::NTuple{2,UInt32}
         B_frag = ($([:($(Symbol(B, i)) % UInt32) for i in 0:1]...),)::NTuple{2,UInt32}
@@ -718,6 +763,8 @@ function wmma_mma_row_col_m16n16k16_s8!(env::Environment, D::Symbol, A::Symbol, 
 
     return Step("WMMA::mma 16x16x16", Variable[A => Amap, B => Bmap, C => Cmap], Variable[D => Dmap], stmt)
 end
+
+################################################################################
 
 # function permute_simd(inmap::Mapping, perm::Mapping)
 #     simd03(i) = i isa SIMD && 0 ≤ i.bit < 2
