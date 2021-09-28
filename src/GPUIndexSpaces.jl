@@ -666,49 +666,57 @@ end
 
 ################################################################################
 
-export wmma
-function wmma(inname_A::Symbol, inname_B::Symbol, inname_C::Symbol, outname_D::Symbol, inmap::Mapping)
-    quote
-        tid = Int32(threadIdx().x - 1)
-        @inbounds a0 = A_mem[1 + 2 * tid + 0] % UInt32
-        @inbounds a1 = A_mem[1 + 2 * tid + 1] % UInt32
-        @inbounds b0 = B_mem[1 + 2 * tid + 0] % UInt32
-        @inbounds b1 = B_mem[1 + 2 * tid + 1] % UInt32
-        c0 = Int32(0)
-        c1 = Int32(0)
-        c2 = Int32(0)
-        c3 = Int32(0)
-        c4 = Int32(0)
-        c5 = Int32(0)
-        c6 = Int32(0)
-        c7 = Int32(0)
-        #
-        # A_frag = ($([Symbol(inname_A, i) for i in 0:1]...,))
-        # B_frag = ($([Symbol(inname_B, i) for i in 0:1]...,))
-        # C_frag = ($([Symbol(inname_C, i) for i in 0:7]...,))
-        A_frag = (a0, a1)::NTuple{2,UInt32}
-        B_frag = (b0, b1)::NTuple{2,UInt32}
-        C_frag = (c0, c1, c2, c3, c4, c5, c6, c7)::NTuple{8,Int32}
+export wmma_mma_row_col_m16n16k16_s8!
+function wmma_mma_row_col_m16n16k16_s8!(env::Environment, D::Symbol, A::Symbol, B::Symbol, C::Symbol)
+    Amap = env[A]
+    Bmap = env[B]
+    Cmap = env[C]
+    @assert D ∉ keys(env)
+    Dmap = Cmap
+    env[D] = Dmap
+
+    threads_A = [v.bit for (k, v) in Amap.mapping if v isa Thread]
+    thread_bits_A = isempty(threads_A) ? 0 : maximum(threads_A) + 1
+    registers_A = [v.bit for (k, v) in Amap.mapping if v isa Register]
+    register_bits_A = isempty(registers_A) ? 0 : maximum(registers_A) + 1
+    simds_A = [v.bit for (k, v) in Amap.mapping if v isa SIMD]
+    simd_bits_A = isempty(simds_A) ? 0 : maximum(simds_A) + 1
+
+    threads_B = [v.bit for (k, v) in Bmap.mapping if v isa Thread]
+    thread_bits_B = isempty(threads_B) ? 0 : maximum(threads_B) + 1
+    registers_B = [v.bit for (k, v) in Bmap.mapping if v isa Register]
+    register_bits_B = isempty(registers_B) ? 0 : maximum(registers_B) + 1
+    simds_B = [v.bit for (k, v) in Bmap.mapping if v isa SIMD]
+    simd_bits_B = isempty(simds_B) ? 0 : maximum(simds_B) + 1
+
+    threads_C = [v.bit for (k, v) in Cmap.mapping if v isa Thread]
+    thread_bits_C = isempty(threads_C) ? 0 : maximum(threads_C) + 1
+    registers_C = [v.bit for (k, v) in Cmap.mapping if v isa Register]
+    register_bits_C = isempty(registers_C) ? 0 : maximum(registers_C) + 1
+    simds_C = [v.bit for (k, v) in Cmap.mapping if v isa SIMD]
+    simd_bits_C = isempty(simds_C) ? 0 : maximum(simds_C) + 1
+
+    @assert thread_bits_A == 5
+    @assert register_bits_A == 1
+    @assert simd_bits_A == 2
+
+    @assert thread_bits_B == 5
+    @assert register_bits_B == 1
+    @assert simd_bits_B == 2
+
+    @assert thread_bits_C == 5
+    @assert register_bits_C == 3
+    @assert simd_bits_C == 0
+
+    stmt = quote
+        A_frag = ($([:($(Symbol(A, i)) % UInt32) for i in 0:1]...),)::NTuple{2,UInt32}
+        B_frag = ($([:($(Symbol(B, i)) % UInt32) for i in 0:1]...),)::NTuple{2,UInt32}
+        C_frag = ($([Symbol(C, i) for i in 0:7]...),)::NTuple{8,Int32}
         D_frag = WMMA.llvm_wmma_mma_row_col_m16n16k16_s8(A_frag, B_frag, C_frag)::NTuple{8,Int32}
-        # $([:($(Symbol(inname_D, i)) = D_frag[$i+1]) for i in 0:7]...)
-        d0 = D_frag[1]
-        d1 = D_frag[2]
-        d2 = D_frag[3]
-        d3 = D_frag[4]
-        d4 = D_frag[5]
-        d5 = D_frag[6]
-        d6 = D_frag[7]
-        d7 = D_frag[8]
-        #
-        @inbounds D_mem[1 + 8 * tid + 0] = d0
-        @inbounds D_mem[1 + 8 * tid + 1] = d1
-        @inbounds D_mem[1 + 8 * tid + 2] = d2
-        @inbounds D_mem[1 + 8 * tid + 3] = d3
-        @inbounds D_mem[1 + 8 * tid + 4] = d4
-        @inbounds D_mem[1 + 8 * tid + 5] = d5
-        @inbounds D_mem[1 + 8 * tid + 6] = d6
-        @inbounds D_mem[1 + 8 * tid + 7] = d7
+        ($([Symbol(D, i) for i in 0:7]...),) = D_frag
     end
+
+    return Step("WMMA::mma 16x16x16", Variable[A => Amap, B => Bmap, C => Cmap], Variable[D => Dmap], stmt)
 end
 
 # function permute_simd(inmap::Mapping, perm::Mapping)

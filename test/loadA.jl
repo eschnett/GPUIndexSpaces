@@ -178,7 +178,7 @@ const map_E_shared = Mapping(Dict([Dish(6) => SIMD(0);
 ################################################################################
 
 env = Environment()
- 
+
 step_load_E = load!(env, :E_reg, map_E_registers, :E_mem, map_E_global)
 print(step_load_E)
 
