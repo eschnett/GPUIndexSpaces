@@ -4,71 +4,6 @@ using OrderedCollections
 
 ################################################################################
 
-const Code = Union{Expr,Number,Symbol}
-
-# # See <https://discourse.julialang.org/t/code-generation-unnecessary-comment-lines-when-using-quote/398/2>
-# filter_out_lineno(x) = x
-# filter_out_lineno(::LineNumberNode) = nothing
-# function filter_out_lineno(ex::Expr)
-#     args = []
-#     for arg in ex.args
-#         arg′ = filter_out_lineno(arg)
-#         arg′ ≢ nothing && push!(args, arg′)
-#     end
-#     return Expr(ex.head, args...)
-# end
-
-################################################################################
-
-const SizeT = Int32              # Int32 (faster) or Int64 (for large arrays)
-
-# # Bit access helpers
-# getbit(expression::AbstractString, i::Int) = "(($expression) >> $i) & 1"
-# setbit(expression::AbstractString, i::Int) = "($expression) << $i"
-
-const lomask4 = 0x0f0f0f0f
-get_lo4(r0::UInt32, r1::UInt32) = (r0 & lomask4) | ((r1 << 0x04) & ~lomask4)
-get_hi4(r0::UInt32, r1::UInt32) = ((r0 >> 0x04) & lomask4) | (r1 & ~lomask4)
-get_lo4(r0::Int32, r1::Int32) = get_lo4(r0 % UInt32, r1 % UInt32) % Int32
-get_hi4(r0::Int32, r1::Int32) = get_hi4(r0 % UInt32, r1 % UInt32) % Int32
-
-# const lomask8 = 0x00ff00ff
-# get_lo8(r0::UInt32, r1::UInt32) = (r0 & lomask8) | ((r1 << 0x08) & ~lomask8)
-# get_hi8(r0::UInt32, r1::UInt32) = ((r0 >> 0x08) & lomask8) | (r1 & ~lomask8)
-# get_lo8(r0::Int32, r1::Int32) = get_lo8(r0 % UInt32, r1 % UInt32) % Int32
-# get_hi8(r0::Int32, r1::Int32) = get_hi8(r0 % UInt32, r1 % UInt32) % Int32
-get_lo8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x6420)
-get_hi8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x7531)
-
-# const lomask16 = 0x0000ffff
-# get_lo16(r0::UInt32, r1::UInt32) = (r0 & lomask16) | ((r1 << 0x10) & ~lomask16)
-# get_hi16(r0::UInt32, r1::UInt32) = ((r0 >> 0x10) & lomask16) | (r1 & ~lomask16)
-# get_lo16(r0::Int32, r1::Int32) = get_lo16(r0 % UInt32, r1 % UInt32) % Int32
-# get_hi16(r0::Int32, r1::Int32) = get_hi16(r0 % UInt32, r1 % UInt32) % Int32
-get_lo16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x5410)
-get_hi16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x7632)
-
-# TODO: ES: Each call is translated to 1 shift and 2 logical
-# operations. I think 1 shift and 1 logical operation should suffice.
-get_lo4u(r0::Code, r1::Code) = :(($r0 & $lomask4) | (($r1 << 0x04) & ~$lomask4))
-get_hi4u(r0::Code, r1::Code) = :((($r0 >> 0x04) & $lomask4) | ($r1 & ~$lomask4))
-get_lo4(r0::Code, r1::Code) = :($(get_lo4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-get_hi4(r0::Code, r1::Code) = :($(get_hi4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-
-# get_lo8u(r0::Code, r1::Code) = :(($r0 & $lomask8) | (($r1 << 0x08) & ~$lomask8))
-# get_hi8u(r0::Code, r1::Code) = :((($r0 >> 0x08) & $lomask8) | ($r1 & ~$lomask8))
-# get_lo8(r0::Code, r1::Code) = :($(get_lo8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-# get_hi8(r0::Code, r1::Code) = :($(get_hi8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-get_lo8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
-get_hi8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
-
-# get_lo16u(r0::Code, r1::Code) = :(($r0 & $lomask16) | (($r1 << 0x10) & ~$lomask16))
-# get_hi16u(r0::Code, r1::Code) = :((($r0 >> 0x10) & $lomask16) | ($r1 & ~$lomask16))
-# get_lo16(r0::Code, r1::Code) = :($(get_lo16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-# get_hi16(r0::Code, r1::Code) = :($(get_hi16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-get_lo16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x5410 % UInt32) % Int32)
-get_hi16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7632 % UInt32) % Int32)
-
 function make_uint(i::Integer)
     @assert i ≥ 0
     i ≤ typemax(UInt8) && return UInt8(i)
@@ -78,62 +13,9 @@ function make_uint(i::Integer)
     @assert false
 end
 
-struct BitMap
-    srcbit::Int
-    dstbit::Int
-    dist::Int
-    BitMap(srcbit::Int, dstbit::Int) = new(srcbit, dstbit, dstbit - srcbit)
-end
-function movebits(expression::Code, bitmap::Vector{BitMap}, expression_mask::Integer=0)
-    expression_mask = UInt(expression_mask)
-    # Assert all sources are unique
-    @assert length(Set(bm.srcbit for bm in bitmap)) == length(bitmap)
-    distances = Set(bm.dist for bm in bitmap)
-    exprs = Code[]
-    for distance in sort!(collect(distances))
-        expr = expression
-        bits = Int[bm.srcbit for bm in bitmap if bm.dist == distance]
-        @assert !isempty(bits)
-        mask = make_uint(sum(UInt(1) << bit for bit in bits))
-        @assert mask ≠ 0
-        if expression_mask ≠ 0
-            @assert mask | expression_mask == expression_mask
-        end
-        if expr isa Number
-            expr = expr & mask
-        else
-            if mask ≠ expression_mask
-                expr = :($expr & $mask)
-            end
-        end
-        if expr isa Number
-            expr = expr << distance
-        else
-            if distance < 0
-                expr = :($expr >>> $(make_uint(-distance)))
-            elseif distance > 0
-                expr = :($expr << $(make_uint(distance)))
-            else
-                # do nothing
-            end
-        end
-        push!(exprs, expr)
-    end
-    # Optimize expression
-    filter!(≠(0), exprs)
-    # Convert constants to `Int` to produce more efficient PTX code,
-    # where offsets can be included in the load/store instructions and
-    # don't require explicit add instructions
-    exprs = map(expr -> expr isa Integer ? Int(expr) : expr, exprs)
-    if length(exprs) == 0
-        expr = make_uint(0)
-    elseif length(exprs) == 1
-        expr = exprs[1]
-    else
-        expr = :(+($(exprs...)))
-    end
-    return expr::Code
-end
+################################################################################
+
+const SizeT = Int32              # Int32 (faster) or Int64 (for large arrays)
 
 ################################################################################
 
@@ -186,105 +68,129 @@ Base.:(∘)(g::Mapping, f::Mapping) = Mapping(Dict(k => g[v] for (k, v) in f.map
 
 ################################################################################
 
-export AbstractStep, inname, outname, inmap, outmap, expression
+export Environment
+const Variable = Pair{Symbol,Mapping}
+const Environment = Dict{Symbol,Mapping}
+
+################################################################################
+
+################################################################################
+
+const Code = Union{Expr,Number,Symbol}
+
+# # See <https://discourse.julialang.org/t/code-generation-unnecessary-comment-lines-when-using-quote/398/2>
+# filter_out_lineno(x) = x
+# filter_out_lineno(::LineNumberNode) = nothing
+# function filter_out_lineno(ex::Expr)
+#     args = []
+#     for arg in ex.args
+#         arg′ = filter_out_lineno(arg)
+#         arg′ ≢ nothing && push!(args, arg′)
+#     end
+#     return Expr(ex.head, args...)
+# end
+
+export AbstractStep, invars, outvars, code
 abstract type AbstractStep end
 description(::AbstractStep) = error("undefined")
-inname(::AbstractStep) = error("undefined")
-outname(::AbstractStep) = error("undefined")
-inmap(::AbstractStep) = error("undefined")
-outmap(::AbstractStep) = error("undefined")
-expression(::AbstractStep) = error("undefined")
+invars(::AbstractStep) = error("undefined")
+outvars(::AbstractStep) = error("undefined")
+code(::AbstractStep) = error("undefined")
 
 function Base.show(io::IO, step::AbstractStep)
     println(io, "# $(description(step))")
-    println(io, "#   Input: $(inname(step))")
-    println(io, "#   Output: $(outname(step))")
-    println(io, "#   Input mapping:")
-    for (k, v) in sort!(OrderedDict(inmap(step).mapping))
-        println(io, "#     $k => $v")
+    println(io, "#     Inputs: $(join([var[1] for var in invars(step)], ", "))")
+    for var in invars(step)
+        println(io, "#         $(var[1]):")
+        for (k, v) in sort!(OrderedDict(var[2].mapping))
+            println(io, "#             $k => $v")
+        end
     end
-    println(io, "#   Output mapping:")
-    for (k, v) in sort!(OrderedDict(outmap(step).mapping))
-        println(io, "#     $k => $v")
+    println(io, "#     Outputs: $(join([var[1] for var in outvars(step)], ", "))")
+    for var in outvars(step)
+        println(io, "#         $(var[1]):")
+        for (k, v) in sort!(OrderedDict(var[2].mapping))
+            println(io, "#             $k => $v")
+        end
     end
-    #STRING return println(io, join(expression(step), "\n"))
-    return println(io, expression(step))
+    return println(io, code(step))
 end
 
 export Step
 struct Step <: AbstractStep
     description::String
-    inname::Symbol
-    outname::Symbol
-    inmap::Mapping
-    outmap::Mapping
-    #STRING expression::Vector{String}
-    expression::Code
+    invars::Vector{Variable}
+    outvars::Vector{Variable}
+    code::Code
 end
 description(step::Step) = step.description
-inname(step::Step) = step.inname
-outname(step::Step) = step.outname
-inmap(step::Step) = step.inmap
-outmap(step::Step) = step.outmap
-expression(step::Step) = step.expression
-
-export Id
-struct Id <: AbstractStep
-    mapping::Mapping
-    name::Symbol
-end
-description(step::Id) = "No-op"
-inname(step::Id) = step.name
-outname(step::Id) = step.name
-inmap(step::Id) = step.mapping
-outmap(step::Id) = step.mapping
-#STRING expression(step::Id) = []
-expression(step::Id) = quote end
+invars(step::Step) = step.invars
+outvars(step::Step) = step.outvars
+code(step::Step) = step.code
 
 export Seq
 struct Seq <: AbstractStep
-    step1::AbstractStep
-    step2::AbstractStep
-    function Seq(step1::AbstractStep, step2::AbstractStep)
-        @assert outname(step1) == inname(step2)
-        @assert outmap(step1) == inmap(step2)
-        return new(step1, step2)
+    description::String
+    invars::Vector{Variable}
+    outvars::Vector{Variable}
+    steps::Vector{AbstractStep}
+    function Seq(steps::Vector{<:AbstractStep})
+        description′ = "{ " * join(description.(steps), "; ") * " }"
+        invars′ = Variable[]
+        outvars′ = Variable[]
+        all_invars = Environment()
+        all_outvars = Environment()
+        for step in steps
+            this_step_insymbols = Set{Symbol}()
+            for invar in invars(step)
+                @assert invar[1] ∉ this_step_insymbols
+                push!(this_step_insymbols, invar[1])
+                if invar[1] ∈ keys(all_invars)
+                    # Input already seen, ensure mapping matches
+                    @assert invar[2] == all_invars[invar[1]]
+                else
+                    if invar[1] ∈ keys(all_outvars)
+                        # Input is a previous output, ensure mapping matches
+                        @assert invar[2] == all_outvars[invar[1]]
+                    else
+                        # New input
+                        push!(invars′, invar)
+                        all_invars[invar[1]] = invar[2]
+                    end
+                end
+            end
+            this_step_outsymbols = Set{Symbol}()
+            for outvar in outvars(step)
+                @assert outvar[1] ∉ this_step_outsymbols
+                push!(this_step_outsymbols, outvar[1])
+                if outvar[1] ∈ keys(all_invars)
+                    # We don't allow overwriting inputs
+                    @assert false
+                else
+                    if outvar[1] ∈ keys(all_outvars)
+                        # Output already seen, ensure mapping matches
+                        @assert outvar[2] == all_outvars[outvar[1]]
+                    else
+                        # New output
+                        push!(outvars′, outvar)
+                        all_outvars[outvar[1]] = outvar[2]
+                    end
+                end
+            end
+        end
+        return new(description′, invars′, outvars′, steps)
     end
 end
-description(step::Seq) = join([description(step.step1), description(step.step2)], "; ")
-inname(step::Seq) = inname(step.step1)
-outname(step::Seq) = outname(step.step2)
-inmap(step::Seq) = inmap(step.step1)
-outmap(step::Seq) = outmap(step.step2)
-#STRING expression(step::Seq) = [expression(step.step1); expression(step.step2)]
-expression(step::Seq) = quote
-    $(expression(step.step1))
-    $(expression(step.step2))
+description(step::Seq) = step.description
+invars(step::Seq) = step.invars
+outvars(step::Seq) = step.outvars
+code(step::Seq) = quote
+    $(code.(step.steps)...)
 end
 
-Base.:(∘)(step2::AbstractStep, step1::AbstractStep) = Seq(step1, step2)
-Base.:|>(step1::AbstractStep, step2::AbstractStep) = Seq(step1, step2)
+Base.:|>(step1::AbstractStep, step2::AbstractStep) = Seq([step1, step2])
 
 ################################################################################
-
-#STRING export prelude
-#STRING prelude() = """
-#STRING __device__ __forceinline__ int8_t get_int8_0(int x) { return (uint8_t)x; }
-#STRING __device__ __forceinline__ int8_t get_int8_1(int x) { return (uint8_t)(x >> 8); }
-#STRING __device__ __forceinline__ int8_t get_int8_2(int x) { return (uint8_t)(x >> 16); }
-#STRING __device__ __forceinline__ int8_t get_int8_4(int x) { return (uint8_t)(x >> 24); }
-#STRING 
-#STRING __device__ __forceinline__ int assemble_int8(int8_t x0, int8_t x1, int8_t x2, int8_t x3) {
-#STRING   return (unsigned)(uint8_t)x0 | ((unsigned)(uint8_t)x1 << 8) | ((unsigned)(uint8_t)x2 << 16) | ((unsigned)(uint8_t)x3 << 24);
-#STRING }
-#STRING 
-#STRING __device__ __forceinline__ int16_t get_int16_0(int x) { return (uint16_t)x; }
-#STRING __device__ __forceinline__ int16_t get_int16_1(int x) { return (uint16_t)(x >> 16); }
-#STRING 
-#STRING __device__ __forceinline__ int assemble_int16(int16_t x0, int16_t x1) {
-#STRING   return (unsigned)(uint16_t)x0 | ((unsigned)(uint16_t)x1 << 16);
-#STRING }
-#STRING """
 
 get_int8_0(x::Int32) = x % Int8
 get_int8_1(x::Int32) = (x >>> 8) % Int8
@@ -301,145 +207,271 @@ get_int16_1(x::Int32) = (x >>> 16) % Int16
 
 assemble_int16(x0::Int16, x1::Int16) = ((x0 % UInt16 % UInt32) | ((x1 % UInt16 % UInt32) << 16)) % Int32
 
-export constant
-function constant(outname::Symbol, outmap::Mapping, value::Code)
-    registers = [v.bit for (k, v) in outmap.mapping if v isa Register]
+export constant!
+function constant!(env::Environment, lhs::Symbol, lhsmap::Mapping, value::Code)
+    @assert lhs ∉ keys(env)
+    env[lhs] = lhsmap
+
+    registers = [v.bit for (k, v) in lhsmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
-    simds = [v.bit for (k, v) in outmap.mapping if v isa SIMD]
+    simds = [v.bit for (k, v) in lhsmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
+
     stmts = Code[]
     for r in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$r"
+        lhsname = Symbol(lhs, rname)
         if simd_bits == 0
             push!(stmts, quote
-                      $(Symbol(outname, rname)) = $value
+                      $lhsname = $value
                   end)
         elseif simd_bits == 1
             push!(stmts, quote
-                      $(Symbol(outname, rname)) = assemble_int16($value, $value)
+                      $lhsname = assemble_int16($value, $value)
                   end)
         elseif simd_bits == 2
             push!(stmts, quote
-                      $(Symbol(outname, rname)) = assemble_int8($value, $value, $value, $value)
+                      $lhsname = assemble_int8($value, $value, $value, $value)
                   end)
         else
             @assert false
         end
     end
-    return Step("Set to constant", Symbol("(nothing)"), outname, Mapping(Dict()), outmap, quote
+
+    return Step("Set to constant", Variable[], Variable[lhs => lhsmap], quote
                     $(stmts...)
                 end)
 end
 
-export assign
-function assign(inname::Symbol, outname::Symbol, inmap::Mapping)
-    registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
+export assign!
+function assign!(env::Environment, lhs::Symbol, rhs::Symbol)
+    rhsmap = env[rhs]
+    @assert lhs ∉ keys(env)
+    lhsmap = rhsmap
+    env[lhs] = lhsmap
+
+    registers = [v.bit for (k, v) in rhsmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
+
     stmts = Code[]
     for r in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$r"
+        lhsname = Symbol(lhs, rname)
         push!(stmts, quote
-                  $(Symbol(outname, rname)) = $(Symbol(inname, rname))
+                  $lhsname = $(Symbol(rhs, rname))
               end)
     end
-    return Step("Assign to variable", inname, outname, inmap, inmap, quote
+
+    return Step("Assign to variable", Variable[rhs => rhsmap], Variable[lhs => lhsmap], quote
                     $(stmts...)
                 end)
 end
 
-export apply
-function apply(inname::Symbol, outname::Symbol, inmap::Mapping, fun::Function)
-    registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
+export apply!
+function apply!(env::Environment, lhs::Symbol, rhs::Symbol, fun::Function)
+    rhsmap = env[rhs]
+    @assert lhs ∉ keys(env)
+    lhsmap = rhsmap
+    env[lhs] = lhsmap
+
+    registers = [v.bit for (k, v) in rhsmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
-    simds = [v.bit for (k, v) in inmap.mapping if v isa SIMD]
+    simds = [v.bit for (k, v) in rhsmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
+
     stmts = Code[]
     for r in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$r"
+        lhsname = Symbol(lhs, rname)
         if simd_bits == 0
             result = push!(stmts, quote
-                               $(Symbol(outname, rname)) = $(fun(Symbol(inname, rname))::Code)
+                               $lhsname = $(fun(Symbol(rhs, rname))::Code)
                            end)
         elseif simd_bits == 1
-            push!(stmts, "const int16_t $outname$(rname)_in0 = get_int16_0($inname$rname);")
-            push!(stmts, "const int16_t $outname$(rname)_in1 = get_int16_1($inname$rname);")
-            funcall0 = fun("$outname$(rname)_in0")
-            funcall1 = fun("$outname$(rname)_in1")
-            push!(stmts, "const int16_t $outname$(rname)_out0 = $funcall0;")
-            push!(stmts, "const int16_t $outname$(rname)_out1 = $funcall1;")
-            push!(stmts, "const int $outname$rname = assemble_int16($outname$(rname)_out0, $outname$(rname)_out1);")
+            push!(stmts, "const int16_t $name$(rname)_in0 = get_int16_0($var[1]$rname);")
+            push!(stmts, "const int16_t $name$(rname)_in1 = get_int16_1($var[1]$rname);")
+            funcall0 = fun("$name$(rname)_in0")
+            funcall1 = fun("$name$(rname)_in1")
+            push!(stmts, "const int16_t $name$(rname)_out0 = $funcall0;")
+            push!(stmts, "const int16_t $name$(rname)_out1 = $funcall1;")
+            push!(stmts, "const int $name$rname = assemble_int16($name$(rname)_out0, $name$(rname)_out1);")
         elseif simd_bits == 2
-            push!(stmts, "const int8_t $outname$(rname)_in0 = get_int8_0($inname$rname);")
-            push!(stmts, "const int8_t $outname$(rname)_in1 = get_int8_1($inname$rname);")
-            push!(stmts, "const int8_t $outname$(rname)_in2 = get_int8_2($inname$rname);")
-            push!(stmts, "const int8_t $outname$(rname)_in3 = get_int8_3($inname$rname);")
-            funcall0 = fun("$outname$(rname)_in0")
-            funcall1 = fun("$outname$(rname)_in1")
-            funcall2 = fun("$outname$(rname)_in2")
-            funcall3 = fun("$outname$(rname)_in3")
-            push!(stmts, "const int8_t $outname$(rname)_out0 = $funcall0;")
-            push!(stmts, "const int8_t $outname$(rname)_out1 = $funcall1;")
-            push!(stmts, "const int8_t $outname$(rname)_out2 = $funcall2;")
-            push!(stmts, "const int8_t $outname$(rname)_out3 = $funcall3;")
+            push!(stmts, "const int8_t $name$(rname)_in0 = get_int8_0($var[1]$rname);")
+            push!(stmts, "const int8_t $name$(rname)_in1 = get_int8_1($var[1]$rname);")
+            push!(stmts, "const int8_t $name$(rname)_in2 = get_int8_2($var[1]$rname);")
+            push!(stmts, "const int8_t $name$(rname)_in3 = get_int8_3($var[1]$rname);")
+            funcall0 = fun("$name$(rname)_in0")
+            funcall1 = fun("$name$(rname)_in1")
+            funcall2 = fun("$name$(rname)_in2")
+            funcall3 = fun("$name$(rname)_in3")
+            push!(stmts, "const int8_t $name$(rname)_out0 = $funcall0;")
+            push!(stmts, "const int8_t $name$(rname)_out1 = $funcall1;")
+            push!(stmts, "const int8_t $name$(rname)_out2 = $funcall2;")
+            push!(stmts, "const int8_t $name$(rname)_out3 = $funcall3;")
             push!(stmts,
-                  "const int $outname$rname = assemble_int8($outname$(rname)_out0, $outname$(rname)_out1, $outname$(rname)_out2, $outname$(rname)_out3);")
+                  "const int $name$rname = assemble_int8($name$(rname)_out0, $name$(rname)_out1, $name$(rname)_out2, $name$(rname)_out3);")
         elseif simd_bits == 3
             # TODO
             result = push!(stmts, quote
-                               $(Symbol(outname, rname)) = $(fun(Symbol(inname, rname))::Code)
+                               $lhsname = $(fun(Symbol(rhs, rname))::Code)
                            end)
         else
             @assert false
         end
     end
-    return Step("Apply function", inname, outname, inmap, inmap, quote
+
+    return Step("Apply function", Variable[rhs => rhsmap], Variable[lhs => lhsmap], quote
                     $(stmts...)
                 end)
 end
 
-export load
-function load(memname::Symbol, outname::Symbol, memmap::Mapping, outmap::Mapping)
-    blocks = [v.bit for (k, v) in outmap.mapping if v isa Block]
+################################################################################
+
+const lomask4 = 0x0f0f0f0f
+get_lo4(r0::UInt32, r1::UInt32) = (r0 & lomask4) | ((r1 << 0x04) & ~lomask4)
+get_hi4(r0::UInt32, r1::UInt32) = ((r0 >> 0x04) & lomask4) | (r1 & ~lomask4)
+get_lo4(r0::Int32, r1::Int32) = get_lo4(r0 % UInt32, r1 % UInt32) % Int32
+get_hi4(r0::Int32, r1::Int32) = get_hi4(r0 % UInt32, r1 % UInt32) % Int32
+
+# const lomask8 = 0x00ff00ff
+# get_lo8(r0::UInt32, r1::UInt32) = (r0 & lomask8) | ((r1 << 0x08) & ~lomask8)
+# get_hi8(r0::UInt32, r1::UInt32) = ((r0 >> 0x08) & lomask8) | (r1 & ~lomask8)
+# get_lo8(r0::Int32, r1::Int32) = get_lo8(r0 % UInt32, r1 % UInt32) % Int32
+# get_hi8(r0::Int32, r1::Int32) = get_hi8(r0 % UInt32, r1 % UInt32) % Int32
+get_lo8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x6420)
+get_hi8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x7531)
+
+# const lomask16 = 0x0000ffff
+# get_lo16(r0::UInt32, r1::UInt32) = (r0 & lomask16) | ((r1 << 0x10) & ~lomask16)
+# get_hi16(r0::UInt32, r1::UInt32) = ((r0 >> 0x10) & lomask16) | (r1 & ~lomask16)
+# get_lo16(r0::Int32, r1::Int32) = get_lo16(r0 % UInt32, r1 % UInt32) % Int32
+# get_hi16(r0::Int32, r1::Int32) = get_hi16(r0 % UInt32, r1 % UInt32) % Int32
+get_lo16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x5410)
+get_hi16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x7632)
+
+# TODO: ES: Each call is translated to 1 shift and 2 logical
+# operations. I think 1 shift and 1 logical operation should suffice.
+get_lo4u(r0::Code, r1::Code) = :(($r0 & $lomask4) | (($r1 << 0x04) & ~$lomask4))
+get_hi4u(r0::Code, r1::Code) = :((($r0 >> 0x04) & $lomask4) | ($r1 & ~$lomask4))
+get_lo4(r0::Code, r1::Code) = :($(get_lo4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+get_hi4(r0::Code, r1::Code) = :($(get_hi4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+
+# get_lo8u(r0::Code, r1::Code) = :(($r0 & $lomask8) | (($r1 << 0x08) & ~$lomask8))
+# get_hi8u(r0::Code, r1::Code) = :((($r0 >> 0x08) & $lomask8) | ($r1 & ~$lomask8))
+# get_lo8(r0::Code, r1::Code) = :($(get_lo8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+# get_hi8(r0::Code, r1::Code) = :($(get_hi8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+get_lo8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
+get_hi8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
+
+# get_lo16u(r0::Code, r1::Code) = :(($r0 & $lomask16) | (($r1 << 0x10) & ~$lomask16))
+# get_hi16u(r0::Code, r1::Code) = :((($r0 >> 0x10) & $lomask16) | ($r1 & ~$lomask16))
+# get_lo16(r0::Code, r1::Code) = :($(get_lo16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+# get_hi16(r0::Code, r1::Code) = :($(get_hi16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+get_lo16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x5410 % UInt32) % Int32)
+get_hi16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7632 % UInt32) % Int32)
+
+struct BitMap
+    srcbit::Int
+    dstbit::Int
+    dist::Int
+    BitMap(srcbit::Int, dstbit::Int) = new(srcbit, dstbit, dstbit - srcbit)
+end
+function movebits(code::Code, bitmap::Vector{BitMap}, code_mask::Integer=0)
+    code_mask = UInt(code_mask)
+    # Assert all sources are unique
+    @assert length(Set(bm.srcbit for bm in bitmap)) == length(bitmap)
+    distances = Set(bm.dist for bm in bitmap)
+    exprs = Code[]
+    for distance in sort!(collect(distances))
+        expr = code
+        bits = Int[bm.srcbit for bm in bitmap if bm.dist == distance]
+        @assert !isempty(bits)
+        mask = make_uint(sum(UInt(1) << bit for bit in bits))
+        @assert mask ≠ 0
+        if code_mask ≠ 0
+            @assert mask | code_mask == code_mask
+        end
+        if expr isa Number
+            expr = expr & mask
+        else
+            if mask ≠ code_mask
+                expr = :($expr & $mask)
+            end
+        end
+        if expr isa Number
+            expr = expr << distance
+        else
+            if distance < 0
+                expr = :($expr >>> $(make_uint(-distance)))
+            elseif distance > 0
+                expr = :($expr << $(make_uint(distance)))
+            else
+                # do nothing
+            end
+        end
+        push!(exprs, expr)
+    end
+    # Optimize expression
+    filter!(≠(0), exprs)
+    # Convert constants to `Int` to produce more efficient PTX code,
+    # where offsets can be included in the load/store instructions and
+    # don't require explicit add instructions
+    exprs = map(expr -> expr isa Integer ? Int(expr) : expr, exprs)
+    if length(exprs) == 0
+        expr = make_uint(0)
+    elseif length(exprs) == 1
+        expr = exprs[1]
+    else
+        expr = :(+($(exprs...)))
+    end
+    return expr::Code
+end
+
+export load!
+function load!(env::Environment, lhs::Symbol, lhsmap::Mapping, mem::Symbol, memmap::Mapping)
+    @assert lhs ∉ keys(env)
+    env[lhs] = lhsmap
+
+    blocks = [v.bit for (k, v) in lhsmap.mapping if v isa Block]
     block_bits = isempty(blocks) ? 0 : maximum(blocks) + 1
-    warps = [v.bit for (k, v) in outmap.mapping if v isa Warp]
+    warps = [v.bit for (k, v) in lhsmap.mapping if v isa Warp]
     warp_bits = isempty(warps) ? 0 : maximum(warps) + 1
-    threads = [v.bit for (k, v) in outmap.mapping if v isa Thread]
+    threads = [v.bit for (k, v) in lhsmap.mapping if v isa Thread]
     thread_bits = isempty(threads) ? 0 : maximum(threads) + 1
-    registers = [v.bit for (k, v) in outmap.mapping if v isa Register]
+    registers = [v.bit for (k, v) in lhsmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
-    simds = [v.bit for (k, v) in outmap.mapping if v isa SIMD]
+    simds = [v.bit for (k, v) in lhsmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
 
     mem_simds = [v.bit for (k, v) in memmap.mapping if v isa SIMD]
     mem_simd_bits = isempty(mem_simds) ? 0 : maximum(mem_simds) + 1
     @assert mem_simd_bits == simd_bits
-    all_simd_bits_equal = Dict(k => v for (k, v) in outmap.mapping if v isa SIMD) ==
+    all_simd_bits_equal = Dict(k => v for (k, v) in lhsmap.mapping if v isa SIMD) ==
                           Dict(k => v for (k, v) in memmap.mapping if v isa SIMD)
 
-    memmap_inv_inmap = memmap ∘ inv(outmap)
+    mem_inv_lhsmap = memmap ∘ inv(lhsmap)
 
     stmts = Code[]
     for reg in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$reg"
+        lhsname = Symbol(lhs, rname)
         if all_simd_bits_equal
             expressions = Code[]
-            # TODO: Convert to `size_t`
             # TODO: This assumes a memory layout in `int`s, not bytes
             # TODO: Check for bank conflicts
             push!(expressions,
                   movebits(:((blockIdx().x - 1) % $SizeT),
-                           [BitMap(b, (memmap_inv_inmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
+                           [BitMap(b, (mem_inv_lhsmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
                            (1 << max_block_bits) - 1))
             push!(expressions,
                   movebits(:((threadIdx().y - 1) % $SizeT),
-                           [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
-                           (1 << max_warp_bits) - 1))
+                           [BitMap(w, (mem_inv_lhsmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)], (1 << max_warp_bits) - 1))
             push!(expressions,
                   movebits(:((threadIdx().x - 1) % $SizeT),
-                           [BitMap(t, (memmap_inv_inmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
+                           [BitMap(t, (mem_inv_lhsmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
                            (1 << max_thread_bits) - 1))
             push!(expressions,
-                  movebits(SizeT(reg), [BitMap(r, (memmap_inv_inmap[Register(r)]::Memory).bit) for r in 0:(register_bits - 1)]))
+                  movebits(SizeT(reg), [BitMap(r, (mem_inv_lhsmap[Register(r)]::Memory).bit) for r in 0:(register_bits - 1)]))
             @assert !isempty(expressions)
             filter!(≠(0), expressions)
             if length(expressions) == 0
@@ -453,60 +485,61 @@ function load(memname::Symbol, outname::Symbol, memmap::Mapping, outmap::Mapping
             # `$expression + 1`, so that the added `1` can be combined
             # with the subtracted `1` in the `getindex` function.
             push!(stmts, quote
-                      @inbounds $(Symbol(outname, rname)) = $memname[1 + $expression]
+                      @inbounds $lhsname = $mem[1 + $expression]
                   end)
         else
             @assert false
         end
     end
-    return Step("Load from memory", Symbol("(nothing)"), outname, Mapping(Dict()), outmap, quote
+    return Step("Load from memory", Variable[], Variable[lhs => lhsmap], quote
                     $(stmts...)
                 end)
 end
 
-export store
-function store(inname::Symbol, memname::Symbol, inmap::Mapping, memmap::Mapping)
-    blocks = [v.bit for (k, v) in inmap.mapping if v isa Block]
+export store!
+function store!(env::Environment, rhs::Symbol, mem::Symbol, memmap::Mapping)
+    rhsmap = env[rhs]
+
+    blocks = [v.bit for (k, v) in rhsmap.mapping if v isa Block]
     block_bits = isempty(blocks) ? 0 : maximum(blocks) + 1
-    warps = [v.bit for (k, v) in inmap.mapping if v isa Warp]
+    warps = [v.bit for (k, v) in rhsmap.mapping if v isa Warp]
     warp_bits = isempty(warps) ? 0 : maximum(warps) + 1
-    threads = [v.bit for (k, v) in inmap.mapping if v isa Thread]
+    threads = [v.bit for (k, v) in rhsmap.mapping if v isa Thread]
     thread_bits = isempty(threads) ? 0 : maximum(threads) + 1
-    registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
+    registers = [v.bit for (k, v) in rhsmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
-    simds = [v.bit for (k, v) in inmap.mapping if v isa SIMD]
+    simds = [v.bit for (k, v) in rhsmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
 
     mem_simds = [v.bit for (k, v) in memmap.mapping if v isa SIMD]
     mem_simd_bits = isempty(mem_simds) ? 0 : maximum(mem_simds) + 1
     @assert mem_simd_bits == simd_bits
-    all_simd_bits_equal = Dict(k => v for (k, v) in inmap.mapping if v isa SIMD) ==
+    all_simd_bits_equal = Dict(k => v for (k, v) in rhsmap.mapping if v isa SIMD) ==
                           Dict(k => v for (k, v) in memmap.mapping if v isa SIMD)
 
-    memmap_inv_inmap = memmap ∘ inv(inmap)
+    mem_inv_rhsmap = memmap ∘ inv(rhsmap)
 
     stmts = Code[]
     for reg in 0:((1 << register_bits) - 1)
         rname = register_bits == 0 ? "" : "$reg"
+        rhsname = Symbol(rhs, rname)
         if all_simd_bits_equal
             expressions = Code[]
-            # TODO: Convert to `size_t`
             # TODO: This assumes a memory layout in `int`s, not bytes
             # TODO: Check for bank conflicts
             push!(expressions,
                   movebits(:((blockIdx().x - 1) % $SizeT),
-                           [BitMap(b, (memmap_inv_inmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
+                           [BitMap(b, (mem_inv_rhsmap[Block(b)]::Memory).bit) for b in 0:(block_bits - 1)],
                            (1 << max_block_bits) - 1))
             push!(expressions,
                   movebits(:((threadIdx().y - 1) % $SizeT),
-                           [BitMap(w, (memmap_inv_inmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)],
-                           (1 << max_warp_bits) - 1))
+                           [BitMap(w, (mem_inv_rhsmap[Warp(w)]::Memory).bit) for w in 0:(warp_bits - 1)], (1 << max_warp_bits) - 1))
             push!(expressions,
                   movebits(:((threadIdx().x - 1) % $SizeT),
-                           [BitMap(t, (memmap_inv_inmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
+                           [BitMap(t, (mem_inv_rhsmap[Thread(t)]::Memory).bit) for t in 0:(thread_bits - 1)],
                            (1 << max_thread_bits) - 1))
             push!(expressions,
-                  movebits(SizeT(reg), [BitMap(r, (memmap_inv_inmap[Register(r)]::Memory).bit) for r in 0:(register_bits - 1)]))
+                  movebits(SizeT(reg), [BitMap(r, (mem_inv_rhsmap[Register(r)]::Memory).bit) for r in 0:(register_bits - 1)]))
             @assert !isempty(expressions)
             filter!(≠(0), expressions)
             if length(expressions) == 0
@@ -520,25 +553,37 @@ function store(inname::Symbol, memname::Symbol, inmap::Mapping, memmap::Mapping)
             # `$expression + 1`, so that the added `1` can be combined
             # with the subtracted `1` in the `getindex` function.
             push!(stmts, quote
-                      @inbounds $memname[1 + $expression] = $(Symbol(inname, rname))
+                      @inbounds $mem[1 + $expression] = $rhsname
                   end)
         else
             @assert false
         end
     end
-    return Step("Store to memory", inname, inname, inmap, inmap, quote
+    return Step("Store to memory", [rhs => rhsmap], Variable[], quote
                     $(stmts...)
                 end)
 end
 
-export permute
-function permute(inname::Symbol, outname::Symbol, inmap::Mapping, register::Register, simd::SIMD)
-    registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
+################################################################################
+
+function Base.permute!(env::Environment, lhs::Symbol, rhs::Symbol, register::Register, simd::SIMD)
+    rhsmap = env[rhs]
+    @assert lhs ∉ keys(env)
+    inv_rhsmap = inv(rhsmap)
+    simd_dual = inv_rhsmap[simd]
+    register_dual = inv_rhsmap[register]
+    lhsmap = copy(rhsmap)
+    lhsmap[simd_dual] = register
+    lhsmap[register_dual] = simd
+    env[lhs] = lhsmap
+
+    registers = [v.bit for (k, v) in rhsmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
-    simds = [v.bit for (k, v) in inmap.mapping if v isa SIMD]
+    simds = [v.bit for (k, v) in rhsmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
     @assert 0 ≤ register.bit < register_bits
     @assert 0 ≤ simd.bit < simd_bits
+
     stmts = Code[]
     for reg in 0:((1 << register_bits) - 1)
         if reg & (1 << register.bit) == 0
@@ -548,37 +593,44 @@ function permute(inname::Symbol, outname::Symbol, inmap::Mapping, register::Regi
             rname1 = register_bits == 0 ? "" : "$reg1"
             if simd_bits == 3 && simd.bit == 0
                 push!(stmts, quote
-                          $(Symbol(outname, rname0)) = $(get_lo4(Symbol(inname, rname0), Symbol(inname, rname1)))
-                          $(Symbol(outname, rname1)) = $(get_hi4(Symbol(inname, rname0), Symbol(inname, rname1)))
+                          $(Symbol(lhs, rname0)) = $(get_lo4(Symbol(rhs, rname0), Symbol(rhs, rname1)))
+                          $(Symbol(lhs, rname1)) = $(get_hi4(Symbol(rhs, rname0), Symbol(rhs, rname1)))
                       end)
             elseif simd_bits == 3 && simd.bit == 1
                 push!(stmts, quote
-                          $(Symbol(outname, rname0)) = $(get_lo8(Symbol(inname, rname0), Symbol(inname, rname1)))
-                          $(Symbol(outname, rname1)) = $(get_hi8(Symbol(inname, rname0), Symbol(inname, rname1)))
+                          $(Symbol(lhs, rname0)) = $(get_lo8(Symbol(rhs, rname0), Symbol(rhs, rname1)))
+                          $(Symbol(lhs, rname1)) = $(get_hi8(Symbol(rhs, rname0), Symbol(rhs, rname1)))
                       end)
             else
                 error("not implemented")
             end
         end
     end
-    inv_inmap = inv(inmap)
-    simd_dual = inv_inmap[simd]
-    register_dual = inv_inmap[register]
-    outmap = copy(inmap)
-    outmap[simd_dual] = register
-    outmap[register_dual] = simd
-    return Step("Permute Register($(register.bit)) and SIMD($(simd.bit))", inname, outname, inmap, outmap, quote
+
+    return Step("Permute Register($(register.bit)) and SIMD($(simd.bit))", Variable[rhs => rhsmap], Variable[lhs => lhsmap],
+                quote
                     $(stmts...)
                 end)
 end
 
-function permute(inname::Symbol, outname::Symbol, inmap::Mapping, thread::Thread, register::Register)
-    threads = [v.bit for (k, v) in inmap.mapping if v isa Thread]
+function Base.permute!(env::Environment, lhs::Symbol, rhs::Symbol, thread::Thread, register::Register)
+    rhsmap = env[rhs]
+    @assert lhs ∉ keys(env)
+    inv_rhsmap = inv(rhsmap)
+    register_dual = inv_rhsmap[register]
+    thread_dual = inv_rhsmap[thread]
+    lhsmap = copy(rhsmap)
+    lhsmap[register_dual] = thread
+    lhsmap[thread_dual] = register
+    env[lhs] = lhsmap
+
+    threads = [v.bit for (k, v) in rhsmap.mapping if v isa Thread]
     thread_bits = isempty(threads) ? 0 : maximum(threads) + 1
-    registers = [v.bit for (k, v) in inmap.mapping if v isa Register]
+    registers = [v.bit for (k, v) in rhsmap.mapping if v isa Register]
     register_bits = isempty(registers) ? 0 : maximum(registers) + 1
     @assert 0 ≤ thread.bit < thread_bits
     @assert 0 ≤ register.bit < register_bits
+
     stmts = Code[]
     push!(stmts, quote
               mask = $(UInt32(1 << thread.bit))
@@ -593,28 +645,26 @@ function permute(inname::Symbol, outname::Symbol, inmap::Mapping, thread::Thread
             rname0 = register_bits == 0 ? "" : "$reg0"
             rname1 = register_bits == 0 ? "" : "$reg1"
             result = push!(stmts, quote
-                               $(Symbol(outname, rname0)) = $(Symbol(inname, rname0))
-                               $(Symbol(outname, rname1)) = $(Symbol(inname, rname1))
-                               src = isthread1 ? $(Symbol(inname, rname0)) : $(Symbol(inname, rname1))
+                               $(Symbol(lhs, rname0)) = $(Symbol(rhs, rname0))
+                               $(Symbol(lhs, rname1)) = $(Symbol(rhs, rname1))
+                               src = isthread1 ? $(Symbol(rhs, rname0)) : $(Symbol(rhs, rname1))
                                dst = shfl_xor_sync($(~UInt32(0)), src, mask)
                                if isthread1
-                                   $(Symbol(outname, rname0)) = dst
+                                   $(Symbol(lhs, rname0)) = dst
                                else
-                                   $(Symbol(outname, rname1)) = dst
+                                   $(Symbol(lhs, rname1)) = dst
                                end
                            end)
         end
     end
-    inv_inmap = inv(inmap)
-    register_dual = inv_inmap[register]
-    thread_dual = inv_inmap[thread]
-    outmap = copy(inmap)
-    outmap[register_dual] = thread
-    outmap[thread_dual] = register
-    return Step("Permute Thread($(thread.bit)) and Register($(register.bit))", inname, outname, inmap, outmap, quote
+
+    return Step("Permute Thread($(thread.bit)) and Register($(register.bit))", Variable[rhs => rhsmap], Variable[lhs => lhsmap],
+                quote
                     $(stmts...)
                 end)
 end
+
+################################################################################
 
 export wmma
 function wmma(inname_A::Symbol, inname_B::Symbol, inname_C::Symbol, outname_D::Symbol, inmap::Mapping)

@@ -162,28 +162,32 @@ const map_E_shared = Mapping(Dict([Dish(6) => SIMD(0);
 
 ################################################################################
 
-# step_load_A = load(:A_mem, :A_reg, map_A2_global, map_A_registers)
+# env = Environment()
+# 
+# step_load_A = load!(env, :A_reg, map_A_registers, :A_mem, map_A2_global)
 # print(step_load_A)
 # 
-# step_inc = apply(:A_reg, :A_reg′, map_A_register, expr -> :($expr + Int32(1)))
+# step_inc = apply!(env, :A_reg′, :A_reg, expr -> :($expr + Int32(1)))
 # print(step_inc)
 # 
-# step_store_A = store(:A_reg′, :A_mem, map_A_register, map_A2_global)
+# step_store_A = store!(env, :A_reg′, :A_mem, map_A2_global)
 # print(step_store_A)
 # 
 # allsteps = step_load_A |> step_inc |> step_store_A
 
 ################################################################################
 
-step_load_E = load(:E_mem, :E_reg, map_E_global, map_E_registers)
+env = Environment()
+ 
+step_load_E = load!(env, :E_reg, map_E_registers, :E_mem, map_E_global)
 print(step_load_E)
 
-step_shuffle1_E = permute(:E_reg, :E_reg′, outmap(step_load_E), Register(0), SIMD(0))
+step_shuffle1_E = permute!(env, :E_reg′, :E_reg, Register(0), SIMD(0))
 print(step_shuffle1_E)
-step_shuffle2_E = permute(:E_reg′, :E_reg″, outmap(step_shuffle1_E), Register(1), SIMD(1))
+step_shuffle2_E = permute!(env, :E_reg″, :E_reg′, Register(1), SIMD(1))
 print(step_shuffle2_E)
 
-step_store_E = store(:E_reg″, :E_shared, outmap(step_shuffle2_E), map_E_shared)
+step_store_E = store!(env, :E_reg″, :E_shared, map_E_shared)
 print(step_store_E)
 
 allsteps = step_load_E |> step_shuffle1_E |> step_shuffle2_E |> step_store_E
@@ -210,7 +214,7 @@ allsteps = step_load_E |> step_shuffle1_E |> step_shuffle2_E |> step_store_E
 ################################################################################
 
 @eval function runsteps(A_mem, E_mem, E_shared)
-    $(expression(allsteps))
+    $(code(allsteps))
     return nothing
 end
 

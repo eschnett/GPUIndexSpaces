@@ -10,7 +10,7 @@ end
 ################################################################################
 
 @eval function runsteps(A_mem, B_mem, D_mem)
-    # $(expression(allsteps))
+    # $(code(allsteps))
     $(wmma(:a, :b, :c, :d, Mapping(Dict())))
     return nothing
 end

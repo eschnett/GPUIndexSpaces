@@ -18,13 +18,15 @@ memmap = Mapping(Dict(Dish(0) => Memory(0), Dish(1) => Memory(1), Dish(2) => Mem
 
 ################################################################################
 
-step_constant = constant(:r, mapping, :(Int32(42)))
+env = Environment()
+
+step_constant = constant!(env, :r, mapping, :(Int32(42)))
 print(step_constant)
 
-step_assign = assign(:r, :s, mapping)
+step_assign = assign!(env, :s, :r)
 print(step_assign)
 
-step_clamp = apply(:s, :t, mapping, expr -> :(min(Int32(127), max(Int32(-127), $expr))))
+step_clamp = apply!(env, :t, :s, expr -> :(min(Int32(127), max(Int32(-127), $expr))))
 print(step_clamp)
 
 allsteps = step_constant |> step_assign |> step_clamp
@@ -32,17 +34,18 @@ print(allsteps)
 
 ################################################################################
 
-step_load = load(:m, :r, memmap, mapping)
+env = Environment()
+
+step_load = load!(env, :r, mapping, :m, memmap)
 print(step_load)
 
-step_clamp = apply(:r, :s, mapping, expr -> :(min(Int32(127), max(Int32(-127), $expr))))
+step_clamp = apply!(env, :s, :r, expr -> :(min(Int32(127), max(Int32(-127), $expr))))
 print(step_clamp)
 
-step_permute = permute(:s, :t, mapping, Thread(0), Register(0))
+step_permute = permute!(env, :t, :s, Thread(0), Register(0))
 print(step_permute)
-mapping = outmap(step_permute)
 
-step_store = store(:t, :m, mapping, memmap)
+step_store = store!(env, :t, :m, memmap)
 print(step_store)
 
 allsteps = step_load |> step_clamp |> step_permute |> step_store
@@ -51,7 +54,7 @@ print(allsteps)
 ################################################################################
 
 @eval function runsteps(m)
-    $(expression(allsteps))
+    $(code(allsteps))
     return nothing
 end
 
