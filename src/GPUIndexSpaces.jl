@@ -1,5 +1,6 @@
 module GPUIndexSpaces
 
+using LLVM
 using OrderedCollections
 
 ################################################################################
@@ -13,9 +14,37 @@ function make_uint(i::Integer)
     @assert false
 end
 
-# function merge(mask::UInt32, iftrue::UInt32, iffalse::UInt32)
-#     ccall("llvm.nvvm.lop.b32", llvmcall, UInt32, ()))
-# end
+export cuda_lop3
+function cuda_lop3(x::UInt32, y::UInt32, z::UInt32, op::UInt32)
+    LLVM.Interop.@asmcall("lop3.b32 \$0, \$1, \$2, \$3, \$4;", "=r,r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32,UInt32}, x, y, z,
+                          op)
+end
+
+const Int_UInt_8_6_32 = Union{Int8,Int16,Int32,UInt8,UInt16,UInt32}
+function cuda_lop3(x::Int_UInt_8_6_32, y::Int_UInt_8_6_32, z::Int_UInt_8_6_32, op::Int_UInt_8_6_32)
+    return cuda_lop3(x % UInt32, y % UInt32, z % UInt32, op % UInt32)::UInt32
+end
+
+"""
+    r = a & mask | b & ~mask
+
+See <https://forums.developer.nvidia.com/t/reverse-lut-for-lop3-lut/110651>:
+    0x01: ~a & ~b & ~c;
+    0x02: ~a & ~b &  c;
+    0x04: ~a &  b & ~c;
+    0x08: ~a &  b &  c;
+    0x10:  a & ~b & ~c;
+    0x20:  a & ~b &  c;
+    0x40:  a &  b & ~c;
+    0x80:  a &  b &  c;
+
+    a & mask:  0x20 0x80
+    b & ~mask: 0x04 0x40
+    op = 0xe4
+"""
+bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = cuda_lop3(iftrue, iffalse, mask, 0xe4)::UInt32
+bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = cuda_lop3(iftrue, iffalse, mask, 0xe4) % Int32
+export bitwise_merge
 
 ################################################################################
 
@@ -419,48 +448,53 @@ end
 
 ################################################################################
 
+export get_lo4, get_hi4
 const lomask4 = 0x0f0f0f0f
-get_lo4(r0::UInt32, r1::UInt32) = (r0 & lomask4) | ((r1 << 0x04) & ~lomask4)
-get_hi4(r0::UInt32, r1::UInt32) = ((r0 >> 0x04) & lomask4) | (r1 & ~lomask4)
+# get_lo4(r0::UInt32, r1::UInt32) = (r0 & lomask4) | ((r1 << 0x04) & ~lomask4)
+# get_hi4(r0::UInt32, r1::UInt32) = ((r0 >> 0x04) & lomask4) | (r1 & ~lomask4)
+get_lo4(r0::UInt32, r1::UInt32) = bitwise_merge(lomask4, r1 << 0x04, r0)
+get_hi4(r0::UInt32, r1::UInt32) = bitwise_merge(lomask4, r1, r0 >> 0x04)
 get_lo4(r0::Int32, r1::Int32) = get_lo4(r0 % UInt32, r1 % UInt32) % Int32
 get_hi4(r0::Int32, r1::Int32) = get_hi4(r0 % UInt32, r1 % UInt32) % Int32
 
+export get_lo8, get_hi8
 # const lomask8 = 0x00ff00ff
 # get_lo8(r0::UInt32, r1::UInt32) = (r0 & lomask8) | ((r1 << 0x08) & ~lomask8)
 # get_hi8(r0::UInt32, r1::UInt32) = ((r0 >> 0x08) & lomask8) | (r1 & ~lomask8)
 # get_lo8(r0::Int32, r1::Int32) = get_lo8(r0 % UInt32, r1 % UInt32) % Int32
 # get_hi8(r0::Int32, r1::Int32) = get_hi8(r0 % UInt32, r1 % UInt32) % Int32
-get_lo8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x6420)
-get_hi8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x7531)
+get_lo8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x6420 % UInt32) % Int32
+get_hi8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x7531 % UInt32) % Int32
 
+export get_lo16, get_hi16
 # const lomask16 = 0x0000ffff
 # get_lo16(r0::UInt32, r1::UInt32) = (r0 & lomask16) | ((r1 << 0x10) & ~lomask16)
 # get_hi16(r0::UInt32, r1::UInt32) = ((r0 >> 0x10) & lomask16) | (r1 & ~lomask16)
 # get_lo16(r0::Int32, r1::Int32) = get_lo16(r0 % UInt32, r1 % UInt32) % Int32
 # get_hi16(r0::Int32, r1::Int32) = get_hi16(r0 % UInt32, r1 % UInt32) % Int32
-get_lo16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x5410)
-get_hi16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0, r1, 0x7632)
+get_lo16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x5410 % UInt32) % Int32
+get_hi16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x7632 % UInt32) % Int32
 
-# TODO: ES: Each call is translated to 1 shift and 2 logical
-# operations. I think 1 shift and 1 logical operation should suffice.
-get_lo4u(r0::Code, r1::Code) = :(($r0 & $lomask4) | (($r1 << 0x04) & ~$lomask4))
-get_hi4u(r0::Code, r1::Code) = :((($r0 >> 0x04) & $lomask4) | ($r1 & ~$lomask4))
-get_lo4(r0::Code, r1::Code) = :($(get_lo4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-get_hi4(r0::Code, r1::Code) = :($(get_hi4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-
-# get_lo8u(r0::Code, r1::Code) = :(($r0 & $lomask8) | (($r1 << 0x08) & ~$lomask8))
-# get_hi8u(r0::Code, r1::Code) = :((($r0 >> 0x08) & $lomask8) | ($r1 & ~$lomask8))
-# get_lo8(r0::Code, r1::Code) = :($(get_lo8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-# get_hi8(r0::Code, r1::Code) = :($(get_hi8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-get_lo8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
-get_hi8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
-
-# get_lo16u(r0::Code, r1::Code) = :(($r0 & $lomask16) | (($r1 << 0x10) & ~$lomask16))
-# get_hi16u(r0::Code, r1::Code) = :((($r0 >> 0x10) & $lomask16) | ($r1 & ~$lomask16))
-# get_lo16(r0::Code, r1::Code) = :($(get_lo16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-# get_hi16(r0::Code, r1::Code) = :($(get_hi16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-get_lo16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x5410 % UInt32) % Int32)
-get_hi16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7632 % UInt32) % Int32)
+# # TODO: ES: Each call is translated to 1 shift and 2 logical
+# # operations. I think 1 shift and 1 logical operation should suffice.
+# get_lo4u(r0::Code, r1::Code) = :(($r0 & $lomask4) | (($r1 << 0x04) & ~$lomask4))
+# get_hi4u(r0::Code, r1::Code) = :((($r0 >> 0x04) & $lomask4) | ($r1 & ~$lomask4))
+# get_lo4(r0::Code, r1::Code) = :($(get_lo4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+# get_hi4(r0::Code, r1::Code) = :($(get_hi4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+# 
+# # get_lo8u(r0::Code, r1::Code) = :(($r0 & $lomask8) | (($r1 << 0x08) & ~$lomask8))
+# # get_hi8u(r0::Code, r1::Code) = :((($r0 >> 0x08) & $lomask8) | ($r1 & ~$lomask8))
+# # get_lo8(r0::Code, r1::Code) = :($(get_lo8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+# # get_hi8(r0::Code, r1::Code) = :($(get_hi8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+# get_lo8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
+# get_hi8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
+# 
+# # get_lo16u(r0::Code, r1::Code) = :(($r0 & $lomask16) | (($r1 << 0x10) & ~$lomask16))
+# # get_hi16u(r0::Code, r1::Code) = :((($r0 >> 0x10) & $lomask16) | ($r1 & ~$lomask16))
+# # get_lo16(r0::Code, r1::Code) = :($(get_lo16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+# # get_hi16(r0::Code, r1::Code) = :($(get_hi16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
+# get_lo16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x5410 % UInt32) % Int32)
+# get_hi16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7632 % UInt32) % Int32)
 
 struct BitMap
     srcbit::Int
@@ -679,13 +713,13 @@ function Base.permute!(env::Environment, lhs::Symbol, rhs::Symbol, register::Reg
             rname1 = register_bits == 0 ? "" : "$reg1"
             if simd_bits == 3 && simd.bit == 0
                 push!(stmts, quote
-                          $(Symbol(lhs, rname0)) = $(get_lo4(Symbol(rhs, rname0), Symbol(rhs, rname1)))
-                          $(Symbol(lhs, rname1)) = $(get_hi4(Symbol(rhs, rname0), Symbol(rhs, rname1)))
+                          $(Symbol(lhs, rname0)) = get_lo4($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
+                          $(Symbol(lhs, rname1)) = get_hi4($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
                       end)
             elseif simd_bits == 3 && simd.bit == 1
                 push!(stmts, quote
-                          $(Symbol(lhs, rname0)) = $(get_lo8(Symbol(rhs, rname0), Symbol(rhs, rname1)))
-                          $(Symbol(lhs, rname1)) = $(get_hi8(Symbol(rhs, rname0), Symbol(rhs, rname1)))
+                          $(Symbol(lhs, rname0)) = get_lo8($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
+                          $(Symbol(lhs, rname1)) = get_hi8($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
                       end)
             else
                 error("not implemented")
@@ -774,15 +808,15 @@ function div2!(env::Environment, y::Symbol, x::Symbol)
                       end)
             elseif simd_bits == 1
                 push!(stmts, quote
-                          $(Symbol(y, rname)) = $(Symbol(x, rname)) >>> 0x01 & 0x7fff7fff | $(Symbol(x, rname)) & 0x80008000
+                          $(Symbol(y, rname)) = bitwise_merge(0x80008000, $(Symbol(x, rname)) >>> 0x01, $(Symbol(x, rname)))
                       end)
             elseif simd_bits == 2
                 push!(stmts, quote
-                          $(Symbol(y, rname)) = $(Symbol(x, rname)) >>> 0x01 & 0x7f7f7f7f | $(Symbol(x, rname)) & 0x80808080
+                          $(Symbol(y, rname)) = bitwise_merge(0x80808080, $(Symbol(x, rname)) >>> 0x01, $(Symbol(x, rname)))
                       end)
             elseif simd_bits == 3
                 push!(stmts, quote
-                          $(Symbol(y, rname)) = $(Symbol(x, rname)) >>> 0x01 & 0x77777777 | $(Symbol(x, rname)) & 0x88888888
+                          $(Symbol(y, rname)) = bitwise_merge(0x88888888, $(Symbol(x, rname)) >>> 0x01, $(Symbol(x, rname)))
                       end)
             else
                 @assert 0
