@@ -13,6 +13,10 @@ function make_uint(i::Integer)
     @assert false
 end
 
+# function merge(mask::UInt32, iftrue::UInt32, iffalse::UInt32)
+#     ccall("llvm.nvvm.lop.b32", llvmcall, UInt32, ()))
+# end
+
 ################################################################################
 
 const SizeT = Int32              # Int32 (faster) or Int64 (for large arrays)
@@ -746,8 +750,53 @@ function Base.permute!(env::Environment, lhs::Symbol, rhs::Symbol, thread::Threa
                 end)
 end
 
-export nodal2modal!
-function nodal2modal!(env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,<:Index})
+export div2!
+function div2!(env::Environment, y::Symbol, x::Symbol)
+    xmap = env[x]
+    @assert y ∉ keys(env)
+
+    ymap = xmap
+    env[y] = ymap
+
+    registers = [v for (k, v) in xmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
+    simds = [v.bit for (k, v) in xmap if v isa SIMD]
+    simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            rname = register_mask == 0 ? "" : "$r"
+
+            if simd_bits == 0
+                push!(stmts, quote
+                          $(Symbol(y, rname)) = $(Symbol(x, rname)) >> 0x01
+                      end)
+            elseif simd_bits == 1
+                push!(stmts, quote
+                          $(Symbol(y, rname)) = $(Symbol(x, rname)) >>> 0x01 & 0x7fff7fff | $(Symbol(x, rname)) & 0x80008000
+                      end)
+            elseif simd_bits == 2
+                push!(stmts, quote
+                          $(Symbol(y, rname)) = $(Symbol(x, rname)) >>> 0x01 & 0x7f7f7f7f | $(Symbol(x, rname)) & 0x80808080
+                      end)
+            elseif simd_bits == 3
+                push!(stmts, quote
+                          $(Symbol(y, rname)) = $(Symbol(x, rname)) >>> 0x01 & 0x77777777 | $(Symbol(x, rname)) & 0x88888888
+                      end)
+            else
+                @assert 0
+            end
+        end
+    end
+
+    return Step("div2", Variable[x => xmap], Variable[y => ymap], quote
+                    $(stmts...)
+                end)
+end
+
+export addsub!
+function addsub!(env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,<:Index})
     xmap = env[x]
     @assert k ∉ keys(env)
 
@@ -776,40 +825,23 @@ function nodal2modal!(env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,
 
                 if simd_bits == 0
                     push!(stmts, quote
-                              $(Symbol(x, rname0, "′")) = $(Symbol(x, rname0)) >> 0x01
-                              $(Symbol(x, rname1, "′")) = $(Symbol(x, rname1)) >> 0x01
-                              $(Symbol(k, rname0)) = $(Symbol(x, rname0, "′")) + $(Symbol(x, rname1, "′"))
-                              $(Symbol(k, rname1)) = $(Symbol(x, rname0, "′")) - $(Symbol(x, rname1, "′"))
+                              $(Symbol(k, rname0)) = $(Symbol(x, rname0)) + $(Symbol(x, rname1))
+                              $(Symbol(k, rname1)) = $(Symbol(x, rname0)) - $(Symbol(x, rname1))
                           end)
                 elseif simd_bits == 1
-                    push!(stmts,
-                          quote
-                              $(Symbol(x, rname0, "′")) = $(Symbol(x, rname0)) >>> 0x01 & 0x7fff7fff |
-                                                          $(Symbol(x, rname0)) & 0x80008000
-                              $(Symbol(x, rname1, "′")) = $(Symbol(x, rname1)) >>> 0x01 & 0x7fff7fff |
-                                                          $(Symbol(x, rname1)) & 0x80008000
-                              $(Symbol(k, rname0)) = $(Symbol(x, rname0, "′")) + $(Symbol(x, rname1, "′"))
-                              $(Symbol(k, rname1)) = $(Symbol(x, rname0, "′")) - $(Symbol(x, rname1, "′"))
+                    push!(stmts, quote
+                              $(Symbol(k, rname0)) = $(Symbol(x, rname0)) + $(Symbol(x, rname1))
+                              $(Symbol(k, rname1)) = $(Symbol(x, rname0)) - $(Symbol(x, rname1))
                           end)
                 elseif simd_bits == 2
-                    push!(stmts,
-                          quote
-                              $(Symbol(x, rname0, "′")) = $(Symbol(x, rname0)) >>> 0x01 & 0x7f7f7f7f |
-                                                          $(Symbol(x, rname0)) & 0x80808080
-                              $(Symbol(x, rname1, "′")) = $(Symbol(x, rname1)) >>> 0x01 & 0x7f7f7f7f |
-                                                          $(Symbol(x, rname1)) & 0x80808080
-                              $(Symbol(k, rname0)) = $(Symbol(x, rname0, "′")) + $(Symbol(x, rname1, "′"))
-                              $(Symbol(k, rname1)) = $(Symbol(x, rname0, "′")) - $(Symbol(x, rname1, "′"))
+                    push!(stmts, quote
+                              $(Symbol(k, rname0)) = $(Symbol(x, rname0)) + $(Symbol(x, rname1))
+                              $(Symbol(k, rname1)) = $(Symbol(x, rname0)) - $(Symbol(x, rname1))
                           end)
                 elseif simd_bits == 3
-                    push!(stmts,
-                          quote
-                              $(Symbol(x, rname0, "′")) = $(Symbol(x, rname0)) >>> 0x01 & 0x77777777 |
-                                                          $(Symbol(x, rname0)) & 0x88888888
-                              $(Symbol(x, rname1, "′")) = $(Symbol(x, rname1)) >>> 0x01 & 0x77777777 |
-                                                          $(Symbol(x, rname1)) & 0x88888888
-                              $(Symbol(k, rname0)) = $(Symbol(x, rname0, "′")) + $(Symbol(x, rname1, "′"))
-                              $(Symbol(k, rname1)) = $(Symbol(x, rname0, "′")) - $(Symbol(x, rname1, "′"))
+                    push!(stmts, quote
+                              $(Symbol(k, rname0)) = $(Symbol(x, rname0)) + $(Symbol(x, rname1))
+                              $(Symbol(k, rname1)) = $(Symbol(x, rname0)) - $(Symbol(x, rname1))
                           end)
                 else
                     @assert 0
@@ -818,7 +850,7 @@ function nodal2modal!(env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,
         end
     end
 
-    return Step("nodal2modal", Variable[x => xmap], Variable[k => kmap], quote
+    return Step("addsub", Variable[x => xmap], Variable[k => kmap], quote
                     $(stmts...)
                 end)
 end
