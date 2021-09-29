@@ -105,7 +105,7 @@ function fourier!(env::Environment, Y::Symbol, A::Symbol, X::Symbol) # cplx::Cpl
     steps = AbstractStep[load!(env, :A, map_A_registers, :A_mem, map_A_memory);
                          load!(env, :X, map_X_registers, :X_mem, map_X_memory);
 
-                         #
+                         # Split inputs
                          split!(env, :Are, :Aim, :A, Cplx(0));
                          div2!(env, :X′, :X)
                          addsub!(env, :Xpm, :X′, Dish(4) => PlMi(0));
@@ -127,11 +127,14 @@ function fourier!(env::Environment, Y::Symbol, A::Symbol, X::Symbol) # cplx::Cpl
                          # Note omitted minus sign
                          wmma_mma_row_col_m16n16k16_s8!(env, :Ymim, :Are, :Xpim, :Y0mim);
 
-                         #
-                         merge!(env, :Yp, :Ypre, :Ypim, Cplx(0) => Register(3))
-                         merge!(env, :Ym, :Ymre, :Ymim, Cplx(0) => Register(3));
-                         merge!(env, :Ypm, :Yp, :Ym, PlMi(0) => Register(4));
-                         addsub!(env, :Y, :Ypm, PlMi(0) => Beam(4));
+                         # Merge output
+                         merge!(env, :Ypmre, :Ypre, :Ymre, PlMi(0) => Register(4));
+                         merge!(env, :Ypmim, :Ypim, :Ymim, PlMi(0) => Register(4));
+                         addsub!(env, :Yre, :Ypmre, PlMi(0) => Beam(4); flipsignsub2=true);
+                         addsub!(env, :Yim, :Ypmim, PlMi(0) => Beam(4));
+                         merge!(env, :Y, :Yre, :Yim, Cplx(0) => Register(3));
+
+                         # Store output
                          store!(env, :Y, :Y_mem, map_Y_memory)]
     return Seq(steps)
 end

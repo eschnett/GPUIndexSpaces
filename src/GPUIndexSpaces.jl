@@ -796,7 +796,7 @@ function div2!(env::Environment, y::Symbol, x::Symbol)
 end
 
 export addsub!
-function addsub!(env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,<:Index})
+function addsub!(env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,<:Index}; flipsignsub2::Bool=false)
     xmap = env[x]
     @assert k ∉ keys(env)
 
@@ -823,25 +823,29 @@ function addsub!(env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,<:Ind
                 rname0 = register_mask == 0 ? "" : "$r0"
                 rname1 = register_mask == 0 ? "" : "$r1"
 
+                addop = :(+)
+                # We allow changing the sign of the second operand of the subtraction
+                subop = flipsignsub2 ? :(+) : :(-)
+
                 if simd_bits == 0
                     push!(stmts, quote
-                              $(Symbol(k, rname0)) = $(Symbol(x, rname0)) + $(Symbol(x, rname1))
-                              $(Symbol(k, rname1)) = $(Symbol(x, rname0)) - $(Symbol(x, rname1))
+                              $(Symbol(k, rname0)) = $addop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
+                              $(Symbol(k, rname1)) = $subop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
                           end)
                 elseif simd_bits == 1
                     push!(stmts, quote
-                              $(Symbol(k, rname0)) = $(Symbol(x, rname0)) + $(Symbol(x, rname1))
-                              $(Symbol(k, rname1)) = $(Symbol(x, rname0)) - $(Symbol(x, rname1))
+                              $(Symbol(k, rname0)) = $addop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
+                              $(Symbol(k, rname1)) = $subop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
                           end)
                 elseif simd_bits == 2
                     push!(stmts, quote
-                              $(Symbol(k, rname0)) = $(Symbol(x, rname0)) + $(Symbol(x, rname1))
-                              $(Symbol(k, rname1)) = $(Symbol(x, rname0)) - $(Symbol(x, rname1))
+                              $(Symbol(k, rname0)) = $addop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
+                              $(Symbol(k, rname1)) = $subop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
                           end)
                 elseif simd_bits == 3
                     push!(stmts, quote
-                              $(Symbol(k, rname0)) = $(Symbol(x, rname0)) + $(Symbol(x, rname1))
-                              $(Symbol(k, rname1)) = $(Symbol(x, rname0)) - $(Symbol(x, rname1))
+                              $(Symbol(k, rname0)) = $addop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
+                              $(Symbol(k, rname1)) = $subop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
                           end)
                 else
                     @assert 0
@@ -851,50 +855,6 @@ function addsub!(env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,<:Ind
     end
 
     return Step("addsub", Variable[x => xmap], Variable[k => kmap], quote
-                    $(stmts...)
-                end)
-end
-
-export modal2nodal!
-function modal2nodal!(env::Environment, x::Symbol, k::Symbol, k2x::Pair{<:Index,<:Index})
-    kmap = env[k]
-    @assert x ∉ keys(env)
-
-    register = kmap[k2x[1]]::Register
-    @assert k2x[2] ∉ keys(kmap)
-
-    xmap = copy(kmap)
-    delete!(xmap, k2x[1])
-    xmap[k2x[2]] = register
-    env[x] = xmap
-
-    registers = [v for (k, v) in kmap if v isa Register]
-    register_mask = sum(UInt[1 << reg.bit for reg in registers])
-    simds = [v.bit for (k, v) in kmap if v isa SIMD]
-    simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
-    @assert (1 << register.bit) & register_mask ≠ 0
-    @assert simd_bits == 0
-
-    stmts = Code[]
-    for r in 0:register_mask
-        if r & ~register_mask == 0
-            if r & 1 << register.bit == 0
-                r0 = r
-                r1 = r | 1 << register.bit
-                rname0 = register_mask == 0 ? "" : "$r0"
-                rname1 = register_mask == 0 ? "" : "$r1"
-
-                # op = r & 1 << (kmap[Cplx(0)]::Register).bit == 0 ? :+ : :-
-
-                push!(stmts, quote
-                          $(Symbol(x, rname0)) = $(Symbol(k, rname0)) + $(Symbol(k, rname1))
-                          $(Symbol(x, rname1)) = $(Symbol(k, rname0)) - $(Symbol(k, rname1))
-                      end)
-            end
-        end
-    end
-
-    return Step("modal2nodal", Variable[k => kmap], Variable[x => xmap], quote
                     $(stmts...)
                 end)
 end
