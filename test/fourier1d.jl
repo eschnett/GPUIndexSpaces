@@ -113,26 +113,24 @@ function fourier!(env::Environment, Y::Symbol, A::Symbol, X::Symbol) # cplx::Cpl
                          split!(env, :Xpre, :Xpim, :Xp, Cplx(0));
                          split!(env, :Xmre, :Xmim, :Xm, Cplx(0));
 
-                         # Real part of FT
+                         # Y-plus
                          constant!(env, :Y0pre, map_Ypre_registers, 0);
                          wmma_mma_row_col_m16n16k16_s8!(env, :Ypre, :Are, :Xpre, :Y0pre);
-                         constant!(env, :Y0mre, map_Ypre_registers, 0);
-                         # Note omitted minus sign
-                         wmma_mma_row_col_m16n16k16_s8!(env, :Ymre, :Aim, :Xpim, :Y0mre);
-
-                         # Imaginary part of FT
                          constant!(env, :Y0pim, map_Ypre_registers, 0);
-                         wmma_mma_row_col_m16n16k16_s8!(env, :Ypim, :Aim, :Xpre, :Y0pim);
+                         wmma_mma_row_col_m16n16k16_s8!(env, :Ypim, :Are, :Xpim, :Y0pim);
+
+                         # Y-minus
+                         constant!(env, :Y0mre, map_Ypre_registers, 0);
+                         wmma_mma_row_col_m16n16k16_s8!(env, :Ymre′, :Aim, :Xmim, :Y0mre);
+                         apply!(env, :Ymre, :Ymre′, expr -> :(-$expr));
                          constant!(env, :Y0mim, map_Ypre_registers, 0);
-                         # Note omitted minus sign
-                         wmma_mma_row_col_m16n16k16_s8!(env, :Ymim, :Are, :Xpim, :Y0mim);
+                         wmma_mma_row_col_m16n16k16_s8!(env, :Ymim, :Aim, :Xmre, :Y0mim);
 
                          # Merge output
-                         merge!(env, :Ypmre, :Ypre, :Ymre, PlMi(0) => Register(4));
-                         merge!(env, :Ypmim, :Ypim, :Ymim, PlMi(0) => Register(4));
-                         addsub!(env, :Yre, :Ypmre, PlMi(0) => Beam(4); flipsignsub2=true);
-                         addsub!(env, :Yim, :Ypmim, PlMi(0) => Beam(4));
-                         merge!(env, :Y, :Yre, :Yim, Cplx(0) => Register(3));
+                         merge!(env, :Yp, :Ypre, :Ypim, Cplx(0) => Register(3));
+                         merge!(env, :Ym, :Ymre, :Ymim, Cplx(0) => Register(3));
+                         merge!(env, :Ypm, :Yp, :Ym, PlMi(0) => Register(4));
+                         addsub!(env, :Y, :Ypm, PlMi(0) => Beam(4));
 
                          # Store output
                          store!(env, :Y, :Y_mem, map_Y_memory)]
@@ -160,7 +158,9 @@ function runcuda()
     A_mem = CuArray(A_mem)
     X_mem = CuArray(X_mem)
     Y_mem = CuArray{Int32}(undef, 2^10)
-    @cuda blocks = 1 threads = (32, 1) runsteps(A_mem, X_mem, Y_mem)
+    # kernel = @cuda blocks = 1 threads = (32, 1) maxregs=32 launch=false runsteps(A_mem, X_mem, Y_mem)
+    kernel = @cuda launch = false maxregs = 32 runsteps(A_mem, X_mem, Y_mem)
+    kernel(A_mem, X_mem, Y_mem; threads=(32, 1), blocks=1)
     synchronize()
     Y_mem = Array(Y_mem)
     println(Y_mem .% UInt32)

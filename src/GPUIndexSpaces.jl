@@ -5,6 +5,8 @@ using OrderedCollections
 
 ################################################################################
 
+const Code = Union{Expr,Number,Symbol}
+
 function make_uint(i::Integer)
     @assert i ≥ 0
     i ≤ typemax(UInt8) && return UInt8(i)
@@ -23,6 +25,11 @@ end
 const Int_UInt_8_6_32 = Union{Int8,Int16,Int32,UInt8,UInt16,UInt32}
 function cuda_lop3(x::Int_UInt_8_6_32, y::Int_UInt_8_6_32, z::Int_UInt_8_6_32, op::Int_UInt_8_6_32)
     return cuda_lop3(x % UInt32, y % UInt32, z % UInt32, op % UInt32)::UInt32
+end
+
+function cuda_lop3(x::Code, y::Code, z::Code, op::Int_UInt_8_6_32)
+    return :(LLVM.Interop.@asmcall("lop3.b32 \$0, \$1, \$2, \$3, \$4;", "=r,r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32,UInt32},
+                                   $x % UInt32, $y % UInt32, $z % UInt32, $(op % UInt32)))
 end
 
 """
@@ -45,6 +52,8 @@ See <https://forums.developer.nvidia.com/t/reverse-lut-for-lop3-lut/110651>:
 bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = cuda_lop3(iftrue, iffalse, mask, 0xe4)::UInt32
 bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = cuda_lop3(iftrue, iffalse, mask, 0xe4) % Int32
 export bitwise_merge
+
+bitwise_merge(mask::Code, iffalse::Code, iftrue::Code) = :(cuda_lop3($iftrue, $iffalse, $mask, 0xe4)::UInt32)
 
 ################################################################################
 
@@ -129,8 +138,6 @@ const Environment = Dict{Symbol,Mapping}
 # end
 
 ################################################################################
-
-const Code = Union{Expr,Number,Symbol}
 
 # # See <https://discourse.julialang.org/t/code-generation-unnecessary-comment-lines-when-using-quote/398/2>
 # filter_out_lineno(x) = x
@@ -246,25 +253,52 @@ Base.:|>(step1::AbstractStep, step2::AbstractStep) = Seq([step1, step2])
 
 ################################################################################
 
-get_int8_0(x::Int32) = x % Int8
-get_int8_1(x::Int32) = (x >>> 8) % Int8
-get_int8_2(x::Int32) = (x >>> 16) % Int8
-get_int8_3(x::Int32) = (x >>> 24) % Int8
-
-function assemble_int8(x0::Int8, x1::Int8, x2::Int8, x3::Int8)
-    return ((x0 % UInt8 % UInt32) | ((x1 % UInt8 % UInt32) << 8) | ((x2 % UInt8 % UInt32) << 16) | ((x3 % UInt8 % UInt32) << 32)) %
-           Int32
+export sync_threads!
+function sync_threads!(env::Environment)
+    return Step("sync_threads", Variable[], Variable[], quote
+                    sync_threads()
+                end)
 end
+
+################################################################################
+
+function assemble_int4(x0::Code, x1::Code, x2::Code, x3::Code, x4::Code, x5::Code, x6::Code, x7::Code)
+    return :((($x0 % Int8) & 0x0000000f |
+              (($x1 % Int8) << 0x04) & 0x000000f0 |
+              (($x2 % Int8) << 0x08) & 0x00000f00 |
+              (($x3 % Int8) << 0x0c) & 0x0000f000 |
+              (($x4 % Int8) << 0x10) & 0x000f0000 |
+              (($x5 % Int8) << 0x14) & 0x00f00000 |
+              (($x6 % Int8) << 0x18) & 0x0f000000 |
+              (($x7 % Int8) << 0x1c) & 0xf0000000) % Int32)
+end
+
+# get_int8_0(x::Int32) = x % Int8
+# get_int8_1(x::Int32) = (x >>> 8) % Int8
+# get_int8_2(x::Int32) = (x >>> 16) % Int8
+# get_int8_3(x::Int32) = (x >>> 24) % Int8
+
+# function assemble_int8(x0::Int8, x1::Int8, x2::Int8, x3::Int8)
+#     return ((x0 % UInt8 % UInt32) | ((x1 % UInt8 % UInt32) << 8) | ((x2 % UInt8 % UInt32) << 16) | ((x3 % UInt8 % UInt32) << 32)) %
+#            Int32
+# end
 
 function assemble_int8(x0::Code, x1::Code, x2::Code, x3::Code)
-    return :((($x0 % UInt8 % UInt32) | ($x1 % UInt8 % UInt32) << 8 | ($x2 % UInt8 % UInt32) << 16 | ($x3 % UInt8 % UInt32) << 32) %
-             Int32)
+    return :((($x0 % Int8) & 0x000000ff |
+              (($x1 % Int8) << 0x08) & 0x0000ff00 |
+              (($x2 % Int8) << 0x10) & 0x00ff0000 |
+              (($x3 % Int8) << 0x18) & 0xff000000) % Int32)
 end
 
-get_int16_0(x::Int32) = x % Int16
-get_int16_1(x::Int32) = (x >>> 16) % Int16
+# get_int16_0(x::Int32) = x % Int16
+# get_int16_1(x::Int32) = (x >>> 16) % Int16
+# 
 
-assemble_int16(x0::Int16, x1::Int16) = ((x0 % UInt16 % UInt32) | ((x1 % UInt16 % UInt32) << 16)) % Int32
+# assemble_int16(x0::Int16, x1::Int16) = ((x0 % UInt16 % UInt32) | ((x1 % UInt16 % UInt32) << 16)) % Int32
+
+function assemble_int16(x0::Code, x1::Code)
+    return :((($x0 % Int16) & 0x0000ffff | (($x1 % Int16) << 0x10) & 0xffff0000) % Int32)
+end
 
 export constant!
 function constant!(env::Environment, lhs::Symbol, lhsmap::Mapping, value::Code)
@@ -287,6 +321,8 @@ function constant!(env::Environment, lhs::Symbol, lhsmap::Mapping, value::Code)
                 push!(stmts, :($lhsname = $(assemble_int16(value, value))))
             elseif simd_bits == 2
                 push!(stmts, :($lhsname = $(assemble_int8(value, value, value, value))))
+            elseif simd_bits == 3
+                push!(stmts, :($lhsname = $(assemble_int4(value, value, value, value, value, value, value, value))))
             else
                 @assert false
             end
@@ -448,54 +484,6 @@ end
 
 ################################################################################
 
-export get_lo4, get_hi4
-const lomask4 = 0x0f0f0f0f
-# get_lo4(r0::UInt32, r1::UInt32) = (r0 & lomask4) | ((r1 << 0x04) & ~lomask4)
-# get_hi4(r0::UInt32, r1::UInt32) = ((r0 >> 0x04) & lomask4) | (r1 & ~lomask4)
-get_lo4(r0::UInt32, r1::UInt32) = bitwise_merge(lomask4, r1 << 0x04, r0)
-get_hi4(r0::UInt32, r1::UInt32) = bitwise_merge(lomask4, r1, r0 >> 0x04)
-get_lo4(r0::Int32, r1::Int32) = get_lo4(r0 % UInt32, r1 % UInt32) % Int32
-get_hi4(r0::Int32, r1::Int32) = get_hi4(r0 % UInt32, r1 % UInt32) % Int32
-
-export get_lo8, get_hi8
-# const lomask8 = 0x00ff00ff
-# get_lo8(r0::UInt32, r1::UInt32) = (r0 & lomask8) | ((r1 << 0x08) & ~lomask8)
-# get_hi8(r0::UInt32, r1::UInt32) = ((r0 >> 0x08) & lomask8) | (r1 & ~lomask8)
-# get_lo8(r0::Int32, r1::Int32) = get_lo8(r0 % UInt32, r1 % UInt32) % Int32
-# get_hi8(r0::Int32, r1::Int32) = get_hi8(r0 % UInt32, r1 % UInt32) % Int32
-get_lo8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x6420 % UInt32) % Int32
-get_hi8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x7531 % UInt32) % Int32
-
-export get_lo16, get_hi16
-# const lomask16 = 0x0000ffff
-# get_lo16(r0::UInt32, r1::UInt32) = (r0 & lomask16) | ((r1 << 0x10) & ~lomask16)
-# get_hi16(r0::UInt32, r1::UInt32) = ((r0 >> 0x10) & lomask16) | (r1 & ~lomask16)
-# get_lo16(r0::Int32, r1::Int32) = get_lo16(r0 % UInt32, r1 % UInt32) % Int32
-# get_hi16(r0::Int32, r1::Int32) = get_hi16(r0 % UInt32, r1 % UInt32) % Int32
-get_lo16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x5410 % UInt32) % Int32
-get_hi16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x7632 % UInt32) % Int32
-
-# # TODO: ES: Each call is translated to 1 shift and 2 logical
-# # operations. I think 1 shift and 1 logical operation should suffice.
-# get_lo4u(r0::Code, r1::Code) = :(($r0 & $lomask4) | (($r1 << 0x04) & ~$lomask4))
-# get_hi4u(r0::Code, r1::Code) = :((($r0 >> 0x04) & $lomask4) | ($r1 & ~$lomask4))
-# get_lo4(r0::Code, r1::Code) = :($(get_lo4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-# get_hi4(r0::Code, r1::Code) = :($(get_hi4u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-# 
-# # get_lo8u(r0::Code, r1::Code) = :(($r0 & $lomask8) | (($r1 << 0x08) & ~$lomask8))
-# # get_hi8u(r0::Code, r1::Code) = :((($r0 >> 0x08) & $lomask8) | ($r1 & ~$lomask8))
-# # get_lo8(r0::Code, r1::Code) = :($(get_lo8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-# # get_hi8(r0::Code, r1::Code) = :($(get_hi8u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-# get_lo8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
-# get_hi8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
-# 
-# # get_lo16u(r0::Code, r1::Code) = :(($r0 & $lomask16) | (($r1 << 0x10) & ~$lomask16))
-# # get_hi16u(r0::Code, r1::Code) = :((($r0 >> 0x10) & $lomask16) | ($r1 & ~$lomask16))
-# # get_lo16(r0::Code, r1::Code) = :($(get_lo16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-# # get_hi16(r0::Code, r1::Code) = :($(get_hi16u(:($r0 % UInt32), :($r1 % UInt32))) % Int32)
-# get_lo16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x5410 % UInt32) % Int32)
-# get_hi16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7632 % UInt32) % Int32)
-
 struct BitMap
     srcbit::Int
     dstbit::Int
@@ -620,7 +608,8 @@ function load!(env::Environment, lhs::Symbol, lhsmap::Mapping, mem::Symbol, memm
 end
 
 export store!
-function store!(env::Environment, rhs::Symbol, mem::Symbol, memmap::Mapping)
+function store!(env::Environment, rhs::Symbol, mem::Symbol, memmap::Mapping; ignore::Set{<:Index}=Set{Index}(),
+                offset::Code=Int32(0))
     rhsmap = env[rhs]
 
     blocks = [v for (k, v) in rhsmap.mapping if v isa Block]
@@ -640,7 +629,8 @@ function store!(env::Environment, rhs::Symbol, mem::Symbol, memmap::Mapping)
     all_simd_bits_equal = Dict(k => v for (k, v) in rhsmap.mapping if v isa SIMD) ==
                           Dict(k => v for (k, v) in memmap.mapping if v isa SIMD)
 
-    mem_inv_rhsmap = memmap ∘ inv(rhsmap)
+    inv_rhsmap = inv(rhsmap)
+    # mem_inv_rhsmap = memmap ∘ inv_rhsmap
 
     stmts = Code[]
     for r in 0:register_mask
@@ -652,15 +642,22 @@ function store!(env::Environment, rhs::Symbol, mem::Symbol, memmap::Mapping)
                 # TODO: This assumes a memory layout in `int`s, not bytes
                 # TODO: Check for bank conflicts
                 push!(expressions,
-                      movebits(:((blockIdx().x - 1) % $SizeT), [BitMap(bl.bit, (mem_inv_rhsmap[bl]::Memory).bit) for bl in blocks],
+                      movebits(:((blockIdx().x - 1) % $SizeT),
+                               [BitMap(bl.bit, (memmap[inv_rhsmap[bl]]::Memory).bit) for bl in blocks if inv_rhsmap[bl] ∉ ignore],
                                block_mask))
                 push!(expressions,
-                      movebits(:((threadIdx().y - 1) % $SizeT), [BitMap(wr.bit, (mem_inv_rhsmap[wr]::Memory).bit) for wr in warps],
+                      movebits(:((threadIdx().y - 1) % $SizeT),
+                               [BitMap(wr.bit, (memmap[inv_rhsmap[wr]]::Memory).bit) for wr in warps if inv_rhsmap[wr] ∉ ignore],
                                warp_mask))
                 push!(expressions,
                       movebits(:((threadIdx().x - 1) % $SizeT),
-                               [BitMap(thr.bit, (mem_inv_rhsmap[thr]::Memory).bit) for thr in threads], thread_mask))
-                push!(expressions, movebits(SizeT(r), [BitMap(reg.bit, (mem_inv_rhsmap[reg]::Memory).bit) for reg in registers]))
+                               [BitMap(thr.bit, (memmap[inv_rhsmap[thr]]::Memory).bit)
+                                for thr in threads if inv_rhsmap[thr] ∉ ignore], thread_mask))
+                push!(expressions,
+                      movebits(SizeT(r),
+                               [BitMap(reg.bit, (memmap[inv_rhsmap[reg]]::Memory).bit)
+                                for reg in registers if inv_rhsmap[reg] ∉ ignore]))
+                push!(expressions, offset)
                 @assert !isempty(expressions)
                 filter!(≠(0), expressions)
                 if length(expressions) == 0
@@ -686,6 +683,40 @@ end
 
 ################################################################################
 
+# const lomask4 = 0x0f0f0f0f
+# get_lo4(r0::UInt32, r1::UInt32) = (r0 & lomask4) | ((r1 << 0x04) & ~lomask4)
+# get_hi4(r0::UInt32, r1::UInt32) = ((r0 >> 0x04) & lomask4) | (r1 & ~lomask4)
+# get_lo4(r0::UInt32, r1::UInt32) = bitwise_merge(lomask4, r1 << 0x04, r0)
+# get_hi4(r0::UInt32, r1::UInt32) = bitwise_merge(lomask4, r1, r0 >> 0x04)
+# get_lo4(r0::Int32, r1::Int32) = get_lo4(r0 % UInt32, r1 % UInt32) % Int32
+# get_hi4(r0::Int32, r1::Int32) = get_hi4(r0 % UInt32, r1 % UInt32) % Int32
+
+# const lomask8 = 0x00ff00ff
+# get_lo8(r0::UInt32, r1::UInt32) = (r0 & lomask8) | ((r1 << 0x08) & ~lomask8)
+# get_hi8(r0::UInt32, r1::UInt32) = ((r0 >> 0x08) & lomask8) | (r1 & ~lomask8)
+# get_lo8(r0::Int32, r1::Int32) = get_lo8(r0 % UInt32, r1 % UInt32) % Int32
+# get_hi8(r0::Int32, r1::Int32) = get_hi8(r0 % UInt32, r1 % UInt32) % Int32
+# get_lo8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x6420 % UInt32) % Int32
+# get_hi8(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x7531 % UInt32) % Int32
+
+# const lomask16 = 0x0000ffff
+# get_lo16(r0::UInt32, r1::UInt32) = (r0 & lomask16) | ((r1 << 0x10) & ~lomask16)
+# get_hi16(r0::UInt32, r1::UInt32) = ((r0 >> 0x10) & lomask16) | (r1 & ~lomask16)
+# get_lo16(r0::Int32, r1::Int32) = get_lo16(r0 % UInt32, r1 % UInt32) % Int32
+# get_hi16(r0::Int32, r1::Int32) = get_hi16(r0 % UInt32, r1 % UInt32) % Int32
+# get_lo16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x5410 % UInt32) % Int32
+# get_hi16(r0::Int32, r1::Int32) = CUDA.byte_perm(r0 % UInt32, r1 % UInt32, 0x7632 % UInt32) % Int32
+
+const lomask4 = 0x0f0f0f0f
+get_lo4(r0::Code, r1::Code) = :($(bitwise_merge(lomask4, :($r1 << 0x04), r0)) % Int32)
+get_hi4(r0::Code, r1::Code) = :($(bitwise_merge(lomask4, r1, :($r0 >>> 0x04))) % Int32)
+
+get_lo8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
+get_hi8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
+
+get_lo16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x5410 % UInt32) % Int32)
+get_hi16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7632 % UInt32) % Int32)
+
 function Base.permute!(env::Environment, lhs::Symbol, rhs::Symbol, register::Register, simd::SIMD)
     rhsmap = env[rhs]
     @assert lhs ∉ keys(env)
@@ -698,31 +729,38 @@ function Base.permute!(env::Environment, lhs::Symbol, rhs::Symbol, register::Reg
     env[lhs] = lhsmap
 
     registers = [v for (k, v) in rhsmap.mapping if v isa Register]
-    register_bits = isempty(registers) ? 0 : maximum(registers) + 1
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
     simds = [v.bit for (k, v) in rhsmap.mapping if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
-    @assert 0 ≤ register.bit < register_bits
+    @assert (1 << register.bit) & register_mask ≠ 0
     @assert 0 ≤ simd.bit < simd_bits
 
     stmts = Code[]
-    for reg in 0:((1 << register_bits) - 1)
-        if reg & (1 << register.bit) == 0
-            reg0 = reg
-            reg1 = reg | (1 << register.bit)
-            rname0 = register_bits == 0 ? "" : "$reg0"
-            rname1 = register_bits == 0 ? "" : "$reg1"
-            if simd_bits == 3 && simd.bit == 0
-                push!(stmts, quote
-                          $(Symbol(lhs, rname0)) = get_lo4($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                          $(Symbol(lhs, rname1)) = get_hi4($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                      end)
-            elseif simd_bits == 3 && simd.bit == 1
-                push!(stmts, quote
-                          $(Symbol(lhs, rname0)) = get_lo8($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                          $(Symbol(lhs, rname1)) = get_hi8($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                      end)
-            else
-                error("not implemented")
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            if r & (1 << register.bit) == 0
+                r0 = r
+                r1 = r | (1 << register.bit)
+                rname0 = register_mask == 0 ? "" : "$r0"
+                rname1 = register_mask == 0 ? "" : "$r1"
+                if simd_bits == 3 && simd.bit == 0
+                    push!(stmts, quote
+                              $(Symbol(lhs, rname0)) = $(get_lo4(Symbol(rhs, rname0), Symbol(rhs, rname1)))
+                              $(Symbol(lhs, rname1)) = $(get_hi4(Symbol(rhs, rname0), Symbol(rhs, rname1)))
+                          end)
+                elseif simd_bits == 3 && simd.bit == 1
+                    push!(stmts, quote
+                              $(Symbol(lhs, rname0)) = $(get_lo8(Symbol(rhs, rname0), Symbol(rhs, rname1)))
+                              $(Symbol(lhs, rname1)) = $(get_hi8(Symbol(rhs, rname0), Symbol(rhs, rname1)))
+                          end)
+                elseif simd_bits == 3 && simd.bit == 2
+                    push!(stmts, quote
+                              $(Symbol(lhs, rname0)) = $(get_lo16(Symbol(rhs, rname0), Symbol(rhs, rname1)))
+                              $(Symbol(lhs, rname1)) = $(get_hi16(Symbol(rhs, rname0), Symbol(rhs, rname1)))
+                          end)
+                else
+                    error("not implemented")
+                end
             end
         end
     end
@@ -780,51 +818,6 @@ function Base.permute!(env::Environment, lhs::Symbol, rhs::Symbol, thread::Threa
 
     return Step("Permute Thread($(thread.bit)) and Register($(register.bit))", Variable[rhs => rhsmap], Variable[lhs => lhsmap],
                 quote
-                    $(stmts...)
-                end)
-end
-
-export div2!
-function div2!(env::Environment, y::Symbol, x::Symbol)
-    xmap = env[x]
-    @assert y ∉ keys(env)
-
-    ymap = xmap
-    env[y] = ymap
-
-    registers = [v for (k, v) in xmap if v isa Register]
-    register_mask = sum(UInt[1 << reg.bit for reg in registers])
-    simds = [v.bit for (k, v) in xmap if v isa SIMD]
-    simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
-
-    stmts = Code[]
-    for r in 0:register_mask
-        if r & ~register_mask == 0
-            rname = register_mask == 0 ? "" : "$r"
-
-            if simd_bits == 0
-                push!(stmts, quote
-                          $(Symbol(y, rname)) = $(Symbol(x, rname)) >> 0x01
-                      end)
-            elseif simd_bits == 1
-                push!(stmts, quote
-                          $(Symbol(y, rname)) = bitwise_merge(0x80008000, $(Symbol(x, rname)) >>> 0x01, $(Symbol(x, rname)))
-                      end)
-            elseif simd_bits == 2
-                push!(stmts, quote
-                          $(Symbol(y, rname)) = bitwise_merge(0x80808080, $(Symbol(x, rname)) >>> 0x01, $(Symbol(x, rname)))
-                      end)
-            elseif simd_bits == 3
-                push!(stmts, quote
-                          $(Symbol(y, rname)) = bitwise_merge(0x88888888, $(Symbol(x, rname)) >>> 0x01, $(Symbol(x, rname)))
-                      end)
-            else
-                @assert 0
-            end
-        end
-    end
-
-    return Step("div2", Variable[x => xmap], Variable[y => ymap], quote
                     $(stmts...)
                 end)
 end
@@ -894,6 +887,91 @@ function addsub!(env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,<:Ind
 end
 
 ################################################################################
+
+export convert_int16_to_int32!
+function convert_int16_to_int32!(env::Environment, ylo::Symbol, yhi::Symbol, x::Symbol)
+    xmap = env[x]
+    @assert ylo ∉ keys(env)
+    @assert yhi ∉ keys(env)
+
+    registers = [v for (k, v) in xmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
+    simds = [v.bit for (k, v) in xmap if v isa SIMD]
+    simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
+
+    @assert simd_bits == 1
+
+    ymap = copy(xmap)
+    delete!(ymap, SIMD(0))
+    env[ylo] = ymap
+    env[yhi] = ymap
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            rname = register_mask == 0 ? "" : "$r"
+
+            push!(stmts, quote
+                      $(Symbol(ylo, rname)) = $(Symbol(x, rname)) % Int16 % Int32
+                      $(Symbol(yhi, rname)) = ($(Symbol(x, rname)) % Int32) >> 0x10
+                  end)
+        end
+    end
+
+    return Step("convert_int16_to_int32", Variable[x => xmap], Variable[ylo => ymap, yhi => ymap], quote
+                    $(stmts...)
+                end)
+end
+
+################################################################################
+
+export div2!
+function div2!(env::Environment, y::Symbol, x::Symbol)
+    xmap = env[x]
+    @assert y ∉ keys(env)
+
+    ymap = xmap
+    env[y] = ymap
+
+    registers = [v for (k, v) in xmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
+    simds = [v.bit for (k, v) in xmap if v isa SIMD]
+    simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            rname = register_mask == 0 ? "" : "$r"
+
+            if simd_bits == 0
+                push!(stmts, quote
+                          $(Symbol(y, rname)) = $(Symbol(x, rname)) >> 0x01
+                      end)
+            elseif simd_bits == 1
+                push!(stmts,
+                      quote
+                          $(Symbol(y, rname)) = $(bitwise_merge(0x80008000, :($(Symbol(x, rname)) >>> 0x01), Symbol(x, rname)))
+                      end)
+            elseif simd_bits == 2
+                push!(stmts,
+                      quote
+                          $(Symbol(y, rname)) = $(bitwise_merge(0x80808080, :($(Symbol(x, rname)) >>> 0x01), Symbol(x, rname)))
+                      end)
+            elseif simd_bits == 3
+                push!(stmts,
+                      quote
+                          $(Symbol(y, rname)) = $(bitwise_merge(0x88888888, :($(Symbol(x, rname)) >>> 0x01), Symbol(x, rname)))
+                      end)
+            else
+                @assert 0
+            end
+        end
+    end
+
+    return Step("div2", Variable[x => xmap], Variable[y => ymap], quote
+                    $(stmts...)
+                end)
+end
 
 export wmma_mma_row_col_m16n16k16_s8!
 function wmma_mma_row_col_m16n16k16_s8!(env::Environment, D::Symbol, A::Symbol, B::Symbol, C::Symbol)
