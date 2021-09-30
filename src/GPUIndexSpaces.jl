@@ -156,24 +156,26 @@ abstract type AbstractStep end
 description(::AbstractStep) = error("undefined")
 invars(::AbstractStep) = error("undefined")
 outvars(::AbstractStep) = error("undefined")
+unusedsymbols(::AbstractStep) = error("undefined")
 code(::AbstractStep) = error("undefined")
 
 function Base.show(io::IO, step::AbstractStep)
     println(io, "# $(description(step))")
-    println(io, "#     Inputs: $(join([var[1] for var in invars(step)], ", "))")
-    for var in invars(step)
+    println(io, "#     Inputs: [$(join(sort!([var[1] for var in invars(step)]), ", "))]")
+    for var in sort(invars(step); by=v -> v[1])
         println(io, "#         $(var[1]):")
         for (k, v) in sort!(OrderedDict(var[2].mapping))
             println(io, "#             $k => $v")
         end
     end
-    println(io, "#     Outputs: $(join([var[1] for var in outvars(step)], ", "))")
-    for var in outvars(step)
+    println(io, "#     Outputs: [$(join(sort!([var[1] for var in outvars(step)]), ", "))]")
+    for var in sort(outvars(step); by=v -> v[1])
         println(io, "#         $(var[1]):")
         for (k, v) in sort!(OrderedDict(var[2].mapping))
             println(io, "#             $k => $v")
         end
     end
+    println(io, "#     Unused: [$(join(sort!(collect(unusedsymbols(step))), ", "))]")
     return println(io, code(step))
 end
 
@@ -187,6 +189,7 @@ end
 description(step::Step) = step.description
 invars(step::Step) = step.invars
 outvars(step::Step) = step.outvars
+unusedsymbols(step::Step) = Set(v[1] for v in step.outvars)
 code(step::Step) = step.code
 
 export Seq
@@ -194,13 +197,16 @@ struct Seq <: AbstractStep
     description::String
     invars::Vector{Variable}
     outvars::Vector{Variable}
+    unusedsymbols::Set{Symbol}
     steps::Vector{AbstractStep}
+
     function Seq(steps::Vector{<:AbstractStep})
         description′ = "{ " * join(description.(steps), "; ") * " }"
         invars′ = Variable[]
         outvars′ = Variable[]
         all_invars = Environment()
         all_outvars = Environment()
+        unusedsymbols′ = Set{Symbol}()
         for step in steps
             this_step_insymbols = Set{Symbol}()
             for invar in invars(step)
@@ -238,13 +244,17 @@ struct Seq <: AbstractStep
                     end
                 end
             end
+            @assert isdisjoint(this_step_insymbols, this_step_outsymbols)
+            setdiff!(unusedsymbols′, this_step_insymbols)
+            union!(unusedsymbols′, unusedsymbols(step))
         end
-        return new(description′, invars′, outvars′, steps)
+        return new(description′, invars′, outvars′, unusedsymbols′, steps)
     end
 end
 description(step::Seq) = step.description
 invars(step::Seq) = step.invars
 outvars(step::Seq) = step.outvars
+unusedsymbols(step::Seq) = step.unusedsymbols
 code(step::Seq) = quote
     $(code.(step.steps)...)
 end
@@ -676,6 +686,7 @@ function store!(env::Environment, rhs::Symbol, mem::Symbol, memmap::Mapping; ign
             end
         end
     end
+    # TODO: If the offset is non-zero, mark it as input
     return Step("Store to memory", [rhs => rhsmap], Variable[], quote
                     $(stmts...)
                 end)

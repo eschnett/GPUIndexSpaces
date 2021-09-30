@@ -172,5 +172,5 @@ if CUDA.functional()
     # @device_code_llvm
     # @device_code_ptx
     # @device_code_sass
-    @device_code_sass runcuda()
+    runcuda()
 end
