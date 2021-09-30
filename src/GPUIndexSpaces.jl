@@ -783,11 +783,11 @@ function Base.permute!(env::Environment, lhs::Symbol, rhs::Symbol, thread::Threa
     env[lhs] = lhsmap
 
     threads = [v for (k, v) in rhsmap.mapping if v isa Thread]
-    thread_bits = isempty(threads) ? 0 : maximum(threads) + 1
+    thread_mask = sum(UInt[1 << thr.bit for thr in threads])
     registers = [v for (k, v) in rhsmap.mapping if v isa Register]
     register_mask = sum(UInt[1 << reg.bit for reg in registers])
-    @assert 0 ≤ thread.bit < thread_bits
-    @assert 0 ≤ register.bit < register_bits
+    @assert (1 << thread.bit) & thread_mask ≠ 0
+    @assert (1 << register.bit) & register_mask ≠ 0
 
     stmts = Code[]
     push!(stmts, quote
@@ -796,23 +796,25 @@ function Base.permute!(env::Environment, lhs::Symbol, rhs::Symbol, thread::Threa
               # Thread 1: exchange register 0
               isthread1 = ((threadIdx().x - 1) % Int32) & mask ≠ 0
           end)
-    for reg in 0:((1 << register_bits) - 1)
-        if reg & (1 << register.bit) == 0
-            reg0 = reg
-            reg1 = reg | (1 << register.bit)
-            rname0 = register_bits == 0 ? "" : "$reg0"
-            rname1 = register_bits == 0 ? "" : "$reg1"
-            result = push!(stmts, quote
-                               $(Symbol(lhs, rname0)) = $(Symbol(rhs, rname0))
-                               $(Symbol(lhs, rname1)) = $(Symbol(rhs, rname1))
-                               src = isthread1 ? $(Symbol(rhs, rname0)) : $(Symbol(rhs, rname1))
-                               dst = shfl_xor_sync($(~UInt32(0)), src, mask)
-                               if isthread1
-                                   $(Symbol(lhs, rname0)) = dst
-                               else
-                                   $(Symbol(lhs, rname1)) = dst
-                               end
-                           end)
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            if r & (1 << register.bit) == 0
+                r0 = r
+                r1 = r | (1 << register.bit)
+                rname0 = register_mask == 0 ? "" : "$r0"
+                rname1 = register_mask == 0 ? "" : "$r1"
+                result = push!(stmts, quote
+                                   $(Symbol(lhs, rname0)) = $(Symbol(rhs, rname0))
+                                   $(Symbol(lhs, rname1)) = $(Symbol(rhs, rname1))
+                                   src = isthread1 ? $(Symbol(rhs, rname0)) : $(Symbol(rhs, rname1))
+                                   dst = shfl_xor_sync($(~UInt32(0)), src, mask)
+                                   if isthread1
+                                       $(Symbol(lhs, rname0)) = dst
+                                   else
+                                       $(Symbol(lhs, rname1)) = dst
+                                   end
+                               end)
+            end
         end
     end
 

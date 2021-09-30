@@ -2,7 +2,7 @@ using CUDA
 using GPUIndexSpaces
 
 function runsteps(mem)
-    mem[4] = bitmerge(mem[1], mem[2], mem[3])
+    mem[4] = bitwise_merge(mem[1], mem[2], mem[3])
     return nothing
 end
 
