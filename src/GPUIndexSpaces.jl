@@ -901,37 +901,136 @@ end
 
 ################################################################################
 
-export convert_int16_to_int32!
-function convert_int16_to_int32!(env::Environment, ylo::Symbol, yhi::Symbol, x::Symbol)
-    xmap = env[x]
-    @assert ylo ∉ keys(env)
-    @assert yhi ∉ keys(env)
+export convert_int4_to_int8!
+function convert_int4_to_int8!(env::Environment, lhs::Symbol, rhs::Symbol, indexmap::Pair{<:Index,<:Index})
+    rhsmap = env[rhs]
 
-    registers = [v for (k, v) in xmap if v isa Register]
+    @assert lhs ∉ keys(env)
+    rhsreg = indexmap[2]::Register
+    lhsmap = copy(rhsmap)
+    @assert indexmap[1] ∉ keys(lhsmap)
+    @assert indexmap[2] ∉ values(lhsmap)
+    lhsmap[indexmap[1]] = indexmap[2]
+
+    registers = [v for (k, v) in rhsmap if v isa Register]
     register_mask = sum(UInt[1 << reg.bit for reg in registers])
-    simds = [v.bit for (k, v) in xmap if v isa SIMD]
+    simds = [v.bit for (k, v) in rhsmap if v isa SIMD]
     simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
 
-    @assert simd_bits == 1
-
-    ymap = copy(xmap)
-    delete!(ymap, SIMD(0))
-    env[ylo] = ymap
-    env[yhi] = ymap
+    @assert (1 << rhsreg.bit) & register_mask ≠ 0
+    @assert simd_bits == 3
+    @assert SIMD(0) ∈ keys(ymap)
+    delete!(lhsmap, SIMD(0))
+    lhsmap = map(k => (v isa SIMD ? SIMD(v.bit - 1) : v) for (k, v) in lhsmap)
+    env[lhs] = lhsmap
 
     stmts = Code[]
     for r in 0:register_mask
         if r & ~register_mask == 0
             rname = register_mask == 0 ? "" : "$r"
 
-            push!(stmts, quote
-                      $(Symbol(ylo, rname)) = $(Symbol(x, rname)) % Int16 % Int32
-                      $(Symbol(yhi, rname)) = ($(Symbol(x, rname)) % Int32) >> 0x10
+            lnamelo = "$r"
+            @assert r & (1 << rhsreg.bit) == 0
+            lnamehi = "$(r | (1 << rhsreg.bit))"
+
+            push!(stmts,
+                  quote
+                      $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) & 0x0f0f0f0f ⊻ 0x08080808 + 0x78787878 ⊻ 0x80808080
+                      $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) >> 0x04) & 0x0f0f0f0f ⊻ 0x08080808 + 0x78787878 ⊻ 0x80808080
                   end)
         end
     end
 
-    return Step("convert_int16_to_int32", Variable[x => xmap], Variable[ylo => ymap, yhi => ymap], quote
+    return Step("convert_int4_to_int8", Variable[rhs => rhsmap], Variable[lhs => lhsmap], quote
+                    $(stmts...)
+                end)
+end
+
+export convert_int8_to_int16!
+function convert_int8_to_int16!(env::Environment, lhs::Symbol, rhs::Symbol, indexmap::Pair{<:Index,<:Index})
+    rhsmap = env[rhs]
+
+    @assert lhs ∉ keys(env)
+    rhsreg = indexmap[2]::Register
+    lhsmap = copy(rhsmap)
+    @assert indexmap[1] ∉ keys(lhsmap)
+    @assert indexmap[2] ∉ values(lhsmap)
+    lhsmap[indexmap[1]] = indexmap[2]
+
+    registers = [v for (k, v) in rhsmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
+    simds = [v.bit for (k, v) in rhsmap if v isa SIMD]
+    simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
+
+    @assert (1 << rhsreg.bit) & register_mask ≠ 0
+    @assert simd_bits == 2
+    @assert SIMD(0) ∈ keys(ymap)
+    delete!(lhsmap, SIMD(0))
+    lhsmap = map(k => (v isa SIMD ? SIMD(v.bit - 1) : v) for (k, v) in lhsmap)
+    env[lhs] = lhsmap
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            rname = register_mask == 0 ? "" : "$r"
+
+            lnamelo = "$r"
+            @assert r & (1 << rhsreg.bit) == 0
+            lnamehi = "$(r | (1 << rhsreg.bit))"
+
+            push!(stmts,
+                  quote
+                      $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) & 0x00ff00ff ⊻ 0x00800080 + 0x7f807f80 ⊻ 0x80008000
+                      $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) >> 0x08) & 0x00ff00ff ⊻ 0x00800080 + 0x7f807f80 ⊻ 0x80008000
+                  end)
+        end
+    end
+
+    return Step("convert_int4_to_int8", Variable[rhs => rhsmap], Variable[lhs => lhsmap], quote
+                    $(stmts...)
+                end)
+end
+
+export convert_int16_to_int32!
+function convert_int16_to_int32!(env::Environment, y::Symbol, x::Symbol, indexmap::Pair{<:Index,<:Index})
+    rhsmap = env[rhs]
+
+    @assert lhs ∉ keys(env)
+    rhsreg = indexmap[2]::Register
+    lhsmap = copy(rhsmap)
+    @assert indexmap[1] ∉ keys(lhsmap)
+    @assert indexmap[2] ∉ values(lhsmap)
+    lhsmap[indexmap[1]] = indexmap[2]
+
+    registers = [v for (k, v) in rhsmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
+    simds = [v.bit for (k, v) in rhsmap if v isa SIMD]
+    simd_bits = isempty(simds) ? 0 : maximum(simds) + 1
+
+    @assert (1 << rhsreg.bit) & register_mask ≠ 0
+    @assert simd_bits == 1
+    @assert SIMD(0) ∈ keys(ymap)
+    delete!(lhsmap, SIMD(0))
+    lhsmap = map(k => (v isa SIMD ? SIMD(v.bit - 1) : v) for (k, v) in lhsmap)
+    env[lhs] = lhsmap
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            rname = register_mask == 0 ? "" : "$r"
+
+            lnamelo = "$r"
+            @assert r & (1 << rhsreg.bit) == 0
+            lnamehi = "$(r | (1 << rhsreg.bit))"
+
+            push!(stmts, quote
+                      $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) % Int16 % Int32
+                      $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) % Int32) >> 0x10
+                  end)
+        end
+    end
+
+    return Step("convert_int16_to_int32", Variable[rhs => rhsmap], Variable[lhs => lhsmap], quote
                     $(stmts...)
                 end)
 end

@@ -101,36 +101,92 @@ const map_E_shared = Mapping(Dict([Cplx(0) => SIMD(0);
                                    Time(1) => Memory(0);
                                    Time(2) => Memory(1)]))
 
-# const map_Ezero_registers = Mapping(Dict([Cplx(0) => SIMD(0);
-#                                           Polr(0) => SIMD(1);
-#                                           DishJ(0) => Thread(2);
-#                                           DishJ(1) => Thread(3);
-#                                           DishJ(2) => Thread(4);
-#                                           DishJ(3) => Register(0);
-#                                           DishJ(4) => Register(1);
-#                                           DishI(0) => Warp(0);
-#                                           DishI(1) => Warp(1);
-#                                           DishI(2) => Warp(2);
-#                                           DishI(3) => Warp(3);
-#                                           DishI(4) => Warp(4);
-#                                           Time(0) => SIMD(2);
-#                                           Time(1) => Thread(0);
-#                                           Time(2) => Thread(1)]))
+# Layout of E to access the shared memory; see (56)
+const map_E′_registers = Mapping(Dict([Cplx(0) => SIMD(0);
+                                       Polr(0) => SIMD(1);
+                                       DishJ(0) => Thread(2);
+                                       DishJ(1) => Thread(3);
+                                       DishJ(2) => Warp(2);
+                                       DishJ(3) => Warp(3);
+                                       DishJ(4) => Warp(4);
+                                       DishI(0) => Register(0);
+                                       DishI(1) => Thread(4);
+                                       DishI(2) => Thread(0);
+                                       DishI(3) => Thread(1);
+                                       DishI(4) => Register(1);
+                                       Time(0) => SIMD(2);
+                                       Time(1) => Warp(0);
+                                       Time(2) => Warp(1)]))
+
+# Layout of Gin in registers; see (60)
+const map_Gin_registers = Mapping(Dict([Cplx(0) => Register(0);
+                                        Polr(0) => Thread(4);
+                                        DishJ(0) => Thread(2);
+                                        DishJ(1) => Thread(3);
+                                        DishJ(2) => Warp(0); #=???=#
+                                        DishJ(3) => Warp(1); #=???=#
+                                        DishJ(4) => Warp(2); #=???=#
+                                        DishI(0) => SIMD(0);
+                                        DishI(1) => SIMD(1);
+                                        DishI(2) => Thread(0);
+                                        DishI(3) => Thread(1);
+                                        DishI(4) => Register(1)]))
+# Layout of Gin in memory
+const map_Gin_memory = Mapping(Dict([Cplx(0) => Memory(5);
+                                     Polr(0) => Memory(4);
+                                     DishJ(0) => Memory(2);
+                                     DishJ(1) => Memory(3);
+                                     DishJ(2) => Memory(7); #=???=#
+                                     DishJ(3) => Memory(8); #=???=#
+                                     DishJ(4) => Memory(9); #=???=#
+                                     DishI(0) => SIMD(0);
+                                     DishI(1) => SIMD(1);
+                                     DishI(2) => Memory(0);
+                                     DishI(3) => Memory(1);
+                                     DishI(4) => Memory(6)]))
 
 ################################################################################
 
+function zero_dishes!(env::Environment)
+    steps = AbstractStep[constant!(env, :Ezero, map_E′_registers, 0);
+                         store!(env, :Ezero, :E_shared, map_E_shared)]
+    return Seq(steps)
+end
+
 function grid_dishes!(env::Environment)
-    steps = AbstractStep[# constant!(env, :Ezero, map_Ezero_registers, 0);
-                         # store!(env, :Ezero, :E_shared, map_E_shared);
-                         # sync_threads!(env);
-                         load!(env, :E, map_E_registers, :E_mem, map_E_global);
+    steps = AbstractStep[load!(env, :E, map_E_registers, :E_mem, map_E_global);
                          permute!(env, :E′, :E, Register(0), SIMD(2));
                          load!(env, :K, map_K_registers, :K_mem, map_K_memory);
-                         convert_int16_to_int32!(env, :Kd0, :Kd1, :K)
+                         convert_int16_to_int32!(env, :Kd, :K, Dish(0) => Register(0))
+                         split!(env, :Kd0, :Kd1, :Kd, Dish(0))
                          split!(env, :E′d0, :E′d1, :E′, Dish(0));
                          store!(env, :E′d0, :E_shared, map_E_shared; ignore=Set(Dish(d) for d in 1:8), offset=:Kd0);
                          store!(env, :E′d1, :E_shared, map_E_shared; ignore=Set(Dish(d) for d in 1:8), offset=:Kd1)]
+    return Seq(steps)
+end
 
+function fourier1!(env::Environment)
+    steps = AbstractStep[
+                         # Load E
+                         load!(env, :E, map_E′_registers, :E_shared, map_E_shared);
+                         convert_int4_to_int8!(env, :E′, :E, SIMD(0) => Register(2));
+
+                         # Load Gin
+                         load!(env, :Gin, map_Gin_registers, :Gin_memory, map_Gin_shared);
+
+                         # Apply gains
+                         # TODO: Use a sparse matrix multiplication instead
+                         convert_int8_to_int32!(env, :Gin″, :Gin);
+                         convert_int8_to_int32!(env, :E″, E′);
+                         split!(env, :Ere, :Eim, :E″, Cplx(0));
+                         split!(env, :Gre, :Gim, :G″, Cplx(0));
+                         apply!(env, :Ẽre, :Gre, :Gim, :Ere, :Eim, (Gre, Gim, Ere, Eim) -> :(($Gre * $Ere - $Gim * $Eim) >> 0x04));
+                         apply!(env, :Ẽim, :Gre, :Gim, :Ere, :Eim, (Gre, Gim, Ere, Eim) -> :(($Gre * $Eim + $Gim * $Ere) >> 0x04));
+                         merge!(env, :Ẽ, :Ẽre, :Ẽim, Cplx(0) => Register(2));
+                         convert_int32_to_int8!(env, :Ẽ, :Ẽ′);
+
+                         # Temporary store
+                         store!(env, :Ẽ′, :Ẽ_shared, map_Ẽ_shared)]
     return Seq(steps)
 end
 
@@ -192,8 +248,10 @@ end
 ################################################################################
 
 env = Environment()
+# allsteps = zero_dishes!(env)
+# allsteps = grid_dishes!(env)
+allsteps = fourier1!(env)
 # allsteps = fourier!(env, :Y, :A, :X)
-allsteps = grid_dishes!(env)
 println(allsteps)
 
 ################################################################################
