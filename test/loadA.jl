@@ -19,178 +19,171 @@ const Time = Index{:Time}
 
 const Dish′ = Index{:Dish′}
 
-const dish_to_dish′ = Mapping(Dict([Dish(0) => Dish′(6);
-                                    Dish(1) => Dish′(7);
-                                    Dish(2) => Dish′(0);
-                                    Dish(3) => Dish′(1);
-                                    Dish(4) => Dish′(2);
-                                    Dish(5) => Dish′(3);
-                                    Dish(6) => Dish′(4);
-                                    Dish(7) => Dish′(5);
-                                    Dish(8) => Dish′(8)]))
+const dish_to_dish′ = Mapping{Index,Index}(Dict([Dish(0) => Dish′(6)
+                                                 Dish(1) => Dish′(7)
+                                                 Dish(2) => Dish′(0)
+                                                 Dish(3) => Dish′(1)
+                                                 Dish(4) => Dish′(2)
+                                                 Dish(5) => Dish′(3)
+                                                 Dish(6) => Dish′(4)
+                                                 Dish(7) => Dish′(5)
+                                                 Dish(8) => Dish′(8)]))
 
 # Layout of A in global memory (original, now unusedd)
-const map_A_global = Mapping(Dict([Complex(0) => SIMD(0);
-                                   Dish(0) => SIMD(1);
-                                   Dish(1) => SIMD(2);
-                                   Dish(2) => Memory(0);
-                                   Dish(3) => Memory(1);
-                                   Dish(4) => Memory(2);
-                                   Dish(5) => Memory(3);
-                                   Dish(6) => Memory(4);
-                                   Dish(7) => Memory(5);
-                                   Dish(8) => Memory(6);
-                                   Beam(0) => Memory(7);
-                                   Beam(1) => Memory(8);
-                                   Beam(2) => Memory(9);
-                                   Beam(3) => Memory(10);
-                                   Beam(4) => Memory(11);
-                                   Beam(5) => Memory(12);
-                                   Beam(6) => Memory(13);
-                                   Frequency(0) => Memory(14);
-                                   Frequency(1) => Memory(15);
-                                   Frequency(2) => Memory(16);
-                                   Frequency(3) => Memory(17)]))
+const map_A_global = Layout(Dict([Complex(0) => SIMD(4)
+                                  Dish(0) => SIMD(3)
+                                  Dish(1) => SIMD(2)
+                                  Dish(2) => Memory(0)
+                                  Dish(3) => Memory(1)
+                                  Dish(4) => Memory(2)
+                                  Dish(5) => Memory(3)
+                                  Dish(6) => Memory(4)
+                                  Dish(7) => Memory(5)
+                                  Dish(8) => Memory(6)
+                                  Beam(0) => Memory(7)
+                                  Beam(1) => Memory(8)
+                                  Beam(2) => Memory(9)
+                                  Beam(3) => Memory(10)
+                                  Beam(4) => Memory(11)
+                                  Beam(5) => Memory(12)
+                                  Beam(6) => Memory(13)
+                                  Frequency(0) => Memory(14)
+                                  Frequency(1) => Memory(15)
+                                  Frequency(2) => Memory(16)
+                                  Frequency(3) => Memory(17)]))
 
 # Layout of A in global memory (improved; rearranged on CPU)
-const map_A2_global = Mapping(Dict([Dish′(0) => SIMD(0);
-                                    Dish′(1) => SIMD(1);
-                                    Dish′(2) => SIMD(2);
-                                    Dish′(3) => Memory(0);
-                                    Dish′(4) => Memory(1);
-                                    Dish′(5) => Memory(2);
-                                    Dish′(6) => Memory(3);
-                                    Dish′(7) => Memory(4);
-                                    Dish′(8) => Memory(5);
-                                    Complex(0) => Memory(6);
-                                    Beam(0) => Memory(7);
-                                    Beam(1) => Memory(8);
-                                    Beam(2) => Memory(9);
-                                    Beam(3) => Memory(10);
-                                    Beam(4) => Memory(11);
-                                    Beam(5) => Memory(12);
-                                    Beam(6) => Memory(13);
-                                    Frequency(0) => Memory(14);
-                                    Frequency(1) => Memory(15);
-                                    Frequency(2) => Memory(16);
-                                    Frequency(3) => Memory(17)]))
+const map_A2_global = Layout(Dict([Dish′(0) => SIMD(4)
+                                   Dish′(1) => SIMD(3)
+                                   Dish′(2) => SIMD(2)
+                                   Dish′(3) => Memory(0)
+                                   Dish′(4) => Memory(1)
+                                   Dish′(5) => Memory(2)
+                                   Dish′(6) => Memory(3)
+                                   Dish′(7) => Memory(4)
+                                   Dish′(8) => Memory(5)
+                                   Complex(0) => Memory(6)
+                                   Beam(0) => Memory(7)
+                                   Beam(1) => Memory(8)
+                                   Beam(2) => Memory(9)
+                                   Beam(3) => Memory(10)
+                                   Beam(4) => Memory(11)
+                                   Beam(5) => Memory(12)
+                                   Beam(6) => Memory(13)
+                                   Frequency(0) => Memory(14)
+                                   Frequency(1) => Memory(15)
+                                   Frequency(2) => Memory(16)
+                                   Frequency(3) => Memory(17)]))
 
 # Layout of A in registers
-const map_A_registers = Mapping(Dict([Dish′(0) => SIMD(0);
-                                      Dish′(1) => SIMD(1);
-                                      Dish′(2) => SIMD(2);
-                                      Dish′(3) => Thread(0);
-                                      Dish′(4) => Thread(1);
-                                      Dish′(5) => Register(0);
-                                      Dish′(6) => Warp(0);
-                                      Dish′(7) => Warp(1);
-                                      Dish′(8) => Warp(2);
-                                      Beam(0) => Thread(2);
-                                      Beam(1) => Thread(3);
-                                      Beam(2) => Thread(4);
-                                      Beam(3) => Warp(3);
-                                      Beam(4) => Warp(4);
-                                      Beam(5) => Register(1);
-                                      Beam(6) => Register(2);
-                                      Complex(0) => Register(3)]))
+const map_A_registers = Layout(Dict([Dish′(0) => SIMD(4)
+                                     Dish′(1) => SIMD(3)
+                                     Dish′(2) => SIMD(2)
+                                     Dish′(3) => Thread(0)
+                                     Dish′(4) => Thread(1)
+                                     Dish′(5) => Register(0)
+                                     Dish′(6) => Warp(0)
+                                     Dish′(7) => Warp(1)
+                                     Dish′(8) => Warp(2)
+                                     Beam(0) => Thread(2)
+                                     Beam(1) => Thread(3)
+                                     Beam(2) => Thread(4)
+                                     Beam(3) => Warp(3)
+                                     Beam(4) => Warp(4)
+                                     Beam(5) => Register(1)
+                                     Beam(6) => Register(2)
+                                     Complex(0) => Register(3)]))
 
 # Layout of E in global memory
-const map_E_global = Mapping(Dict([Complex(0) => SIMD(0);
-                                   Polarization(0) => SIMD(1);
-                                   Dish(0) => SIMD(2);
-                                   Dish(1) => Memory(0);
-                                   Dish(2) => Memory(1);
-                                   Dish(3) => Memory(2);
-                                   Dish(4) => Memory(3);
-                                   Dish(5) => Memory(4);
-                                   Dish(6) => Memory(5);
-                                   Dish(7) => Memory(6);
-                                   Dish(8) => Memory(7);
-                                   Frequency(0) => Memory(8);
-                                   Frequency(1) => Memory(9);
-                                   Frequency(2) => Memory(10);
-                                   Frequency(3) => Memory(11);
-                                   Time(0) => Memory(12);
-                                   Time(1) => Memory(13);
-                                   Time(2) => Memory(14);
-                                   Time(3) => Memory(15);
-                                   Time(4) => Memory(16);
-                                   Time(5) => Memory(17);
-                                   Time(6) => Memory(18);
-                                   Time(7) => Memory(19);
-                                   Time(8) => Memory(20);
-                                   Time(9) => Memory(21);
-                                   Time(10) => Memory(22);
-                                   Time(11) => Memory(23);
-                                   Time(12) => Memory(24);
-                                   Time(13) => Memory(25);
-                                   Time(14) => Memory(26)]))
+const map_E_global = Layout(Dict([Complex(0) => SIMD(4)
+                                  Polarization(0) => SIMD(3)
+                                  Dish(0) => SIMD(2)
+                                  Dish(1) => Memory(0)
+                                  Dish(2) => Memory(1)
+                                  Dish(3) => Memory(2)
+                                  Dish(4) => Memory(3)
+                                  Dish(5) => Memory(4)
+                                  Dish(6) => Memory(5)
+                                  Dish(7) => Memory(6)
+                                  Dish(8) => Memory(7)
+                                  Frequency(0) => Memory(8)
+                                  Frequency(1) => Memory(9)
+                                  Frequency(2) => Memory(10)
+                                  Frequency(3) => Memory(11)
+                                  Time(0) => Memory(12)
+                                  Time(1) => Memory(13)
+                                  Time(2) => Memory(14)
+                                  Time(3) => Memory(15)
+                                  Time(4) => Memory(16)
+                                  Time(5) => Memory(17)
+                                  Time(6) => Memory(18)
+                                  Time(7) => Memory(19)
+                                  Time(8) => Memory(20)
+                                  Time(9) => Memory(21)
+                                  Time(10) => Memory(22)
+                                  Time(11) => Memory(23)
+                                  Time(12) => Memory(24)
+                                  Time(13) => Memory(25)
+                                  Time(14) => Memory(26)]))
 
 # Layout of E in registers
-const map_E_registers = Mapping(Dict([Complex(0) => SIMD(0);
-                                      Polarization(0) => SIMD(1);
-                                      Dish(0) => SIMD(2);
-                                      Dish(1) => Thread(0);
-                                      Dish(2) => Thread(1);
-                                      Dish(3) => Thread(2);
-                                      Dish(4) => Thread(3);
-                                      Dish(5) => Thread(4);
-                                      Dish(6) => Register(0);
-                                      Dish(7) => Register(1);
-                                      Dish(8) => Warp(0);
-                                      Time(0) => Warp(1);
-                                      Time(1) => Warp(2);
-                                      Time(2) => Warp(3);
-                                      Time(3) => Warp(4)]))
+const map_E_registers = Layout(Dict([Complex(0) => SIMD(4)
+                                     Polarization(0) => SIMD(3)
+                                     Dish(0) => SIMD(2)
+                                     Dish(1) => Thread(0)
+                                     Dish(2) => Thread(1)
+                                     Dish(3) => Thread(2)
+                                     Dish(4) => Thread(3)
+                                     Dish(5) => Thread(4)
+                                     Dish(6) => Register(0)
+                                     Dish(7) => Register(1)
+                                     Dish(8) => Warp(0)
+                                     Time(0) => Warp(1)
+                                     Time(1) => Warp(2)
+                                     Time(2) => Warp(3)
+                                     Time(3) => Warp(4)]))
 
 # Layout of E in shared memory
-const map_E_shared = Mapping(Dict([Dish(6) => SIMD(0);
-                                   Dish(7) => SIMD(1);
-                                   Dish(0) => SIMD(2);
-                                   Dish(1) => Memory(0);
-                                   Dish(2) => Memory(1);
-                                   Dish(3) => Memory(2);
-                                   Dish(4) => Memory(3);
-                                   Dish(5) => Memory(4);
-                                   Dish(8) => Memory(5);
-                                   Polarization(0) => Memory(6);
-                                   Time(0) => Memory(7);
-                                   Time(1) => Memory(8);
-                                   Time(2) => Memory(9);
-                                   Time(3) => Memory(10);
-                                   Complex(0) => Memory(11)]))
+const map_E_shared = Layout(Dict([Dish(6) => SIMD(4)
+                                  Dish(7) => SIMD(3)
+                                  Dish(0) => SIMD(2)
+                                  Dish(1) => Memory(0)
+                                  Dish(2) => Memory(1)
+                                  Dish(3) => Memory(2)
+                                  Dish(4) => Memory(3)
+                                  Dish(5) => Memory(4)
+                                  Dish(8) => Memory(5)
+                                  Polarization(0) => Memory(6)
+                                  Time(0) => Memory(7)
+                                  Time(1) => Memory(8)
+                                  Time(2) => Memory(9)
+                                  Time(3) => Memory(10)
+                                  Complex(0) => Memory(11)]))
 
 ################################################################################
 
+# steps = AbstractStep[]
 # env = Environment()
 # 
-# step_load_A = load!(env, :A_reg, map_A_registers, :A_mem, map_A2_global)
-# print(step_load_A)
+# load!(steps, env, :A_reg, map_A_registers, :A_mem, map_A2_global)
+# apply!(steps, env, :A_reg′, :A_reg, expr -> :($expr + Int32(1)))
+# store!(steps, env, :A_reg′, :A_mem, map_A2_global)
 # 
-# step_inc = apply!(env, :A_reg′, :A_reg, expr -> :($expr + Int32(1)))
-# print(step_inc)
-# 
-# step_store_A = store!(env, :A_reg′, :A_mem, map_A2_global)
-# print(step_store_A)
-# 
-# allsteps = step_load_A |> step_inc |> step_store_A
+# allsteps = Seq(steps)
+# println(allsteps)
 
 ################################################################################
 
+steps = AbstractStep[]
 env = Environment()
 
-step_load_E = load!(env, :E_reg, map_E_registers, :E_mem, map_E_global)
-print(step_load_E)
+load!(steps, env, :E_reg, map_E_registers, :E_mem, map_E_global)
+permute!(steps, env, :E_reg′, :E_reg, Register(0), SIMD(4))
+permute!(steps, env, :E_reg″, :E_reg′, Register(1), SIMD(3))
+store!(steps, env, :E_reg″, :E_shared, map_E_shared)
 
-step_shuffle1_E = permute!(env, :E_reg′, :E_reg, Register(0), SIMD(0))
-print(step_shuffle1_E)
-step_shuffle2_E = permute!(env, :E_reg″, :E_reg′, Register(1), SIMD(1))
-print(step_shuffle2_E)
-
-step_store_E = store!(env, :E_reg″, :E_shared, map_E_shared)
-print(step_store_E)
-
-allsteps = step_load_E |> step_shuffle1_E |> step_shuffle2_E |> step_store_E
+allsteps = Seq(steps)
+println(allsteps)
 
 ################################################################################
 
