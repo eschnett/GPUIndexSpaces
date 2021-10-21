@@ -145,24 +145,24 @@ const map_Gin_memory = Layout(Dict([Cplx(0) => Memory(5)
                                     DishI(3) => Memory(1)
                                     DishI(4) => Memory(6)]))
 
-# Layout of Gmid in registers see (70)
-const map_Gmid_registers = Layout(Dict([BeamI(0) => Thread(2)
-                                        BeamI(1) => Thread(3)
-                                        BeamI(2) => Thread(4)
-                                        BeamI(3) => SIMD(3)
-                                        BeamI(4) => SIMD(4)
-                                        # BeamI(5) => Loop(0)
-                                        # BeamI(6) => Loop(1)
-                                        ]))
-# Layout of Gmid in memory
-const map_Gmid_memory = Layout(Dict([BeamI(0) => Memory(0 + 2)
-                                     BeamI(1) => Memory(0 + 3)
-                                     BeamI(2) => Memory(0 + 4)
-                                     BeamI(3) => SIMD(3)
-                                     BeamI(4) => SIMD(4)
-                                     # BeamI(5) => Loop(0)
-                                     # BeamI(6) => Loop(1)
-                                     ]))
+# # Layout of Gmid in registers see (70)
+# const map_Gmid_registers = Layout(Dict([BeamI(0) => Thread(2)
+#                                         BeamI(1) => Thread(3)
+#                                         BeamI(2) => Thread(4)
+#                                         BeamI(3) => SIMD(3)
+#                                         BeamI(4) => SIMD(4)
+#                                         # BeamI(5) => Loop(0)
+#                                         # BeamI(6) => Loop(1)
+#                                         ]))
+# # Layout of Gmid in memory
+# const map_Gmid_memory = Layout(Dict([BeamI(0) => Memory(0 + 2)
+#                                      BeamI(1) => Memory(0 + 3)
+#                                      BeamI(2) => Memory(0 + 4)
+#                                      BeamI(3) => SIMD(3)
+#                                      BeamI(4) => SIMD(4)
+#                                      # BeamI(5) => Loop(0)
+#                                      # BeamI(6) => Loop(1)
+#                                      ]))
 
 # Layout of 1d N-S FT transformation matrix
 const map_Ans_registers = Layout(Dict([DishI(0) => SIMD(3)
@@ -320,6 +320,7 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
     # Apply input gains
     # TODO: Use a sparse matrix tensor core multiplication instead
     # TODO: As alternative, keep values as `int8` and multiply two at a time
+    # TODO: Investigate dp4a and dp2a
     widen2!(steps, env, :Gin1, :Gin0, SIMD(3) => Register(3), SIMD(4) => Register(4))
     widen2!(steps, env, :E5, :E4, SIMD(3) => Register(3), SIMD(4) => Register(4))
     split!(steps, env, :Ginre, :Ginim, :Gin1, Cplx(0))
@@ -374,14 +375,15 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
                         DishJ(1) => Register(2), DishJ(2) => Warp(2), DishJ(3) => Warp(3), DishJ(4) => Warp(4),
                         Time(0) => Thread(0), Time(1) => Warp(0), Time(2) => Warp(1)))
 
-    # Load Gmid
-    load!(steps, env, :Gmid0, map_Gmid_registers, :Gmid_mem, map_Gmid_memory)
+    # # Load Gmid
+    # load!(steps, env, :Gmid0, map_Gmid_registers, :Gmid_mem, map_Gmid_memory)
 
     # Apply midpoint gains
     # TODO: Use a sparse matrix tensor core multiplication instead?
     # TODO: Use vectorized `Float16` multiplication instead?
-    widen2!(steps, env, :Gmid1, :Gmid0, SIMD(3) => Register(1), SIMD(4) => Register(3))
-    apply!(steps, env, :F̃0, :F, :Gmid1, (F, G) -> :(max(-63, min(63, ($F * $G) >> 0x0c))))
+    # widen2!(steps, env, :Gmid1, :Gmid0, SIMD(3) => Register(1), SIMD(4) => Register(3))
+    # apply!(steps, env, :F̃0, :F, :Gmid1, (F, G) -> :(max(-63, min(63, ($F * $G) >> 0x0c))))
+    apply!(steps, env, :F̃0, :F, F -> :(max(-63, min(63, ($F) >> 0x08))))
     narrow2!(steps, env, :F̃1, :F̃0, Register(0) => SIMD(3), Register(2) => SIMD(4))
     move!(steps, env, :F̃2, :F̃1, Register(1) => Register(0))
     move!(steps, env, :F̃3, :F̃2, Register(3) => Register(1))
