@@ -25,3 +25,25 @@ ptxas -arch=sm_86 -m64 zero.ptx -o zero.cubin
 
 fatbinary --create=zero.fatbin -64 --cicc-cmdline='-ftz=1 -prec_div=1 -prec_sqrt=1 -fmad=1' --image3=kind=elf,sm=86,file=zero.cubin --image3=kind=ptx,sm=86,file=zero.ptx --embedded-fatbin=zero.fatbin.c
 ```
+
+## TODO
+
+- Use `cvt.pack` to pack data
+- Calculate cost of tensor core operations (throughput per SM)
+- Midpoint gains are unsigned: don't sign extend during unpacking
+- Maybe apply midpoint gains purely by shifting?
+- Use tensor cores to apply input gains?
+- Output CUDA kernels in C
+
+## HPC system management
+
+- Use Conda for package management on HPC systems
+- Don't install that many Ubuntu system packages; ask people to use
+  Conda instead
+- What about Spack?
+
+## Julia
+
+- Write CPU kernels in Julia
+- Not CUDA -- are there other packages that allow running on CPU?
+  ROCM? A new package? With good multi-threading?
