@@ -96,13 +96,17 @@ bit(i::Target) = i.bit
 
 Base.show(io::IO, i::Target) = print(io, tag(i), "(", bit(i), ")")
 
-export SIMD, Register, Thread, Warp, Block
+export Ignore, SIMD, Register, Thread, Warp, Block, Loop1, Loop2, Loop3, Loop4
+const Ignore = Target{:Ignore}
 const SIMD = Target{:SIMD}
 const Register = Target{:Register}
 const Thread = Target{:Thread}
 const Warp = Target{:Warp}
 const Block = Target{:Block}
-# const Loop = Target{:Loop}
+const Loop1 = Target{:Loop1}
+const Loop2 = Target{:Loop2}
+const Loop3 = Target{:Loop3}
+const Loop4 = Target{:Loop4}
 
 export Memory
 const Memory = Target{:Memory}
@@ -169,17 +173,21 @@ Base.show(io::IO, env::Environment) = showenv(io, env)
 
 ################################################################################
 
-# # See <https://discourse.julialang.org/t/code-generation-unnecessary-comment-lines-when-using-quote/398/2>
-# filter_out_lineno(x) = x
-# filter_out_lineno(::LineNumberNode) = nothing
-# function filter_out_lineno(ex::Expr)
-#     args = []
-#     for arg in ex.args
-#         arg′ = filter_out_lineno(arg)
-#         arg′ ≢ nothing && push!(args, arg′)
-#     end
-#     return Expr(ex.head, args...)
-# end
+# See <https://discourse.julialang.org/t/code-generation-unnecessary-comment-lines-when-using-quote/398/2>
+export filter_out_lineno
+filter_out_lineno(x) = x
+filter_out_lineno(::LineNumberNode) = nothing
+function filter_out_lineno(ex::Expr)
+    args = []
+    for arg in ex.args
+        if arg isa LineNumberNode
+            # do nothing
+        else
+            push!(args, filter_out_lineno(arg))
+        end
+    end
+    return Expr(ex.head, args...)
+end
 
 export AbstractStep, invars, outvars, code
 abstract type AbstractStep end
@@ -206,6 +214,7 @@ function Base.show(io::IO, step::AbstractStep)
         end
     end
     println(io, "#     Unused: [$(join(sort!(collect(unusedsymbols(step))), ", "))]")
+    # println(io, filter_out_lineno(code(step)))
     println(io, code(step))
     return nothing
 end
@@ -296,6 +305,34 @@ end
 
 Base.:|>(step1::AbstractStep, step2::AbstractStep) = Seq([step1, step2])
 
+export Nested
+struct Nested <: AbstractStep
+    description::String
+    var::Symbol
+    range::Expr
+    body::AbstractStep
+end
+description(nested::Nested) = nested.description
+invars(nested::Nested) = invars(nested.body)
+outvars(nested::Nested) = outvars(nested.body)
+unusedsymbols(nested::Nested) = unusedsymbols(nested.body)
+code(nested::Nested) = quote
+    for $(nested.var) in $(nested.range)
+        $(code(nested.body))
+    end
+end
+
+################################################################################
+
+export loop!
+function loop!(makebody, steps::Vector{AbstractStep}, env::Environment, loopVar::Symbol, loopRange::Code,
+               loopIndices::AbstractArray{<:Index})
+    loop_steps = AbstractStep[]
+    makebody(loop_steps, env)
+    push!(steps, Nested("loop", loopVar, loopRange, Seq(loop_steps)))
+    return nothing
+end
+
 ################################################################################
 
 export sync_threads!
@@ -348,7 +385,8 @@ function constant!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, l
             rname = register_mask == 0 ? "" : "_$r"
             lhsname = Symbol(lhs, rname)
             if simd_bits == 0
-                push!(stmts, :($lhsname = $value % Int32))
+                # push!(stmts, :($lhsname = $value % Int32))
+                push!(stmts, :($lhsname = $value))
             elseif simd_bits == 1
                 push!(stmts, :($lhsname = $(assemble_int16(value, value))))
             elseif simd_bits == 2
@@ -636,6 +674,14 @@ function load!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsma
     @assert lhs ∉ keys(env)
     env[lhs] = lhsmap
 
+    loops1 = [v for (k, v) in lhsmap if v isa Loop1]
+    loop1_mask = sum(UInt[1 << lp.bit for lp in loops1])
+    loops2 = [v for (k, v) in lhsmap if v isa Loop2]
+    loop2_mask = sum(UInt[1 << lp.bit for lp in loops2])
+    loops3 = [v for (k, v) in lhsmap if v isa Loop3]
+    loop3_mask = sum(UInt[1 << lp.bit for lp in loops3])
+    loops4 = [v for (k, v) in lhsmap if v isa Loop4]
+    loop4_mask = sum(UInt[1 << lp.bit for lp in loops4])
     blocks = [v for (k, v) in lhsmap if v isa Block]
     block_mask = sum(UInt[1 << bl.bit for bl in blocks])
     warps = [v for (k, v) in lhsmap if v isa Warp]
@@ -664,14 +710,33 @@ function load!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsma
                 # TODO: This assumes a memory layout in `int`s, not bytes
                 # TODO: Check for bank conflicts
                 push!(expressions,
-                      movebits(:((blockIdx().x - 1) % $SizeT), [BitMap(bl.bit, (mem_inv_lhsmap[bl]::Memory).bit) for bl in blocks],
-                               block_mask))
+                      movebits(:(loopIdx4 % $SizeT),
+                               [BitMap(lp.bit, (mem_inv_lhsmap[lp]::Memory).bit)
+                                for lp in loops4 if !(mem_inv_lhsmap[lp] isa Ignore)], loop4_mask))
                 push!(expressions,
-                      movebits(:((threadIdx().y - 1) % $SizeT), [BitMap(wr.bit, (mem_inv_lhsmap[wr]::Memory).bit) for wr in warps],
-                               warp_mask))
+                      movebits(:(loopIdx3 % $SizeT),
+                               [BitMap(lp.bit, (mem_inv_lhsmap[lp]::Memory).bit)
+                                for lp in loops3 if !(mem_inv_lhsmap[lp] isa Ignore)], loop3_mask))
+                push!(expressions,
+                      movebits(:(loopIdx2 % $SizeT),
+                               [BitMap(lp.bit, (mem_inv_lhsmap[lp]::Memory).bit)
+                                for lp in loops2 if !(mem_inv_lhsmap[lp] isa Ignore)], loop2_mask))
+                push!(expressions,
+                      movebits(:(loopIdx1 % $SizeT),
+                               [BitMap(lp.bit, (mem_inv_lhsmap[lp]::Memory).bit)
+                                for lp in loops1 if !(mem_inv_lhsmap[lp] isa Ignore)], loop1_mask))
+                push!(expressions,
+                      movebits(:((blockIdx().x - 1) % $SizeT),
+                               [BitMap(bl.bit, (mem_inv_lhsmap[bl]::Memory).bit)
+                                for bl in blocks if !(mem_inv_lhsmap[bl] isa Ignore)], block_mask))
+                push!(expressions,
+                      movebits(:((threadIdx().y - 1) % $SizeT),
+                               [BitMap(wr.bit, (mem_inv_lhsmap[wr]::Memory).bit)
+                                for wr in warps if !(mem_inv_lhsmap[wr] isa Ignore)], warp_mask))
                 push!(expressions,
                       movebits(:((threadIdx().x - 1) % $SizeT),
-                               [BitMap(thr.bit, (mem_inv_lhsmap[thr]::Memory).bit) for thr in threads], thread_mask))
+                               [BitMap(thr.bit, (mem_inv_lhsmap[thr]::Memory).bit)
+                                for thr in threads if !(mem_inv_lhsmap[thr] isa Ignore)], thread_mask))
                 push!(expressions, movebits(SizeT(r), [BitMap(reg.bit, (mem_inv_lhsmap[reg]::Memory).bit) for reg in registers]))
                 @assert !isempty(expressions)
                 filter!(≠(0), expressions)
@@ -699,10 +764,18 @@ end
 
 export store!
 # TODO: We could introduce a version of `store!` with `ignore::Set{<:Target}`
-function store!(steps::Vector{AbstractStep}, env::Environment, rhs::Symbol, mem::Symbol, memmap::Layout;
+function store!(steps::Vector{AbstractStep}, env::Environment, rhs::Symbol, mem::Symbol, memmap::Layout; operator::Symbol=:(=),
                 ignore::Set{<:Index}=Set{Index}(), offset::Code=Int32(0))
     rhsmap = env[rhs]
 
+    loops1 = [v for (k, v) in rhsmap if v isa Loop1]
+    loop1_mask = sum(UInt[1 << lp.bit for lp in loops1])
+    loops2 = [v for (k, v) in rhsmap if v isa Loop2]
+    loop2_mask = sum(UInt[1 << lp.bit for lp in loops2])
+    loops3 = [v for (k, v) in rhsmap if v isa Loop3]
+    loop3_mask = sum(UInt[1 << lp.bit for lp in loops3])
+    loops4 = [v for (k, v) in rhsmap if v isa Loop4]
+    loop4_mask = sum(UInt[1 << lp.bit for lp in loops4])
     blocks = [v for (k, v) in rhsmap if v isa Block]
     block_mask = sum(UInt[1 << bl.bit for bl in blocks])
     warps = [v for (k, v) in rhsmap if v isa Warp]
@@ -731,21 +804,38 @@ function store!(steps::Vector{AbstractStep}, env::Environment, rhs::Symbol, mem:
                 # TODO: This assumes a memory layout in `int`s, not bytes
                 # TODO: Check for bank conflicts
                 push!(expressions,
+                      movebits(:(loopIdx4 % $SizeT),
+                               [BitMap(lp.bit, (memmap[inv_rhsmap[lp]]::Memory).bit)
+                                for lp in loops4 if inv_rhsmap[lp] ∉ ignore && !(memmap[inv_rhsmap[lp]] isa Ignore)], loop4_mask))
+                push!(expressions,
+                      movebits(:(loopIdx3 % $SizeT),
+                               [BitMap(lp.bit, (memmap[inv_rhsmap[lp]]::Memory).bit)
+                                for lp in loops3 if inv_rhsmap[lp] ∉ ignore && !(memmap[inv_rhsmap[lp]] isa Ignore)], loop3_mask))
+                push!(expressions,
+                      movebits(:(loopIdx2 % $SizeT),
+                               [BitMap(lp.bit, (memmap[inv_rhsmap[lp]]::Memory).bit)
+                                for lp in loops2 if inv_rhsmap[lp] ∉ ignore && !(memmap[inv_rhsmap[lp]] isa Ignore)], loop2_mask))
+                push!(expressions,
+                      movebits(:(loopIdx1 % $SizeT),
+                               [BitMap(lp.bit, (memmap[inv_rhsmap[lp]]::Memory).bit)
+                                for lp in loops1 if inv_rhsmap[lp] ∉ ignore && !(memmap[inv_rhsmap[lp]] isa Ignore)], loop1_mask))
+                push!(expressions,
                       movebits(:((blockIdx().x - 1) % $SizeT),
-                               [BitMap(bl.bit, (memmap[inv_rhsmap[bl]]::Memory).bit) for bl in blocks if inv_rhsmap[bl] ∉ ignore],
-                               block_mask))
+                               [BitMap(bl.bit, (memmap[inv_rhsmap[bl]]::Memory).bit)
+                                for bl in blocks if inv_rhsmap[bl] ∉ ignore && !(memmap[inv_rhsmap[bl]] isa Ignore)], block_mask))
                 push!(expressions,
                       movebits(:((threadIdx().y - 1) % $SizeT),
-                               [BitMap(wr.bit, (memmap[inv_rhsmap[wr]]::Memory).bit) for wr in warps if inv_rhsmap[wr] ∉ ignore],
-                               warp_mask))
+                               [BitMap(wr.bit, (memmap[inv_rhsmap[wr]]::Memory).bit)
+                                for wr in warps if inv_rhsmap[wr] ∉ ignore && !(memmap[inv_rhsmap[wr]] isa Ignore)], warp_mask))
                 push!(expressions,
                       movebits(:((threadIdx().x - 1) % $SizeT),
                                [BitMap(thr.bit, (memmap[inv_rhsmap[thr]]::Memory).bit)
-                                for thr in threads if inv_rhsmap[thr] ∉ ignore], thread_mask))
+                                for thr in threads if inv_rhsmap[thr] ∉ ignore && !(memmap[inv_rhsmap[thr]] isa Ignore)],
+                               thread_mask))
                 push!(expressions,
                       movebits(SizeT(r),
                                [BitMap(reg.bit, (memmap[inv_rhsmap[reg]]::Memory).bit)
-                                for reg in registers if inv_rhsmap[reg] ∉ ignore]))
+                                for reg in registers if inv_rhsmap[reg] ∉ ignore && !(memmap[inv_rhsmap[reg]] isa Ignore)]))
                 push!(expressions, offset)
                 @assert !isempty(expressions)
                 filter!(≠(0), expressions)
@@ -759,7 +849,13 @@ function store!(steps::Vector{AbstractStep}, env::Environment, rhs::Symbol, mem:
                 # It is important to write `1 + $expression` instead of
                 # `$expression + 1`, so that the added `1` can be combined
                 # with the subtracted `1` in the `getindex` function.
-                push!(stmts, :(@inbounds $mem[1 + $expression] = $rhsname))
+                if operator === :(=)
+                    push!(stmts, :(@inbounds $mem[1 + $expression] = $rhsname))
+                elseif operator === :(+=)
+                    push!(stmts, :(@inbounds $mem[1 + $expression] += $rhsname))
+                else
+                    @assert false
+                end
             else
                 @assert false
             end
@@ -1362,14 +1458,23 @@ function wmma_mma_row_col_m16n16k16_s8!(steps::Vector{AbstractStep}, env::Enviro
     @assert count_ones(thread_mask_A) == 5
     @assert count_ones(register_mask_A) == 1
     @assert simd_bits_A == 2
+    @assert thread_mask_A == 0b11111
+    @assert register_mask_A == 0b1
+    @assert simd_mask_A == 0b11000
 
     @assert count_ones(thread_mask_B) == 5
     @assert count_ones(register_mask_B) == 1
     @assert simd_bits_B == 2
+    @assert thread_mask_B == 0b11111
+    @assert register_mask_B == 0b1
+    @assert simd_mask_B == 0b11000
 
     @assert count_ones(thread_mask_C) == 5
     @assert count_ones(register_mask_C) == 3
     @assert simd_bits_C == 0
+    @assert thread_mask_C == 0b11111
+    @assert register_mask_C == 0b111
+    @assert simd_mask_C == 0b00000
 
     # These fragment layouts are valid for (at least) sm_75 and sm_86
     inv_Amap = inv(Amap)

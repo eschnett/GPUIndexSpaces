@@ -1,0 +1,248 @@
+PTX CompilerJob of kernel runsteps(CuDeviceVector{Int32, 1}, CuDeviceVector{Int32, 1}, CuDeviceVector{Int32, 1}, CuDeviceVector{Int32, 1}, CuDeviceVector{Int32, 1}) for sm_80, maxregs=32
+
+MethodInstance for runsteps(::CuDeviceVector{Int32, 1}, ::CuDeviceVector{Int32, 1}, ::CuDeviceVector{Int32, 1}, ::CuDeviceVector{Int32, 1}, ::CuDeviceVector{Int32, 1})
+  from runsteps(K_mem, E_mem, E_shared, Gin_mem, Ẽ_tmp) in Main at /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:226
+Arguments
+  #self#::Core.Const(runsteps)
+  K_mem::CuDeviceVector{Int32, 1}
+  E_mem::CuDeviceVector{Int32, 1}
+  E_shared::CuDeviceVector{Int32, 1}
+  Gin_mem::CuDeviceVector{Int32, 1}
+  Ẽ_tmp::CuDeviceVector{Int32, 1}
+Locals
+  val@_7::Int32
+  val@_8::Int32
+  val@_9::Int32
+  val@_10::Int32
+  Ezero_3::Int32
+  Ezero_2::Int32
+  Ezero_1::Int32
+  Ezero_0::Int32
+Body::Nothing
+1 ─ %1   = (0 % Main.Int8)::Core.Const(0)
+│   %2   = (%1 & 0x0000000f)::Core.Const(0x00000000)
+│   %3   = (0 % Main.Int8)::Core.Const(0)
+│   %4   = (%3 << 0x04)::Core.Const(0)
+│   %5   = (%4 & 0x000000f0)::Core.Const(0x00000000)
+│   %6   = (%2 | %5)::Core.Const(0x00000000)
+│   %7   = (0 % Main.Int8)::Core.Const(0)
+│   %8   = (%7 << 0x08)::Core.Const(0)
+│   %9   = (%8 & 0x00000f00)::Core.Const(0x00000000)
+│   %10  = (%6 | %9)::Core.Const(0x00000000)
+│   %11  = (0 % Main.Int8)::Core.Const(0)
+│   %12  = (%11 << 0x0c)::Core.Const(0)
+│   %13  = (%12 & 0x0000f000)::Core.Const(0x00000000)
+│   %14  = (%10 | %13)::Core.Const(0x00000000)
+│   %15  = (0 % Main.Int8)::Core.Const(0)
+│   %16  = (%15 << 0x10)::Core.Const(0)
+│   %17  = (%16 & 0x000f0000)::Core.Const(0x00000000)
+│   %18  = (%14 | %17)::Core.Const(0x00000000)
+│   %19  = (0 % Main.Int8)::Core.Const(0)
+│   %20  = (%19 << 0x14)::Core.Const(0)
+│   %21  = (%20 & 0x00f00000)::Core.Const(0x00000000)
+│   %22  = (%18 | %21)::Core.Const(0x00000000)
+│   %23  = (0 % Main.Int8)::Core.Const(0)
+│   %24  = (%23 << 0x18)::Core.Const(0)
+│   %25  = (%24 & 0x0f000000)::Core.Const(0x00000000)
+│   %26  = (%22 | %25)::Core.Const(0x00000000)
+│   %27  = (0 % Main.Int8)::Core.Const(0)
+│   %28  = (%27 << 0x1c)::Core.Const(0)
+│   %29  = (%28 & 0xf0000000)::Core.Const(0x00000000)
+│   %30  = (%26 | %29)::Core.Const(0x00000000)
+│          (Ezero_0 = %30 % Main.Int32)
+│   %32  = (0 % Main.Int8)::Core.Const(0)
+│   %33  = (%32 & 0x0000000f)::Core.Const(0x00000000)
+│   %34  = (0 % Main.Int8)::Core.Const(0)
+│   %35  = (%34 << 0x04)::Core.Const(0)
+│   %36  = (%35 & 0x000000f0)::Core.Const(0x00000000)
+│   %37  = (%33 | %36)::Core.Const(0x00000000)
+│   %38  = (0 % Main.Int8)::Core.Const(0)
+│   %39  = (%38 << 0x08)::Core.Const(0)
+│   %40  = (%39 & 0x00000f00)::Core.Const(0x00000000)
+│   %41  = (%37 | %40)::Core.Const(0x00000000)
+│   %42  = (0 % Main.Int8)::Core.Const(0)
+│   %43  = (%42 << 0x0c)::Core.Const(0)
+│   %44  = (%43 & 0x0000f000)::Core.Const(0x00000000)
+│   %45  = (%41 | %44)::Core.Const(0x00000000)
+│   %46  = (0 % Main.Int8)::Core.Const(0)
+│   %47  = (%46 << 0x10)::Core.Const(0)
+│   %48  = (%47 & 0x000f0000)::Core.Const(0x00000000)
+│   %49  = (%45 | %48)::Core.Const(0x00000000)
+│   %50  = (0 % Main.Int8)::Core.Const(0)
+│   %51  = (%50 << 0x14)::Core.Const(0)
+│   %52  = (%51 & 0x00f00000)::Core.Const(0x00000000)
+│   %53  = (%49 | %52)::Core.Const(0x00000000)
+│   %54  = (0 % Main.Int8)::Core.Const(0)
+│   %55  = (%54 << 0x18)::Core.Const(0)
+│   %56  = (%55 & 0x0f000000)::Core.Const(0x00000000)
+│   %57  = (%53 | %56)::Core.Const(0x00000000)
+│   %58  = (0 % Main.Int8)::Core.Const(0)
+│   %59  = (%58 << 0x1c)::Core.Const(0)
+│   %60  = (%59 & 0xf0000000)::Core.Const(0x00000000)
+│   %61  = (%57 | %60)::Core.Const(0x00000000)
+│          (Ezero_1 = %61 % Main.Int32)
+│   %63  = (0 % Main.Int8)::Core.Const(0)
+│   %64  = (%63 & 0x0000000f)::Core.Const(0x00000000)
+│   %65  = (0 % Main.Int8)::Core.Const(0)
+│   %66  = (%65 << 0x04)::Core.Const(0)
+│   %67  = (%66 & 0x000000f0)::Core.Const(0x00000000)
+│   %68  = (%64 | %67)::Core.Const(0x00000000)
+│   %69  = (0 % Main.Int8)::Core.Const(0)
+│   %70  = (%69 << 0x08)::Core.Const(0)
+│   %71  = (%70 & 0x00000f00)::Core.Const(0x00000000)
+│   %72  = (%68 | %71)::Core.Const(0x00000000)
+│   %73  = (0 % Main.Int8)::Core.Const(0)
+│   %74  = (%73 << 0x0c)::Core.Const(0)
+│   %75  = (%74 & 0x0000f000)::Core.Const(0x00000000)
+│   %76  = (%72 | %75)::Core.Const(0x00000000)
+│   %77  = (0 % Main.Int8)::Core.Const(0)
+│   %78  = (%77 << 0x10)::Core.Const(0)
+│   %79  = (%78 & 0x000f0000)::Core.Const(0x00000000)
+│   %80  = (%76 | %79)::Core.Const(0x00000000)
+│   %81  = (0 % Main.Int8)::Core.Const(0)
+│   %82  = (%81 << 0x14)::Core.Const(0)
+│   %83  = (%82 & 0x00f00000)::Core.Const(0x00000000)
+│   %84  = (%80 | %83)::Core.Const(0x00000000)
+│   %85  = (0 % Main.Int8)::Core.Const(0)
+│   %86  = (%85 << 0x18)::Core.Const(0)
+│   %87  = (%86 & 0x0f000000)::Core.Const(0x00000000)
+│   %88  = (%84 | %87)::Core.Const(0x00000000)
+│   %89  = (0 % Main.Int8)::Core.Const(0)
+│   %90  = (%89 << 0x1c)::Core.Const(0)
+│   %91  = (%90 & 0xf0000000)::Core.Const(0x00000000)
+│   %92  = (%88 | %91)::Core.Const(0x00000000)
+│          (Ezero_2 = %92 % Main.Int32)
+│   %94  = (0 % Main.Int8)::Core.Const(0)
+│   %95  = (%94 & 0x0000000f)::Core.Const(0x00000000)
+│   %96  = (0 % Main.Int8)::Core.Const(0)
+│   %97  = (%96 << 0x04)::Core.Const(0)
+│   %98  = (%97 & 0x000000f0)::Core.Const(0x00000000)
+│   %99  = (%95 | %98)::Core.Const(0x00000000)
+│   %100 = (0 % Main.Int8)::Core.Const(0)
+│   %101 = (%100 << 0x08)::Core.Const(0)
+│   %102 = (%101 & 0x00000f00)::Core.Const(0x00000000)
+│   %103 = (%99 | %102)::Core.Const(0x00000000)
+│   %104 = (0 % Main.Int8)::Core.Const(0)
+│   %105 = (%104 << 0x0c)::Core.Const(0)
+│   %106 = (%105 & 0x0000f000)::Core.Const(0x00000000)
+│   %107 = (%103 | %106)::Core.Const(0x00000000)
+│   %108 = (0 % Main.Int8)::Core.Const(0)
+│   %109 = (%108 << 0x10)::Core.Const(0)
+│   %110 = (%109 & 0x000f0000)::Core.Const(0x00000000)
+│   %111 = (%107 | %110)::Core.Const(0x00000000)
+│   %112 = (0 % Main.Int8)::Core.Const(0)
+│   %113 = (%112 << 0x14)::Core.Const(0)
+│   %114 = (%113 & 0x00f00000)::Core.Const(0x00000000)
+│   %115 = (%111 | %114)::Core.Const(0x00000000)
+│   %116 = (0 % Main.Int8)::Core.Const(0)
+│   %117 = (%116 << 0x18)::Core.Const(0)
+│   %118 = (%117 & 0x0f000000)::Core.Const(0x00000000)
+│   %119 = (%115 | %118)::Core.Const(0x00000000)
+│   %120 = (0 % Main.Int8)::Core.Const(0)
+│   %121 = (%120 << 0x1c)::Core.Const(0)
+│   %122 = (%121 & 0xf0000000)::Core.Const(0x00000000)
+│   %123 = (%119 | %122)::Core.Const(0x00000000)
+│          (Ezero_3 = %123 % Main.Int32)
+│          $(Expr(:inbounds, true))
+│   %126 = Ezero_0::Core.Const(0)
+│   %127 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %128 = Base.getproperty(%127, :y)::Int64
+│   %129 = (%128 - 1)::Int64
+│   %130 = (%129 % Int32)::Int32
+│   %131 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %132 = Base.getproperty(%131, :x)::Int64
+│   %133 = (%132 - 1)::Int64
+│   %134 = (%133 % Int32)::Int32
+│   %135 = (%134 & 0x10)::Int32
+│   %136 = (%135 << 0x04)::Int32
+│   %137 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %138 = Base.getproperty(%137, :x)::Int64
+│   %139 = (%138 - 1)::Int64
+│   %140 = (%139 % Int32)::Int32
+│   %141 = (%140 & 0x03)::Int32
+│   %142 = (%141 << 0x09)::Int32
+│   %143 = (%136 + %142)::Int32
+│   %144 = (%130 + %143)::Int32
+│   %145 = (1 + %144)::Int64
+│          Base.setindex!(E_shared, %126, %145)
+│          (val@_10 = Ezero_0::Core.Const(0))
+│          $(Expr(:inbounds, :pop))
+│          val@_10
+│          $(Expr(:inbounds, true))
+│   %151 = Ezero_1::Core.Const(0)
+│   %152 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %153 = Base.getproperty(%152, :y)::Int64
+│   %154 = (%153 - 1)::Int64
+│   %155 = (%154 % Int32)::Int32
+│   %156 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %157 = Base.getproperty(%156, :x)::Int64
+│   %158 = (%157 - 1)::Int64
+│   %159 = (%158 % Int32)::Int32
+│   %160 = (%159 & 0x10)::Int32
+│   %161 = (%160 << 0x04)::Int32
+│   %162 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %163 = Base.getproperty(%162, :x)::Int64
+│   %164 = (%163 - 1)::Int64
+│   %165 = (%164 % Int32)::Int32
+│   %166 = (%165 & 0x03)::Int32
+│   %167 = (%166 << 0x09)::Int32
+│   %168 = (%161 + %167)::Int32
+│   %169 = (%155 + %168 + 128)::Int64
+│   %170 = (1 + %169)::Int64
+│          Base.setindex!(E_shared, %151, %170)
+│          (val@_9 = Ezero_1::Core.Const(0))
+│          $(Expr(:inbounds, :pop))
+│          val@_9
+│          $(Expr(:inbounds, true))
+│   %176 = Ezero_2::Core.Const(0)
+│   %177 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %178 = Base.getproperty(%177, :y)::Int64
+│   %179 = (%178 - 1)::Int64
+│   %180 = (%179 % Int32)::Int32
+│   %181 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %182 = Base.getproperty(%181, :x)::Int64
+│   %183 = (%182 - 1)::Int64
+│   %184 = (%183 % Int32)::Int32
+│   %185 = (%184 & 0x10)::Int32
+│   %186 = (%185 << 0x04)::Int32
+│   %187 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %188 = Base.getproperty(%187, :x)::Int64
+│   %189 = (%188 - 1)::Int64
+│   %190 = (%189 % Int32)::Int32
+│   %191 = (%190 & 0x03)::Int32
+│   %192 = (%191 << 0x09)::Int32
+│   %193 = (%186 + %192)::Int32
+│   %194 = (%180 + %193 + 2048)::Int64
+│   %195 = (1 + %194)::Int64
+│          Base.setindex!(E_shared, %176, %195)
+│          (val@_8 = Ezero_2::Core.Const(0))
+│          $(Expr(:inbounds, :pop))
+│          val@_8
+│          $(Expr(:inbounds, true))
+│   %201 = Ezero_3::Core.Const(0)
+│   %202 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %203 = Base.getproperty(%202, :y)::Int64
+│   %204 = (%203 - 1)::Int64
+│   %205 = (%204 % Int32)::Int32
+│   %206 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %207 = Base.getproperty(%206, :x)::Int64
+│   %208 = (%207 - 1)::Int64
+│   %209 = (%208 % Int32)::Int32
+│   %210 = (%209 & 0x10)::Int32
+│   %211 = (%210 << 0x04)::Int32
+│   %212 = Main.threadIdx()::NamedTuple{(:x, :y, :z), Tuple{Int64, Int64, Int64}}
+│   %213 = Base.getproperty(%212, :x)::Int64
+│   %214 = (%213 - 1)::Int64
+│   %215 = (%214 % Int32)::Int32
+│   %216 = (%215 & 0x03)::Int32
+│   %217 = (%216 << 0x09)::Int32
+│   %218 = (%211 + %217)::Int32
+│   %219 = (128 + 2048)::Core.Const(2176)
+│   %220 = (%205 + %218 + %219)::Int64
+│   %221 = (1 + %220)::Int64
+│          Base.setindex!(E_shared, %201, %221)
+│          (val@_7 = Ezero_3::Core.Const(0))
+│          $(Expr(:inbounds, :pop))
+│          val@_7
+└──        return Main.nothing
+

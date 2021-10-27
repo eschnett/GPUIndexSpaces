@@ -1,0 +1,98 @@
+; PTX CompilerJob of kernel runsteps(CuDeviceVector{Int32, 1}, CuDeviceVector{Int32, 1}, CuDeviceVector{Int32, 1}, CuDeviceVector{Int32, 1}, CuDeviceVector{Int32, 1}) for sm_80, maxregs=32
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:226 within `runsteps`
+define ptx_kernel void @_Z19julia_runsteps_475513CuDeviceArrayI5Int32Li1ELi1EES_IS0_Li1ELi1EES_IS0_Li1ELi1EES_IS0_Li1ELi1EES_IS0_Li1ELi1EE({ i8 addrspace(1)*, i64, [1 x i64] } %0, { i8 addrspace(1)*, i64, [1 x i64] } %1, { i8 addrspace(1)*, i64, [1 x i64] } %2, { i8 addrspace(1)*, i64, [1 x i64] } %3, { i8 addrspace(1)*, i64, [1 x i64] } %4) local_unnamed_addr #1 {
+entry:
+  %.fca.0.extract7 = extractvalue { i8 addrspace(1)*, i64, [1 x i64] } %2, 0
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:227 within `runsteps`
+; ┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:735 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/dev/CUDA/src/device/intrinsics/indexing.jl:92 within `#threadIdx`
+; ││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/intrinsics/indexing.jl:46 within `threadIdx_y`
+; │││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/intrinsics/indexing.jl:6 within `_index`
+; ││││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/intrinsics/indexing.jl:6 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/base.jl:45
+       %5 = call i32 @llvm.nvvm.read.ptx.sreg.tid.y()
+; ││└└└
+; ││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/intrinsics/indexing.jl:46 within `threadIdx_x`
+; │││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/intrinsics/indexing.jl:6 within `_index`
+; ││││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/intrinsics/indexing.jl:6 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/base.jl:45
+       %6 = call i32 @llvm.nvvm.read.ptx.sreg.tid.x()
+; │└└└└
+; │┌ @ int.jl:486 within `<<`
+    %7 = shl nuw nsw i32 %6, 4
+    %8 = and i32 %7, 256
+    %9 = shl nuw nsw i32 %6, 9
+    %10 = and i32 %9, 1536
+; │└
+; │┌ @ int.jl:87 within `+`
+    %11 = add nuw nsw i32 %8, %5
+    %12 = add nuw nsw i32 %11, %10
+; │└
+; │┌ @ int.jl:974 within `+`
+; ││┌ @ int.jl:506 within `rem`
+     %13 = zext i32 %12 to i64
+; │└└
+; │┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:192 within `setindex!`
+; ││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:153 within `arrayset`
+; │││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:162 within `arrayset_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:84 within `unsafe_store!`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:44 within `pointerset`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:44 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/base.jl:45
+         %14 = bitcast i8 addrspace(1)* %.fca.0.extract7 to i32 addrspace(1)*
+         %15 = getelementptr inbounds i32, i32 addrspace(1)* %14, i64 %13
+         store i32 0, i32 addrspace(1)* %15, align 4
+; │└└└└└└
+; │┌ @ int.jl:87 within `+`
+    %16 = add nuw nsw i32 %5, 128
+; │└
+; │┌ @ operators.jl:655 within `+` @ int.jl:87
+    %17 = add nuw nsw i32 %16, %8
+; ││ @ operators.jl:655 within `+` @ int.jl:976 @ int.jl:87
+    %narrow = add nuw nsw i32 %17, %10
+    %18 = zext i32 %narrow to i64
+; │└
+; │┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:192 within `setindex!`
+; ││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:153 within `arrayset`
+; │││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:162 within `arrayset_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:84 within `unsafe_store!`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:44 within `pointerset`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:44 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/base.jl:45
+         %19 = getelementptr inbounds i32, i32 addrspace(1)* %14, i64 %18
+         store i32 0, i32 addrspace(1)* %19, align 4
+; │└└└└└└
+; │┌ @ int.jl:87 within `+`
+    %20 = or i32 %5, 2048
+; │└
+; │┌ @ operators.jl:655 within `+` @ int.jl:87
+    %21 = add nuw nsw i32 %20, %8
+; ││ @ operators.jl:655 within `+` @ int.jl:976 @ int.jl:87
+    %narrow26 = add nuw nsw i32 %21, %10
+    %22 = zext i32 %narrow26 to i64
+; │└
+; │┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:192 within `setindex!`
+; ││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:153 within `arrayset`
+; │││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:162 within `arrayset_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:84 within `unsafe_store!`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:44 within `pointerset`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:44 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/base.jl:45
+         %23 = getelementptr inbounds i32, i32 addrspace(1)* %14, i64 %22
+         store i32 0, i32 addrspace(1)* %23, align 4
+; │└└└└└└
+; │┌ @ int.jl:87 within `+`
+    %24 = add nuw nsw i32 %5, 2176
+; │└
+; │┌ @ operators.jl:655 within `+` @ int.jl:87
+    %25 = add nuw nsw i32 %24, %8
+; ││ @ operators.jl:655 within `+` @ int.jl:976 @ int.jl:87
+    %narrow27 = add nuw nsw i32 %25, %10
+    %26 = zext i32 %narrow27 to i64
+; │└
+; │┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:192 within `setindex!`
+; ││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:153 within `arrayset`
+; │││┌ @ /home/eschnett/.julia/dev/CUDA/src/device/array.jl:162 within `arrayset_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:84 within `unsafe_store!`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:44 within `pointerset`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/pointer.jl:44 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/DD41d/src/interop/base.jl:45
+         %27 = getelementptr inbounds i32, i32 addrspace(1)* %14, i64 %26
+         store i32 0, i32 addrspace(1)* %27, align 4
+         ret void
+; └└└└└└└
+}

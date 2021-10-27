@@ -1,0 +1,31 @@
+__global__ void runsteps(int *arg) {
+  asm volatile(
+               ".reg .b64       arg;\t\n"
+               ".reg .b32       r<10>;\n\t"
+               ".reg .b64       rd<11>;\n\t"
+               "mov.u64         arg, %0;\n\t"
+               "mov.u32         r1, %%tid.y;\t\n"
+               "mov.u32         r2, %%tid.x;\t\n"
+               "shl.b32         r3, r2, 4;\t\n"
+               "and.b32         r4, r3, 256;\t\n"
+               "shl.b32         r5, r2, 9;\t\n"
+               "and.b32         r6, r5, 1536;\t\n"
+               "add.s32         r7, r4, r1;\t\n"
+               "add.s32         r8, r7, r6;\t\n"
+               "mul.wide.u32    rd2, r8, 4;\t\n"
+               "add.s64         rd3, rd1, rd2;\t\n"
+               "mov.u32         r9, 0;\t\n"
+               "st.global.u32   [rd3], r9;\t\n"
+               "cvt.u64.u32     rd4, r6;\t\n"
+               "cvt.u64.u32     rd5, r4;\t\n"
+               "cvt.u64.u32     rd6, r1;\t\n"
+               "add.s64         rd7, rd6, rd5;\t\n"
+               "add.s64         rd8, rd7, rd4;\t\n"
+               "shl.b64         rd9, rd8, 2;\t\n"
+               "add.s64         rd10, rd1, rd9;\t\n"
+               "st.global.u32   [rd10+512], r9;\t\n"
+               "st.global.u32   [rd10+8192], r9;\t\n"
+               "st.global.u32   [rd10+8704], r9;\t\n"
+               :: "l" (arg)
+               );
+}
