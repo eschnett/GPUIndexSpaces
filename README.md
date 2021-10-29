@@ -45,24 +45,38 @@ fatbinary --create=zero.fatbin -64 --cicc-cmdline='-ftz=1 -prec_div=1 -prec_sqrt
 
 ## TODO
 
-- Use `cvt.pack` to pack data
 - Use `dp4a` to multiply (or `dp2a`?)
-- Use `v4absdiff` to clamp?
 - Use `Float16` for final calculation? Results might need to be scaled.
-- Calculate cost of tensor core operations (throughput per SM)
 - Output CUDA kernels in C
 - `prmt` can sign-extend!
-- `cvt` can convert 2 `Float32` into `Float16x2`
 - `Float16` operations can saturate to `[0, 1]`; use this for clamping?
 - Combine integer and floating-point arithmetic for output of second FT
-- Re-arrange PTX instructions manually to improve instruction mix
+- Re-order PTX instructions manually to improve instruction mix
 - Does CUDA really optimize for the current GPU? I don't see "86" in the SASS output, only "80"
+- Clamp in parallel by multiplying by 2, saturating, and then dividing by 2.
+- Post-process in `fourier2` with `Int32` since there is a three-way addition
+  - with Float32, for 16 outputs:
+    - 16 int2float
+    - 16 mul (8 are muladd)
+    - 16 add (8 are part of muladd)
+    - total: 16*2 + 16/4 + 8/4 cycles = 40 cycles
+  - with Int32, for 16 outputs:
+    - 16 mul (16 are muladd)
+    - 16 add (16 are part of muladd)
+    - total: 16/2 cycles = 8 cycles
 
 ## DONE
 
 - Midpoint gains are unsigned: don't sign extend during unpacking. (No more midpoint gains.)
 - Maybe apply midpoint gains purely by shifting? (Yes.)
 - Use tensor cores to apply input gains? (No; would need very different register layout.)
+- Calculate cost of tensor core operations (throughput per SM):
+  - 2048 Int8 op per cycle per SM (299.3 Top/s, 1740 MHz)
+  - IMMA.16816 instruction, m16n8k16, C[16,8] = A[16,16] * B[16,8], 2*16*16*8 op = 4096 op
+  - throughput is 16 threads/cycle
+- Use `v4absdiff` to clamp? (No; does not work.)
+- Use `cvt.pack` to pack data. (Done.)
+- `cvt` can convert 2 `Float32` into `Float16x2`. (Using it.)
 
 ## HPC system management
 

@@ -3,10 +3,18 @@ using LLVM
 
 ################################################################################
 
+struct Int4x8
+    val::UInt32
+end
+
 struct Int8x4
     val::UInt32
 end
 # vadd4, vsub4, vmin4, vmax4, vset4
+
+struct Int16x2
+    val::UInt32
+end
 
 ################################################################################
 
@@ -74,6 +82,13 @@ function cvt_pack_s8(a::Int32, b::Int32, c::Int32)
     return LLVM.Interop.@asmcall("cvt.pack.sat.s8.s32.b32 \$0, \$1, \$2, \$3;", "=r,r,r,r", Int32, Tuple{Int32,Int32,Int32}, a, b,
                                  c)::Int32
 end
+"""
+    int8 -> uint32
+"""
+function cvt_pack_s8(a::Int32, b::Int32)
+    # ??? I2IP.S8.S32.SAT
+    return LLVM.Interop.@asmcall("cvt.pack.sat.s8.s32.b32 \$0, \$1, \$2, 0;", "=r,r,r", Int32, Tuple{Int32,Int32}, a, b)::Int32
+end
 
 """
     int8x4 -> int32
@@ -83,10 +98,22 @@ function dp4a(a::Int32, b::Int32, c::Int32)
     return LLVM.Interop.@asmcall("dp4a.s32.s32 \$0, \$1, \$2, \$3;", "=r,r,r,r", Int32, Tuple{Int32,Int32,Int32}, a, b, c)::Int32
 end
 
+"""
+   (int8x4, int8x4) -> int8x4
+"""
+function vmin4(a::Int32, b::Int32)
+    # Translated into inefficient code
+    return LLVM.Interop.@asmcall("vmin4.s32.s32.s32 \$0, \$1, \$2, \$2;", "=r,r,r", Int32, Tuple{Int32,Int32}, a, b)::Int32
+end
+
+################################################################################
+
 function kernel(r, x, y, z)
     @inbounds begin
-        # r[1] = cvt_pack_s8(x[1], y[1], z[1])
-        r[1] = dp4a(x[1], y[1], z[1])
+        r[1] = cvt_pack_s8(x[1], y[1], z[1])
+        r[2] = cvt_pack_s8(x[2], y[2])
+        # r[1] = dp4a(x[1], y[1], z[1])
+        # r[1] = vmin4(x[1], y[1])
         # a = Float16x2(x[1], y[1])
         # b = Float16x2(y[1], z[1])
         # c = a + b
@@ -97,9 +124,9 @@ function kernel(r, x, y, z)
     return nothing
 end
 
-x = CuArray(Int32[1])
-y = CuArray(Int32[1])
-z = CuArray(Int32[1])
+x = CuArray(Int32[2])
+y = CuArray(Int32[2])
+z = CuArray(Int32[2])
 r = CuArray{Int32}(undef, 2)
 @device_code_ptx @cuda kernel(r, x, y, z)
 @device_code_sass @cuda kernel(r, x, y, z)
