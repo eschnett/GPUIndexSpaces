@@ -372,15 +372,15 @@ const map_Fpre_registers = Layout(Int32,
 # Layout of F̃ in shared memory
 # TOOD: Use layout from secion 3.1
 const map_F̃_shared = Layout(Int32,
-                             Dict([Cplx(0) => Memory(10 + 2)
+                             Dict([Cplx(0) => Ignore(21) #TODO Memory(10 + 2)
                                    Polr(0) => Memory(0 + 1)
                                    BeamI(0) => Memory(0 + 2)
                                    BeamI(1) => Memory(0 + 3)
                                    BeamI(2) => Memory(0 + 4)
-                                   BeamI(3) => Memory(10 + 0)
-                                   BeamI(4) => Memory(10 + 1)
-                                   BeamI(5) => Memory(10 + 3)
-                                   BeamI(6) => Memory(10 + 4)
+                                   BeamI(3) => Ignore(23) #TODO Memory(10 + 0)
+                                   BeamI(4) => Ignore(22) #TODO Memory(10 + 1)
+                                   BeamI(5) => Ignore(19) #TODO Memory(10 + 3)
+                                   BeamI(6) => Ignore(20) #TODO Memory(10 + 4)
                                    DishJ(0) => SIMD(3)
                                    DishJ(1) => SIMD(4)
                                    DishJ(2) => Memory(5 + 2)
@@ -521,7 +521,7 @@ const map_Jpre_registers = Layout(Int32,
 function zero_dishes!(steps::Vector{AbstractStep}, env::Environment)
     constant!(steps, env, :Ezero, map_E′_registers, 0)
     store!(steps, env, :Ezero, :E_shared, map_E_shared)
-    return nothing
+    return
 end
 
 function grid_dishes!(steps::Vector{AbstractStep}, env::Environment)
@@ -537,7 +537,7 @@ function grid_dishes!(steps::Vector{AbstractStep}, env::Environment)
     store!(steps, env, :E′d1, :E_shared, map_E_shared;
            # ignore=Set([[Dish(d) for d in 1:8]; [Freq(f) for f in 0:6]; [Time(t) for t in 3:14]]), offset=:Kd1)
            ignore=Set(Dish(d) for d in 1:8), offset=:Kd1)
-    return nothing
+    return
 end
 
 function fourier1!(steps::Vector{AbstractStep}, env::Environment)
@@ -659,10 +659,10 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
 
         # Store F̃
         store!(steps, env, :F̃4, :F̃_shared, map_F̃_shared)
-        return nothing
+        return
     end
 
-    return nothing
+    return
 end
 
 function fourier2!(steps::Vector{AbstractStep}, env::Environment)
@@ -769,11 +769,11 @@ function fourier2!(steps::Vector{AbstractStep}, env::Environment)
             # Store fI8
             # Ignoring all Loop3 indices
             store!(steps, env, :fI8, :fI_mem, map_fI_memory; operator=:(+=), ignore=Set(Time(t) for t in 3:6))
-            return nothing
+            return
         end
     end
 
-    return nothing
+    return
 end
 
 function frb!(steps::Vector{AbstractStep}, env::Environment)
@@ -784,7 +784,7 @@ function frb!(steps::Vector{AbstractStep}, env::Environment)
             loop!(steps, env, :loopIdx1, :(Int32(0):Int32(2)), [BeamI(5), BeamI(6)]) do steps, env
                 constant!(steps, env, :fIzero, map_fI_registers, :(Float32(0)))
                 store!(steps, env, :fIzero, :fI_mem, map_fI_memory)
-                return nothing
+                return
             end
         end
         loop!(steps, env, :loopIdx3, :(Int32(0):Int32(15)), [Time(3), Time(4), Time(5), Time(6)]) do steps, env
@@ -793,10 +793,10 @@ function frb!(steps::Vector{AbstractStep}, env::Environment)
             fourier1!(steps, env)
             sync_threads!(steps, env)
             fourier2!(steps, env)
-            return nothing
+            return
         end
     end
-    return nothing
+    return
 end
 
 ################################################################################
@@ -839,14 +839,18 @@ println(frb_allsteps)
 
 ################################################################################
 
-@eval function runsteps(K_mem, E_mem, E_shared, Gin_mem, Ans_mem, Aew_mem, F̃_shared, fI_mem)
-    # $(code(grid_allsteps))
-    # $(code(sync_allsteps))
-    # $(code(fourier1_allsteps))
-    # $(code(sync_allsteps))
-    # $(code(fourier2_allsteps))
+const E_shared_size = 2^12
+# TODO it's just too much memory!
+const F̃_shared_size = 2^10 #TODO 2^15
+const E_shared_offset = 0
+const F̃_shared_offset = E_shared_offset + E_shared_size
+const shmem_size = F̃_shared_offset + F̃_shared_size
+
+@eval function runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem)
+    E_shared = @cuDynamicSharedMem(Int4x8, $E_shared_size, $(sizeof(Int32) * E_shared_offset))
+    F̃_shared = @cuDynamicSharedMem(Int8x4, $F̃_shared_size, $(sizeof(Int32) * F̃_shared_offset))
     $(code(frb_allsteps))
-    return nothing
+    return
 end
 
 function runcuda()
@@ -859,35 +863,36 @@ function runcuda()
     K_mem = CuArray(K_mem)
     E_mem = CuArray(E_mem)
     Gin_mem = CuArray(Gin_mem)
-    E_shared = CuArray{Int4x8}(undef, 2^12)
     Ans_mem = CuArray(Ans_mem)
     Aew_mem = CuArray(Aew_mem)
-    F̃_shared = CuArray{Int8x4}(undef, 2^15)
     fI_mem = CuArray{Float32}(undef, 2^29)
 
-    kernel = @cuda launch = false maxregs = 64 runsteps(K_mem, E_mem, E_shared, Gin_mem, Ans_mem, Aew_mem, F̃_shared, fI_mem)
+    kernel = @cuda launch = false blocks_per_sm = 1 maxregs = 64 runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem)
 
-    kernel(K_mem, E_mem, E_shared, Gin_mem, Ans_mem, Aew_mem, F̃_shared, fI_mem; threads=(32, 32), blocks=84)
+    # sm_75
+    nblocks = 68
+    @assert shmem_size < 12288  # NVIDIA GeForce RTX 2080 Ti has 48 kB shared memory
+
+    # # sm_86
+    # nblocks = 84
+
+    kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=sizeof(Int32) * shmem_size)
     synchronize()
-    # CUDA.@time kernel(K_mem, E_mem, E_shared, Gin_mem, Ans_mem, Aew_mem, F̃_shared, fI_mem; threads=(32, 32), blocks=1)
-    # @btime CUDA.@sync $(kernel(K_mem, E_mem, E_shared, Gin_mem, Ans_mem, Aew_mem, F̃_shared, fI_mem; threads=(32, 32), blocks=1))
+    # CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks,
+    #                   shmem=sizeof(Int32) * shmem_size)
+    # @btime CUDA.@sync $(kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks,
+    #                            shmem=sizeof(Int32) * shmem_size))
 
-    # E_shared = Array(E_shared)
-    # println(E_shared[1:32] .% UInt32)
-    # 
-    # F̃_shared = Array(F̃_shared)
-    # println(F̃_shared[1:32] .% UInt32)
-    # 
     # fI_mem = Array(fI_mem)
     # println(fI_mem[1:32])
 
-    return nothing
+    return
 end
 
 if CUDA.functional()
     # @device_code_warntype runcuda()
     # @device_code_llvm runcuda()
     # @device_code_ptx runcuda()
-    # @device_code_sass runcuda()
-    runcuda()
+    @device_code_sass runcuda()
+    # runcuda()
 end

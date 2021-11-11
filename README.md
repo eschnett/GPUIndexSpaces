@@ -49,7 +49,6 @@ fatbinary --create=zero.fatbin -64 --cicc-cmdline='-ftz=1 -prec_div=1 -prec_sqrt
 - Use `Float16` for final calculation? Results might need to be scaled.
 - Output CUDA kernels in C
 - `prmt` can sign-extend!
-- `Float16` operations can saturate to `[0, 1]`; use this for clamping?
 - Combine integer and floating-point arithmetic for output of second FT
 - Re-order PTX instructions manually to improve instruction mix
 - Does CUDA really optimize for the current GPU? I don't see "86" in the SASS output, only "80"
@@ -77,6 +76,7 @@ fatbinary --create=zero.fatbin -64 --cicc-cmdline='-ftz=1 -prec_div=1 -prec_sqrt
 - Use `v4absdiff` to clamp? (No; does not work.)
 - Use `cvt.pack` to pack data. (Done.)
 - `cvt` can convert 2 `Float32` into `Float16x2`. (Using it.)
+- `Float16` operations can saturate to `[0, 1]`; use this for clamping? (Would be more expensive.)
 
 ## HPC system management
 
