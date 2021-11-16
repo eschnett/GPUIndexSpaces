@@ -51,11 +51,11 @@ unsafe_sub(a::Int4x8, b::Int4x8) = Int4x8(a.val - b.val)
 # Int8x4
 
 function Int8x4(a1::Int32, a2::Int32, a3::Int32, a4::Int32)
-    return Int8x4((a4 % UInt8 % UInt32) << 0x18 |
-                  (a3 % UInt8 % UInt32) << 0x10 |
-                  (a2 % UInt8 % UInt32) << 0x8 |
-                  (a1 % UInt8 % UInt32))
-    ##TODO return cvt_pack_s8(a2, a1, cvt_pack_s8(a4, a3))
+    # return Int8x4((a4 % UInt8 % UInt32) << 0x18 |
+    #               (a3 % UInt8 % UInt32) << 0x10 |
+    #               (a2 % UInt8 % UInt32) << 0x8 |
+    #               (a1 % UInt8 % UInt32))
+    return cvt_pack_s8(a2, a1, cvt_pack_s8(a4, a3))
 end
 
 function Base.convert(::Type{NTuple{2,Int16x2}}, a::Int8x4)
@@ -63,37 +63,37 @@ function Base.convert(::Type{NTuple{2,Int16x2}}, a::Int8x4)
             Int16x2(CUDA.byte_perm(a.val, UInt32(0), 0xb3a2) % UInt32))::NTuple{2,Int16x2}
 end
 function Base.convert(::Type{NTuple{4,Int32}}, a::Int8x4)
-    return (a.val % Int8 % Int32, ((a.val % Int32) >> 0x08) % Int8 % Int32, ((a.val % Int32) >> 0x10) % Int8 % Int32,
-            (a.val % Int32) >> 0x18)
-    ##TODO return (CUDA.byte_perm(a.val, UInt32(0), 0x8880) % Int32, CUDA.byte_perm(a.val, UInt32(0), 0x9991) % Int32,
-    ##TODO         CUDA.byte_perm(a.val, UInt32(0), 0xaaa2) % Int32, CUDA.byte_perm(a.val, UInt32(0), 0xbbb3) % Int32)::NTuple{4,Int32}
+    # return (a.val % Int8 % Int32, ((a.val % Int32) >> 0x08) % Int8 % Int32, ((a.val % Int32) >> 0x10) % Int8 % Int32,
+    #         (a.val % Int32) >> 0x18)
+    return (CUDA.byte_perm(a.val, UInt32(0), 0x8880) % Int32, CUDA.byte_perm(a.val, UInt32(0), 0x9991) % Int32,
+            CUDA.byte_perm(a.val, UInt32(0), 0xaaa2) % Int32, CUDA.byte_perm(a.val, UInt32(0), 0xbbb3) % Int32)::NTuple{4,Int32}
 end
 
-##TODO """
-##TODO     d = cvt_pack_s8(a::Int32, b::Int32, c::Int8x4)
-##TODO     d::Int8x4
-##TODO     d[1] = sat(b)
-##TODO     d[2] = sat(a)
-##TODO     d[3] = c[1]
-##TODO     d[4] = c[2]
-##TODO """
-##TODO function cvt_pack_s8(a::Int32, b::Int32, c::Int8x4)
-##TODO     # I2IP.S8.S32.SAT
-##TODO     return Int8x4(LLVM.Interop.@asmcall("cvt.pack.sat.s8.s32.b32 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32,
-##TODO                                         Tuple{Int32,Int32,UInt32}, a, b, c.val))
-##TODO end
-##TODO """
-##TODO     d = cvt_pack_s8(a::Int32, b::Int32)
-##TODO     d::Int8x4
-##TODO     d[1] = sat(b)
-##TODO     d[2] = sat(a)
-##TODO     d[3] = 0
-##TODO     d[4] = 0
-##TODO """
-##TODO function cvt_pack_s8(a::Int32, b::Int32)
-##TODO     # I2IP.S8.S32.SAT
-##TODO     return Int8x4(LLVM.Interop.@asmcall("cvt.pack.sat.s8.s32.b32 \$0, \$1, \$2, 0;", "=r,r,r", UInt32, Tuple{Int32,Int32}, a, b))
-##TODO end
+"""
+    d = cvt_pack_s8(a::Int32, b::Int32, c::Int8x4)
+    d::Int8x4
+    d[1] = sat(b)
+    d[2] = sat(a)
+    d[3] = c[1]
+    d[4] = c[2]
+"""
+function cvt_pack_s8(a::Int32, b::Int32, c::Int8x4)
+    # I2IP.S8.S32.SAT
+    return Int8x4(LLVM.Interop.@asmcall("cvt.pack.sat.s8.s32.b32 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32,
+                                        Tuple{Int32,Int32,UInt32}, a, b, c.val))
+end
+"""
+    d = cvt_pack_s8(a::Int32, b::Int32)
+    d::Int8x4
+    d[1] = sat(b)
+    d[2] = sat(a)
+    d[3] = 0
+    d[4] = 0
+"""
+function cvt_pack_s8(a::Int32, b::Int32)
+    # I2IP.S8.S32.SAT
+    return Int8x4(LLVM.Interop.@asmcall("cvt.pack.sat.s8.s32.b32 \$0, \$1, \$2, 0;", "=r,r,r", UInt32, Tuple{Int32,Int32}, a, b))
+end
 
 export dp4a
 """
@@ -114,16 +114,16 @@ unsafe_sub(a::Int8x4, b::Int8x4) = Int8x4(a.val - b.val)
 
 Base.convert(::Type{NTuple{2,Int32}}, a::Int16x2) = (a.val % Int16 % Int32, (a.val % Int32) >> 0x10)::NTuple{2,Int32}
 
-##TODO Int16x2(a1::Int32, a2::Int32) = cvs_pack_s16(a2, a1)
-##TODO """
-##TODO     d = cvt_pack_s16(a::Int32, b::Int32)
-##TODO     d::Int16x2
-##TODO     d[1] = sat(b)
-##TODO     d[2] = sat(a)
-##TODO """
-##TODO function cvt_pack_s16(a::Int32, b::Int32)
-##TODO     return Int16x2(LLVM.Interop.@asmcall("cvt.pack.sat.s16.s32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Int32,Int32}, a, b))
-##TODO end
+Int16x2(a1::Int32, a2::Int32) = cvs_pack_s16(a2, a1)
+"""
+    d = cvt_pack_s16(a::Int32, b::Int32)
+    d::Int16x2
+    d[1] = sat(b)
+    d[2] = sat(a)
+"""
+function cvt_pack_s16(a::Int32, b::Int32)
+    return Int16x2(LLVM.Interop.@asmcall("cvt.pack.sat.s16.s32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Int32,Int32}, a, b))
+end
 
 unsafe_add(a::Int16x2, b::Int16x2) = Int16x2(a.val + b.val)
 unsafe_sub(a::Int16x2, b::Int16x2) = Int16x2(a.val - b.val)
@@ -205,6 +205,9 @@ unsafe_sub(a::Float32, b::Float32) = a - b
 ################################################################################
 
 const Code = Union{Expr,Number,Symbol}
+
+export comment
+comment(text, result) = result
 
 function make_uint(i::Integer)
     @assert i ≥ 0
@@ -307,9 +310,10 @@ const Loop2 = Target{:Loop2}
 const Loop3 = Target{:Loop3}
 const Loop4 = Target{:Loop4}
 
-export Memory, Memory2
+export Memory, Memory2, Memory3
 const Memory = Target{:Memory}
 const Memory2 = Target{:Memory2}
+const Memory3 = Target{:Memory3}
 
 export Mapping
 struct Mapping{Key,Value}
@@ -910,7 +914,8 @@ function movebits(code::Code, bitmap::Vector{BitMap}, code_mask::Integer=0)
     return expr::Code
 end
 
-function make_indices(idxmap::Layout, memmap::Layout; ignore::Set{<:Index}=Set{Index}(), offset::Code=Int32(0))
+function make_indices(idxmap::Layout, memmap::Layout; ignore::Set{<:Index}=Set{Index}(), memory::Type{MemoryN}=Memory,
+                      offset::Code=Int32(0)) where {MemoryN}
     loops1 = [v for (k, v) in idxmap if v isa Loop1]
     loop1_mask = sum(UInt[1 << lp.bit for lp in loops1])
     loops2 = [v for (k, v) in idxmap if v isa Loop2]
@@ -938,44 +943,57 @@ function make_indices(idxmap::Layout, memmap::Layout; ignore::Set{<:Index}=Set{I
 
     inv_idxmap = inv(idxmap)
 
+    # Check for bank conflicts
+    flag_if_bank_conflict = identity
+    #BROKEN if MemoryN ≡ Memory
+    #BROKEN     thread_bits = sum(Int[1 << (memmap[inv_idxmap[thr]]::MemoryN).bit
+    #BROKEN                           for thr in threads if inv_idxmap[thr] ∉ ignore && memmap[inv_idxmap[thr]] isa Memory])
+    #BROKEN     if thread_bits ≠ 0x1f
+    #BROKEN         msg = "Bank conflict: thread_mask=0x" * string(thread_bits; base=16) * " (expected 0x1f)"
+    #BROKEN         flag_if_bank_conflict = val -> :(comment($msg, $val))
+    #BROKEN         @warn msg
+    #BROKEN     end
+    #BROKEN end
+
     indices = Dict{Int,Code}()
     for r in 0:register_mask
         if r & ~register_mask == 0
             expressions = Code[]
             # TODO: This assumes a memory layout in `int`s, not bytes
-            # TODO: Check for bank conflicts
+            # TODO: Check for aligned access
             push!(expressions,
                   movebits(:(loopIdx4 % $SizeT),
-                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::Memory).bit)
-                            for lp in loops4 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa Memory], loop4_mask))
+                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit)
+                            for lp in loops4 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN], loop4_mask))
             push!(expressions,
                   movebits(:(loopIdx3 % $SizeT),
-                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::Memory).bit)
-                            for lp in loops3 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa Memory], loop3_mask))
+                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit)
+                            for lp in loops3 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN], loop3_mask))
             push!(expressions,
                   movebits(:(loopIdx2 % $SizeT),
-                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::Memory).bit)
-                            for lp in loops2 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa Memory], loop2_mask))
+                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit)
+                            for lp in loops2 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN], loop2_mask))
             push!(expressions,
                   movebits(:(loopIdx1 % $SizeT),
-                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::Memory).bit)
-                            for lp in loops1 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa Memory], loop1_mask))
+                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit)
+                            for lp in loops1 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN], loop1_mask))
             push!(expressions,
                   movebits(:((blockIdx().x - 1) % $SizeT),
-                           [BitMap(bl.bit, (memmap[inv_idxmap[bl]]::Memory).bit)
-                            for bl in blocks if inv_idxmap[bl] ∉ ignore && memmap[inv_idxmap[bl]] isa Memory], block_mask))
+                           [BitMap(bl.bit, (memmap[inv_idxmap[bl]]::MemoryN).bit)
+                            for bl in blocks if inv_idxmap[bl] ∉ ignore && memmap[inv_idxmap[bl]] isa MemoryN], block_mask))
             push!(expressions,
                   movebits(:((threadIdx().y - 1) % $SizeT),
-                           [BitMap(wr.bit, (memmap[inv_idxmap[wr]]::Memory).bit)
-                            for wr in warps if inv_idxmap[wr] ∉ ignore && memmap[inv_idxmap[wr]] isa Memory], warp_mask))
+                           [BitMap(wr.bit, (memmap[inv_idxmap[wr]]::MemoryN).bit)
+                            for wr in warps if inv_idxmap[wr] ∉ ignore && memmap[inv_idxmap[wr]] isa MemoryN], warp_mask))
             push!(expressions,
-                  movebits(:((threadIdx().x - 1) % $SizeT),
-                           [BitMap(thr.bit, (memmap[inv_idxmap[thr]]::Memory).bit)
-                            for thr in threads if inv_idxmap[thr] ∉ ignore && memmap[inv_idxmap[thr]] isa Memory], thread_mask))
+                  flag_if_bank_conflict(movebits(:((threadIdx().x - 1) % $SizeT),
+                                                 [BitMap(thr.bit, (memmap[inv_idxmap[thr]]::MemoryN).bit)
+                                                  for thr in threads
+                                                  if inv_idxmap[thr] ∉ ignore && memmap[inv_idxmap[thr]] isa MemoryN], thread_mask)))
             push!(expressions,
                   movebits(SizeT(r),
-                           [BitMap(reg.bit, (memmap[inv_idxmap[reg]]::Memory).bit)
-                            for reg in registers if inv_idxmap[reg] ∉ ignore && memmap[inv_idxmap[reg]] isa Memory]))
+                           [BitMap(reg.bit, (memmap[inv_idxmap[reg]]::MemoryN).bit)
+                            for reg in registers if inv_idxmap[reg] ∉ ignore && memmap[inv_idxmap[reg]] isa MemoryN]))
             if offset ≠ 0
                 push!(expressions, offset)
             end
@@ -1004,6 +1022,10 @@ function load!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsma
     register_mask = sum(UInt[1 << reg.bit for reg in registers])
 
     indices = make_indices(lhsmap, memmap)
+    have_memory2 = any(v -> v isa Memory2, values(memmap))
+    indices2 = make_indices(lhsmap, memmap; memory=Memory2)
+    have_memory3 = any(v -> v isa Memory3, values(memmap))
+    indices3 = make_indices(lhsmap, memmap; memory=Memory3)
 
     stmts = Code[]
     for r in 0:register_mask
@@ -1011,10 +1033,18 @@ function load!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsma
             rname = register_mask == 0 ? "" : "_$r"
             lhsname = Symbol(lhs, rname)
             index = indices[r]
+            index2 = indices2[r]
+            index3 = indices3[r]
             # It is important to write `1 + $expression` instead of
             # `$expression + 1`, so that the added `1` can be combined
             # with the subtracted `1` in the `getindex` function.
-            push!(stmts, :(@inbounds $lhsname = $mem[1 + $index]::$type))
+            if have_memory3
+                push!(stmts, :(@inbounds $lhsname = $mem[1 + $index, 1 + $index2, 1 + $index3]::$type))
+            elseif have_memory2
+                push!(stmts, :(@inbounds $lhsname = $mem[1 + $index, 1 + $index2]::$type))
+            else
+                push!(stmts, :(@inbounds $lhsname = $mem[1 + $index]::$type))
+            end
         end
     end
     push!(steps, Step("Load from memory", Variable[], Variable[lhs => lhsmap], quote
@@ -1032,7 +1062,11 @@ function store!(steps::Vector{AbstractStep}, env::Environment, rhs::Symbol, mem:
     registers = [v for (k, v) in rhsmap if v isa Register]
     register_mask = sum(UInt[1 << reg.bit for reg in registers])
 
-    indices = make_indices(rhsmap, memmap; ignore, offset)
+    indices = make_indices(rhsmap, memmap; ignore)
+    have_memory2 = any(v -> v isa Memory2, values(memmap))
+    indices2 = make_indices(rhsmap, memmap; ignore, memory=Memory2)
+    have_memory3 = any(v -> v isa Memory3, values(memmap))
+    indices3 = make_indices(rhsmap, memmap; ignore, memory=Memory3)
 
     stmts = Code[]
     for r in 0:register_mask
@@ -1040,13 +1074,22 @@ function store!(steps::Vector{AbstractStep}, env::Environment, rhs::Symbol, mem:
             rname = register_mask == 0 ? "" : "_$r"
             rhsname = Symbol(rhs, rname)
             index = indices[r]
+            index2 = indices2[r]
+            index3 = indices3[r]
 
             # It is important to write `1 + $expression` instead of
             # `$expression + 1`, so that the added `1` can be combined
             # with the subtracted `1` in the `getindex` function.
             if operator === :(=)
-                push!(stmts, :(@inbounds $mem[1 + $index] = $rhsname))
+                if have_memory3
+                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2, 1 + $index3] = $rhsname))
+                elseif have_memory2
+                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2] = $rhsname))
+                else
+                    push!(stmts, :(@inbounds $mem[1 + $index + $offset] = $rhsname))
+                end
             elseif operator === :(+=)
+                @assert !have_memory2 && !have_memory3
                 push!(stmts, :(@inbounds $mem[1 + $index] += $rhsname))
             else
                 @assert false

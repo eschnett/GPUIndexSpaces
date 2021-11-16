@@ -25,6 +25,17 @@ const PlMi = Index{:PlMi}       # 1 bit (0:+, 1:-)
 # and 2^4 frequencies should take 27% of an A40, i.e. 15 ms when
 # running across all 84 SMs. It should thus take 79 ms for 84
 # frequencies. Current state for 84 frequencies is 113 ms.
+
+# Current state for 84 frequencies is 91 ms.
+
+# Missing optimizations:
+# - shared memory layout for E, use only 24 warps
+# - store A in shared memory
+# - store fI in registers
+
+const M = Cint(3)
+const N = Cint(3)
+
 const map_E_global = Layout(Int32,
                             Dict([Cplx(0) => SIMD(2)
                                   Polr(0) => SIMD(3)
@@ -182,19 +193,20 @@ const map_K_registers = Layout(Int32,
                                      Dish(8) => Warp(2)]))
 
 # Layout of E in shared memory see (49) e.
+const E_shared_size = (5, 32, 32)
 const map_E_shared = Layout(Int32,
                             Dict([Cplx(0) => SIMD(2)
                                   Polr(0) => SIMD(3)
-                                  DishJ(0) => Memory(2)
-                                  DishJ(1) => Memory(3)
-                                  DishJ(2) => Memory(4)
-                                  DishJ(3) => Memory(5)
-                                  DishJ(4) => Memory(6)
-                                  DishI(0) => Memory(7)
-                                  DishI(1) => Memory(8)
-                                  DishI(2) => Memory(9)
-                                  DishI(3) => Memory(10)
-                                  DishI(4) => Memory(11)
+                                  DishJ(0) => Memory2(0)
+                                  DishJ(1) => Memory2(1)
+                                  DishJ(2) => Memory2(2)
+                                  DishJ(3) => Memory2(3)
+                                  DishJ(4) => Memory2(4)
+                                  DishI(0) => Memory3(0)
+                                  DishI(1) => Memory3(1)
+                                  DishI(2) => Memory3(2)
+                                  DishI(3) => Memory3(3)
+                                  DishI(4) => Memory3(4)
                                   Freq(0) => Ignore(0)
                                   Freq(1) => Ignore(1)
                                   Freq(2) => Ignore(2)
@@ -284,25 +296,6 @@ const map_Gin_memory = Layout(Int32,
                                     DishI(3) => Memory(1)
                                     DishI(4) => Memory(6)]))
 
-# # Layout of Gmid in registers see (70)
-# const map_Gmid_registers = Layout(Dict([BeamI(0) => Thread(2)
-#                                         BeamI(1) => Thread(3)
-#                                         BeamI(2) => Thread(4)
-#                                         BeamI(3) => SIMD(3)
-#                                         BeamI(4) => SIMD(4)
-#                                         # BeamI(5) => Loop1(0)
-#                                         # BeamI(6) => Loop1(1)
-#                                         ]))
-# # Layout of Gmid in memory
-# const map_Gmid_memory = Layout(Dict([BeamI(0) => Memory(0 + 2)
-#                                      BeamI(1) => Memory(0 + 3)
-#                                      BeamI(2) => Memory(0 + 4)
-#                                      BeamI(3) => SIMD(3)
-#                                      BeamI(4) => SIMD(4)
-#                                      # BeamI(5) => Loop1(0)
-#                                      # BeamI(6) => Loop1(1)
-#                                      ]))
-
 # Layout of 1d N-S FT transformation matrix
 const map_Ans_registers = Layout(Int32,
                                  Dict([DishI(0) => SIMD(3)
@@ -326,7 +319,7 @@ const map_Ans_memory = Layout(Int32,
                                     BeamI(1) => Memory(3)
                                     BeamI(2) => Memory(4)
                                     BeamI(3) => Memory(5)
-                                    # BeamI(4) => Memory(9)
+                                    # BeamI(4) => Ignore(0)
                                     BeamI(5) => Memory(7)
                                     BeamI(6) => Memory(8)
                                     Cplx(0) => Memory(6)]))
@@ -370,22 +363,22 @@ const map_Fpre_registers = Layout(Int32,
                                         Time(14) => Loop4(7)]))
 
 # Layout of F̃ in shared memory
-# TOOD: Use layout from secion 3.1
+const F̃_shared_size = (8, M * 32 * 16, 2)
 const map_F̃_shared = Layout(Int32,
-                             Dict([Cplx(0) => Ignore(21) #TODO Memory(10 + 2)
-                                   Polr(0) => Memory(0 + 1)
-                                   BeamI(0) => Memory(0 + 2)
-                                   BeamI(1) => Memory(0 + 3)
-                                   BeamI(2) => Memory(0 + 4)
-                                   BeamI(3) => Ignore(23) #TODO Memory(10 + 0)
-                                   BeamI(4) => Ignore(22) #TODO Memory(10 + 1)
-                                   BeamI(5) => Ignore(19) #TODO Memory(10 + 3)
-                                   BeamI(6) => Ignore(20) #TODO Memory(10 + 4)
+                             Dict([Cplx(0) => Memory3(0 + 0)
+                                   Polr(0) => Memory2(0 + 0)
+                                   BeamI(0) => Memory2(4 + 0)
+                                   BeamI(1) => Memory2(4 + 1)
+                                   BeamI(2) => Memory2(4 + 2)
+                                   BeamI(3) => Memory2(4 + 3)
+                                   BeamI(4) => Memory2(4 + 4)
+                                   BeamI(5) => Memory2(4 + 5)
+                                   BeamI(6) => Memory2(4 + 6)
                                    DishJ(0) => SIMD(3)
                                    DishJ(1) => SIMD(4)
-                                   DishJ(2) => Memory(5 + 2)
-                                   DishJ(3) => Memory(5 + 3)
-                                   DishJ(4) => Memory(5 + 4)
+                                   DishJ(2) => Memory(0)
+                                   DishJ(3) => Memory(1)
+                                   DishJ(4) => Memory(2)
                                    Freq(0) => Ignore(0)
                                    Freq(1) => Ignore(1)
                                    Freq(2) => Ignore(2)
@@ -393,9 +386,9 @@ const map_F̃_shared = Layout(Int32,
                                    Freq(4) => Ignore(4)
                                    Freq(5) => Ignore(5)
                                    Freq(6) => Ignore(6)
-                                   Time(0) => Memory(0 + 0)
-                                   Time(1) => Memory(5 + 0)
-                                   Time(2) => Memory(5 + 1)
+                                   Time(0) => Memory2(0 + 1)
+                                   Time(1) => Memory2(0 + 2)
+                                   Time(2) => Memory2(0 + 3)
                                    Time(3) => Ignore(7)
                                    Time(4) => Ignore(8)
                                    Time(5) => Ignore(9)
@@ -471,7 +464,7 @@ const map_Aew_memory = Layout(Int32,
                                     BeamJ(1) => Memory(3)
                                     BeamJ(2) => Memory(4)
                                     BeamJ(3) => Memory(5)
-                                    # BeamJ(4) => Memory(9)
+                                    # BeamJ(4) => Ignore(0)
                                     BeamJ(5) => Memory(7)
                                     BeamJ(6) => Memory(8)
                                     Cplx(0) => Memory(6)]))
@@ -531,12 +524,8 @@ function grid_dishes!(steps::Vector{AbstractStep}, env::Environment)
     widen!(steps, env, :Kd, :K, Dish(0) => Register(0))
     split!(steps, env, :Kd0, :Kd1, :Kd, Dish(0))
     split!(steps, env, :E′d0, :E′d1, :E′, Dish(0))
-    store!(steps, env, :E′d0, :E_shared, map_E_shared;
-           # ignore=Set([[Dish(d) for d in 1:8]; [Freq(f) for f in 0:6]; [Time(t) for t in 3:14]]), offset=:Kd0)
-           ignore=Set(Dish(d) for d in 1:8), offset=:Kd0)
-    store!(steps, env, :E′d1, :E_shared, map_E_shared;
-           # ignore=Set([[Dish(d) for d in 1:8]; [Freq(f) for f in 0:6]; [Time(t) for t in 3:14]]), offset=:Kd1)
-           ignore=Set(Dish(d) for d in 1:8), offset=:Kd1)
+    store!(steps, env, :E′d0, :E_shared, map_E_shared; ignore=Set(Dish(d) for d in 1:8), offset=:(Kd0 * $(Cint(E_shared_size[1]))))
+    store!(steps, env, :E′d1, :E_shared, map_E_shared; ignore=Set(Dish(d) for d in 1:8), offset=:(Kd1 * $(Cint(E_shared_size[1]))))
     return
 end
 
@@ -586,7 +575,7 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
                                      Time(14) => Loop4(7)))
     permute!(steps, env, :Ẽ3, :Ẽ2, Register(0), Thread(3)) # (64)
 
-    loop!(steps, env, :loopIdx1, :(Int32(0):Int32(2)), [BeamI(5), BeamI(6)]) do steps, env
+    loop!(steps, env, :loopIdx1, :(Int32(0):Int32(M - 1)), [BeamI(5), BeamI(6)]) do steps, env
         # Load A
         # TODO: Load from shared memory
         load!(steps, env, :Ans, map_Ans_registers, :Ans_mem, map_Ans_memory)
@@ -631,14 +620,6 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
                                        Time(10) => Loop4(3), Time(11) => Loop4(4), Time(12) => Loop4(5), Time(13) => Loop4(6),
                                        Time(14) => Loop4(7)))
 
-        # # Load Gmid
-        # load!(steps, env, :Gmid0, map_Gmid_registers, :Gmid_mem, map_Gmid_memory)
-
-        # Apply midpoint gains
-        # TODO: Use a sparse matrix tensor core multiplication instead?
-        # TODO: Use vectorized `Float16` multiplication instead?
-        # widen2!(steps, env, :Gmid1, :Gmid0, SIMD(3) => Register(1), SIMD(4) => Register(3))
-        # apply!(steps, env, :F̃0, :F, :Gmid1, (F, G) -> :(max(-Int32(63), min(Int32(63), ($F * $G) >> 0x0c))))
         # TODO: Fold shift-by-8 into narrowing
         apply!(steps, env, :F̃0, :F, F -> :(max(-Int32(63), min(Int32(63), $F >> 0x08))))
         narrow2!(steps, env, :F̃1, :F̃0, Register(0) => SIMD(3), Register(2) => SIMD(4))
@@ -666,12 +647,12 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
 end
 
 function fourier2!(steps::Vector{AbstractStep}, env::Environment)
-    loop!(steps, env, :loopIdx2, :(Int32(0):Int32(2)), [BeamI(5), BeamI(6)]) do steps, env
+    loop!(steps, env, :loopIdx2, :(Int32(0):Int32(M - 1)), [BeamI(5), BeamI(6)]) do steps, env
 
         # Load F̃
         load!(steps, env, :F̃, map_F̃_registers, :F̃_shared, map_F̃_shared)
 
-        loop!(steps, env, :loopIdx1, :(Int32(0):Int32(2)), [BeamJ(5), BeamJ(6)]) do steps, env
+        loop!(steps, env, :loopIdx1, :(Int32(0):Int32(N - 1)), [BeamJ(5), BeamJ(6)]) do steps, env
 
             # Load A
             # TODO: Load from shared memory
@@ -777,17 +758,18 @@ function fourier2!(steps::Vector{AbstractStep}, env::Environment)
 end
 
 function frb!(steps::Vector{AbstractStep}, env::Environment)
-    zero_dishes!(steps, env)
+    # zero_dishes!(steps, env)
     loop!(steps, env, :loopIdx4, :(Int32(0):Int32(255)),
           [Time(7), Time(8), Time(9), Time(10), Time(11), Time(12), Time(13), Time(14)]) do steps, env
-        loop!(steps, env, :loopIdx2, :(Int32(0):Int32(2)), [BeamJ(5), BeamJ(6)]) do steps, env
-            loop!(steps, env, :loopIdx1, :(Int32(0):Int32(2)), [BeamI(5), BeamI(6)]) do steps, env
+        loop!(steps, env, :loopIdx2, :(Int32(0):Int32(N - 1)), [BeamJ(5), BeamJ(6)]) do steps, env
+            loop!(steps, env, :loopIdx1, :(Int32(0):Int32(M - 1)), [BeamI(5), BeamI(6)]) do steps, env
                 constant!(steps, env, :fIzero, map_fI_registers, :(Float32(0)))
                 store!(steps, env, :fIzero, :fI_mem, map_fI_memory)
                 return
             end
         end
         loop!(steps, env, :loopIdx3, :(Int32(0):Int32(15)), [Time(3), Time(4), Time(5), Time(6)]) do steps, env
+            zero_dishes!(steps, env)
             grid_dishes!(steps, env)
             sync_threads!(steps, env)
             fourier1!(steps, env)
@@ -839,12 +821,16 @@ println(frb_allsteps)
 
 ################################################################################
 
-const E_shared_size = 2^12
-# TODO it's just too much memory!
-const F̃_shared_size = 2^10 #TODO 2^15
+const E_shared_length = prod(E_shared_size)
+const F̃_shared_length = prod(F̃_shared_size)
+
 const E_shared_offset = 0
-const F̃_shared_offset = E_shared_offset + E_shared_size
-const shmem_size = F̃_shared_offset + F̃_shared_size
+# const F̃_shared_offset = E_shared_offset + E_shared_length
+const F̃_shared_offset = 0
+# const shmem_length = F̃_shared_offset + F̃_shared_length
+const shmem_length = max(E_shared_offset + E_shared_length, F̃_shared_offset + F̃_shared_length)
+
+const shmem = sizeof(Int32) * shmem_length
 
 @eval function runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem)
     E_shared = @cuDynamicSharedMem(Int4x8, $E_shared_size, $(sizeof(Int32) * E_shared_offset))
@@ -868,20 +854,20 @@ function runcuda()
     fI_mem = CuArray{Float32}(undef, 2^29)
 
     kernel = @cuda launch = false blocks_per_sm = 1 maxregs = 64 runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem)
+    attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem
 
-    # sm_75
-    nblocks = 68
-    @assert shmem_size < 12288  # NVIDIA GeForce RTX 2080 Ti has 48 kB shared memory
+    # # sm_75
+    # nblocks = 68
+    # @assert shmem ≤ 48 * 1024   # NVIDIA GeForce RTX 2080 Ti has 48 kB shared memory
 
-    # # sm_86
-    # nblocks = 84
+    # sm_86
+    nblocks = 84
+    @assert shmem ≤ 99 * 1024   # NVIDIA A10 has 99 kB shared memory
 
-    kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=sizeof(Int32) * shmem_size)
+    kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
     synchronize()
-    # CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks,
-    #                   shmem=sizeof(Int32) * shmem_size)
-    # @btime CUDA.@sync $(kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks,
-    #                            shmem=sizeof(Int32) * shmem_size))
+    CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
+    # @btime CUDA.@sync $(kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem))
 
     # fI_mem = Array(fI_mem)
     # println(fI_mem[1:32])
@@ -890,9 +876,13 @@ function runcuda()
 end
 
 if CUDA.functional()
+    # @device_code_lowered runcuda()
+    # @device_code_typed runcuda()
     # @device_code_warntype runcuda()
     # @device_code_llvm runcuda()
     # @device_code_ptx runcuda()
+    # @device_code_sass cap=:sm_86 runcuda()
     @device_code_sass runcuda()
+    # @device_code runcuda()
     # runcuda()
 end
