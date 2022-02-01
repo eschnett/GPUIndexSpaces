@@ -2,29 +2,44 @@
 
 ## How to run on Sky
 
+Copy source code to Sky:
+```sh
+rsync -Paz --exclude .git --exclude *.toml ~/src/jl/GPUIndexSpaces.jl sky.lwlab:src/jl
+```
+
 Run normally:
-```Julia
+```sh
 ~/julia-1.7/bin/julia --project=@. test/fourier1d.jl
 ```
 
+Copy output from Sky:
+```sh
+rsync -Paz sky.lwlab:src/jl/GPUIndexSpaces.jl/output/frb.sass output/
+```
+
 Run with profiling:
-```Julia
+```sh
 nv-nsight-cu-cli --target-processes all --set full --export profile5 env LD_LIBRARY_PATH=/opt/nvidia/nsight-compute/2021.2.2/target/linux-desktop-glibc_2_11_3-x64:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:/usr/local/lib:/home/eschnett/julia-1.6/lib/julia ~/julia-1.6/bin/julia --project=@. test/frb.jl
 ```
 Note that we need to add the Julia directory
 `/home/eschnett/julia-1.6/lib/julia` to `LD_LIBRARY_PATH`.
 One cannot extract PTX or SASS while profiling.
 
+Copy profiles from Sky:
+```sh
+rsync -Paz sky.lwlab:src/jl/GPUIndexSpaces.jl/profile16.ncu-rep profiles/
+```
+
 ## How to run on Symmetry
 
 Run normally:
-```Julia
+```sh
 module load julia
 julia --project=@. test/fourier1d.jl
 ```
 
 Run with profiling:
-```Julia
+```sh
 nv-nsight-cu-cli --target-processes all env LD_LIBRARY_PATH=/opt/nvidia/nsight-compute/2021.2.2/target/linux-desktop-glibc_2_11_3-x64:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:/usr/local/lib:/cm/shared/apps/julia/julia-1.6.3/lib/julia julia --project=@. test/frb.jl
 ```
 Note that we need to add the Julia directory
