@@ -25,8 +25,10 @@ function Float16x2(a::Float32, b::Float32)
     return Float16x2(LLVM.Interop.@asmcall("cvt.rn.f16x2.f32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Float32,Float32}, a, b))
 end
 function convert(::Type{Tuple{Float32,Float32}}, a::Float16x2)
-    return (LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val),
-            LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10))
+    return (
+        LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val),
+        LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10)
+    )
 end
 Base.:+(a::Float16x2) = a
 Base.:-(a::Float16x2) = Float16x2(LLVM.Interop.@asmcall("neg.rn.f16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
@@ -41,8 +43,11 @@ function Base.:*(a::Float16x2, b::Float16x2)
     return Float16x2(LLVM.Interop.@asmcall("mul.rn.f16x2 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{UInt32,UInt32}, a.val, b.val))
 end
 function Base.muladd(a::Float16x2, b::Float16x2, c::Float16x2)
-    return Float16x2(LLVM.Interop.@asmcall("fma.rn.f16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32},
-                                           a.val, b.val, c.val))
+    return Float16x2(
+        LLVM.Interop.@asmcall(
+            "fma.rn.f16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32}, a.val, b.val, c.val
+        )
+    )
 end
 
 struct BFloat16x2
@@ -52,8 +57,10 @@ function BFloat16x2(a::Float32, b::Float32)
     return BFloat16x2(LLVM.Interop.@asmcall("cvt.rn.bf16x2.f32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Float32,Float32}, a, b))
 end
 function convert(::Type{Tuple{Float32,Float32}}, a::BFloat16x2)
-    return (LLVM.Interop.@asmcall("cvt.f32.bf16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val),
-            LLVM.Interop.@asmcall("cvt.f32.bf16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10))
+    return (
+        LLVM.Interop.@asmcall("cvt.f32.bf16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val),
+        LLVM.Interop.@asmcall("cvt.f32.bf16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10)
+    )
 end
 Base.:+(a::BFloat16x2) = a
 Base.:-(a::BFloat16x2) = BFloat16x2(LLVM.Interop.@asmcall("neg.rn.bf16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
@@ -68,8 +75,11 @@ function Base.:*(a::BFloat16x2, b::BFloat16x2)
     return BFloat16x2(LLVM.Interop.@asmcall("mul.rn.bf16x2 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{UInt32,UInt32}, a.val, b.val))
 end
 function Base.muladd(a::BFloat16x2, b::BFloat16x2, c::BFloat16x2)
-    return BFloat16x2(LLVM.Interop.@asmcall("fma.rn.bf16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32},
-                                            a.val, b.val, c.val))
+    return BFloat16x2(
+        LLVM.Interop.@asmcall(
+            "fma.rn.bf16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32}, a.val, b.val, c.val
+        )
+    )
 end
 
 ################################################################################
@@ -79,8 +89,9 @@ end
 """
 function cvt_pack_s8(a::Int32, b::Int32, c::Int32)
     # I2IP.S8.S32.SAT
-    return LLVM.Interop.@asmcall("cvt.pack.sat.s8.s32.b32 \$0, \$1, \$2, \$3;", "=r,r,r,r", Int32, Tuple{Int32,Int32,Int32}, a, b,
-                                 c)::Int32
+    return LLVM.Interop.@asmcall(
+        "cvt.pack.sat.s8.s32.b32 \$0, \$1, \$2, \$3;", "=r,r,r,r", Int32, Tuple{Int32,Int32,Int32}, a, b, c
+    )::Int32
 end
 """
     int8 -> uint32

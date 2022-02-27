@@ -10,66 +10,102 @@ const Spec = Index{:Spec}       # 4 bits
 const PlMi = Index{:PlMi}       # 1 bit (0:+, 1:-)
 
 # Layout of 1d FT transformation matrix
-const map_A_registers = Layout(Dict([Dish(0) => SIMD(3)
-                                     Dish(1) => SIMD(4)
-                                     Dish(2) => Thread(0)
-                                     Dish(3) => Thread(1)
-                                     Beam(0) => Thread(2)
-                                     Beam(1) => Thread(3)
-                                     Beam(2) => Thread(4)
-                                     Beam(3) => Register(0)
-                                     Cplx(0) => Register(1)]))
-const map_A_memory = Layout(Dict([Dish(0) => SIMD(3)
-                                  Dish(1) => SIMD(4)
-                                  Dish(2) => Memory(0)
-                                  Dish(3) => Memory(1)
-                                  Beam(0) => Memory(2)
-                                  Beam(1) => Memory(3)
-                                  Beam(2) => Memory(4)
-                                  Beam(3) => Memory(5)
-                                  Cplx(0) => Memory(6)]))
+const map_A_registers = Layout(
+    Dict(
+        [
+            Dish(0) => SIMD(3)
+            Dish(1) => SIMD(4)
+            Dish(2) => Thread(0)
+            Dish(3) => Thread(1)
+            Beam(0) => Thread(2)
+            Beam(1) => Thread(3)
+            Beam(2) => Thread(4)
+            Beam(3) => Register(0)
+            Cplx(0) => Register(1)
+        ],
+    ),
+)
+const map_A_memory = Layout(
+    Dict(
+        [
+            Dish(0) => SIMD(3)
+            Dish(1) => SIMD(4)
+            Dish(2) => Memory(0)
+            Dish(3) => Memory(1)
+            Beam(0) => Memory(2)
+            Beam(1) => Memory(3)
+            Beam(2) => Memory(4)
+            Beam(3) => Memory(5)
+            Cplx(0) => Memory(6)
+        ],
+    ),
+)
 
 # Layout of 1d FT input matrix
-const map_X_registers = Layout(Dict([Cplx(0) => Register(2)
-                                     Dish(0) => SIMD(3)
-                                     Dish(1) => SIMD(4)
-                                     Dish(2) => Thread(0)
-                                     Dish(3) => Thread(1)
-                                     Dish(4) => Register(1)
-                                     Spec(0) => Register(0)
-                                     Spec(1) => Thread(2)
-                                     Spec(2) => Thread(3)
-                                     Spec(3) => Thread(4)]))
-const map_X_memory = Layout(Dict([Dish(0) => SIMD(3)
-                                  Dish(1) => SIMD(4)
-                                  Dish(2) => Memory(0)
-                                  Dish(3) => Memory(1)
-                                  Dish(4) => Memory(2)
-                                  Spec(0) => Memory(3)
-                                  Spec(1) => Memory(4)
-                                  Spec(2) => Memory(5)
-                                  Spec(3) => Memory(6)
-                                  Cplx(0) => Memory(7)]))
+const map_X_registers = Layout(
+    Dict(
+        [
+            Cplx(0) => Register(2)
+            Dish(0) => SIMD(3)
+            Dish(1) => SIMD(4)
+            Dish(2) => Thread(0)
+            Dish(3) => Thread(1)
+            Dish(4) => Register(1)
+            Spec(0) => Register(0)
+            Spec(1) => Thread(2)
+            Spec(2) => Thread(3)
+            Spec(3) => Thread(4)
+        ],
+    ),
+)
+const map_X_memory = Layout(
+    Dict(
+        [
+            Dish(0) => SIMD(3)
+            Dish(1) => SIMD(4)
+            Dish(2) => Memory(0)
+            Dish(3) => Memory(1)
+            Dish(4) => Memory(2)
+            Spec(0) => Memory(3)
+            Spec(1) => Memory(4)
+            Spec(2) => Memory(5)
+            Spec(3) => Memory(6)
+            Cplx(0) => Memory(7)
+        ],
+    ),
+)
 
 # Layout of C in registers ([m,n])
-const map_Ypre_registers = Layout(Dict([Spec(0) => Register(0)
-                                        Spec(1) => Thread(0)
-                                        Spec(2) => Thread(1)
-                                        Spec(3) => Register(2)
-                                        Beam(0) => Thread(2)
-                                        Beam(1) => Thread(3)
-                                        Beam(2) => Thread(4)
-                                        Beam(3) => Register(1)]))
-const map_Y_memory = Layout(Dict([Beam(0) => Memory(0)
-                                  Beam(1) => Memory(1)
-                                  Beam(2) => Memory(2)
-                                  Beam(3) => Memory(3)
-                                  Beam(4) => Memory(4)
-                                  Cplx(0) => Memory(5)
-                                  Spec(0) => Memory(6)
-                                  Spec(1) => Memory(7)
-                                  Spec(2) => Memory(8)
-                                  Spec(3) => Memory(9)]))
+const map_Ypre_registers = Layout(
+    Dict(
+        [
+            Spec(0) => Register(0)
+            Spec(1) => Thread(0)
+            Spec(2) => Thread(1)
+            Spec(3) => Register(2)
+            Beam(0) => Thread(2)
+            Beam(1) => Thread(3)
+            Beam(2) => Thread(4)
+            Beam(3) => Register(1)
+        ],
+    ),
+)
+const map_Y_memory = Layout(
+    Dict(
+        [
+            Beam(0) => Memory(0)
+            Beam(1) => Memory(1)
+            Beam(2) => Memory(2)
+            Beam(3) => Memory(3)
+            Beam(4) => Memory(4)
+            Cplx(0) => Memory(5)
+            Spec(0) => Memory(6)
+            Spec(1) => Memory(7)
+            Spec(2) => Memory(8)
+            Spec(3) => Memory(9)
+        ],
+    ),
+)
 
 ################################################################################
 

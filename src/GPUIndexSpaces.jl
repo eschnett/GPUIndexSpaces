@@ -59,14 +59,19 @@ function Int8x4(a1::Int32, a2::Int32, a3::Int32, a4::Int32)
 end
 
 function Base.convert(::Type{NTuple{2,Int16x2}}, a::Int8x4)
-    return (Int16x2(CUDA.byte_perm(a.val, UInt32(0), 0x9180) % UInt32),
-            Int16x2(CUDA.byte_perm(a.val, UInt32(0), 0xb3a2) % UInt32))::NTuple{2,Int16x2}
+    return (
+        Int16x2(CUDA.byte_perm(a.val, UInt32(0), 0x9180) % UInt32), Int16x2(CUDA.byte_perm(a.val, UInt32(0), 0xb3a2) % UInt32)
+    )::NTuple{2,Int16x2}
 end
 function Base.convert(::Type{NTuple{4,Int32}}, a::Int8x4)
     # return (a.val % Int8 % Int32, ((a.val % Int32) >> 0x08) % Int8 % Int32, ((a.val % Int32) >> 0x10) % Int8 % Int32,
     #         (a.val % Int32) >> 0x18)
-    return (CUDA.byte_perm(a.val, UInt32(0), 0x8880) % Int32, CUDA.byte_perm(a.val, UInt32(0), 0x9991) % Int32,
-            CUDA.byte_perm(a.val, UInt32(0), 0xaaa2) % Int32, CUDA.byte_perm(a.val, UInt32(0), 0xbbb3) % Int32)::NTuple{4,Int32}
+    return (
+        CUDA.byte_perm(a.val, UInt32(0), 0x8880) % Int32,
+        CUDA.byte_perm(a.val, UInt32(0), 0x9991) % Int32,
+        CUDA.byte_perm(a.val, UInt32(0), 0xaaa2) % Int32,
+        CUDA.byte_perm(a.val, UInt32(0), 0xbbb3) % Int32,
+    )::NTuple{4,Int32}
 end
 
 """
@@ -79,8 +84,11 @@ end
 """
 function cvt_pack_s8(a::Int32, b::Int32, c::Int8x4)
     # I2IP.S8.S32.SAT
-    return Int8x4(LLVM.Interop.@asmcall("cvt.pack.sat.s8.s32.b32 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32,
-                                        Tuple{Int32,Int32,UInt32}, a, b, c.val))
+    return Int8x4(
+        LLVM.Interop.@asmcall(
+            "cvt.pack.sat.s8.s32.b32 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{Int32,Int32,UInt32}, a, b, c.val
+        )
+    )
 end
 """
     d = cvt_pack_s8(a::Int32, b::Int32)
@@ -103,8 +111,9 @@ export dp4a
 """
 function dp4a(a::Int8x4, b::Int8x4, c::Int32)
     # IDP.4A.S8.S8
-    return LLVM.Interop.@asmcall("dp4a.s32.s32 \$0, \$1, \$2, \$3;", "=r,r,r,r", Int32, Tuple{UInt32,UInt32,Int32}, a.val, b.val,
-                                 c)::Int32
+    return LLVM.Interop.@asmcall(
+        "dp4a.s32.s32 \$0, \$1, \$2, \$3;", "=r,r,r,r", Int32, Tuple{UInt32,UInt32,Int32}, a.val, b.val, c
+    )::Int32
 end
 
 unsafe_add(a::Int8x4, b::Int8x4) = Int8x4(a.val + b.val)
@@ -139,8 +148,10 @@ function Float16x2(a1::Float32, a2::Float32)
     return Float16x2(LLVM.Interop.@asmcall("cvt.rn.f16x2.f32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Float32,Float32}, a2, a1))
 end
 function Base.convert(::Type{NTuple{2,Float32}}, a::Float16x2)
-    return (LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val),
-            LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10))::NTuple{2,Float32}
+    return (
+        LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val),
+        LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10)
+    )::NTuple{2,Float32}
 end
 Base.:+(a::Float16x2) = a
 Base.:-(a::Float16x2) = Float16x2(LLVM.Interop.@asmcall("neg.rn.f16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
@@ -161,8 +172,11 @@ function Base.:*(a::Float16x2, b::Float16x2)
     return Float16x2(LLVM.Interop.@asmcall("mul.rn.f16x2 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{UInt32,UInt32}, a.val, b.val))
 end
 function Base.muladd(a::Float16x2, b::Float16x2, c::Float16x2)
-    return Float16x2(LLVM.Interop.@asmcall("fma.rn.f16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32},
-                                           a.val, b.val, c.val))
+    return Float16x2(
+        LLVM.Interop.@asmcall(
+            "fma.rn.f16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32}, a.val, b.val, c.val
+        )
+    )
 end
 
 unsafe_add(a::Float16x2, b::Float16x2) = a + b
@@ -174,8 +188,10 @@ function BFloat16x2(a::Float32, b::Float32)
     return BFloat16x2(LLVM.Interop.@asmcall("cvt.rn.bf16x2.f32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Float32,Float32}, a, b))
 end
 function Base.convert(::Type{NTuple{2,Float32}}, a::BFloat16x2)
-    return (LLVM.Interop.@asmcall("cvt.f32.bf16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val),
-            LLVM.Interop.@asmcall("cvt.f32.bf16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10))::NTuple{2,Float32}
+    return (
+        LLVM.Interop.@asmcall("cvt.f32.bf16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val),
+        LLVM.Interop.@asmcall("cvt.f32.bf16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10)
+    )::NTuple{2,Float32}
 end
 Base.:+(a::BFloat16x2) = a
 Base.:-(a::BFloat16x2) = BFloat16x2(LLVM.Interop.@asmcall("neg.rn.bf16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
@@ -190,8 +206,11 @@ function Base.:*(a::BFloat16x2, b::BFloat16x2)
     return BFloat16x2(LLVM.Interop.@asmcall("mul.rn.bf16x2 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{UInt32,UInt32}, a.val, b.val))
 end
 function Base.muladd(a::BFloat16x2, b::BFloat16x2, c::BFloat16x2)
-    return BFloat16x2(LLVM.Interop.@asmcall("fma.rn.bf16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32},
-                                            a.val, b.val, c.val))
+    return BFloat16x2(
+        LLVM.Interop.@asmcall(
+            "fma.rn.bf16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32}, a.val, b.val, c.val
+        )
+    )
 end
 
 unsafe_add(a::BFloat16x2, b::BFloat16x2) = a + b
@@ -220,8 +239,9 @@ end
 
 export cuda_lop3
 function cuda_lop3(x::UInt32, y::UInt32, z::UInt32, op::UInt32)
-    LLVM.Interop.@asmcall("lop3.b32 \$0, \$1, \$2, \$3, \$4;", "=r,r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32,UInt32}, x, y, z,
-                          op)
+    LLVM.Interop.@asmcall(
+        "lop3.b32 \$0, \$1, \$2, \$3, \$4;", "=r,r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32,UInt32}, x, y, z, op
+    )
 end
 
 const Int_UInt_8_16_32 = Union{Int8,Int16,Int32,UInt8,UInt16,UInt32}
@@ -230,8 +250,16 @@ function cuda_lop3(x::Int_UInt_8_16_32, y::Int_UInt_8_16_32, z::Int_UInt_8_16_32
 end
 
 function cuda_lop3(x::Code, y::Code, z::Code, op::Int_UInt_8_16_32)
-    return :(LLVM.Interop.@asmcall("lop3.b32 \$0, \$1, \$2, \$3, \$4;", "=r,r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32,UInt32},
-                                   $x % UInt32, $y % UInt32, $z % UInt32, $(op % UInt32)))
+    return :(LLVM.Interop.@asmcall(
+        "lop3.b32 \$0, \$1, \$2, \$3, \$4;",
+        "=r,r,r,r,i",
+        UInt32,
+        Tuple{UInt32,UInt32,UInt32,UInt32},
+        $x % UInt32,
+        $y % UInt32,
+        $z % UInt32,
+        $(op % UInt32)
+    ))
 end
 
 """
@@ -382,7 +410,7 @@ showvar(var::Variable) = showvar(stdout, var)
 function showvar(io::IO, var::Variable)
     println(io, "$(var[1]):")
     print(io, var[2])
-    return
+    return nothing
 end
 Base.show(io::IO, var::Variable) = showvar(io, var)
 export showenv
@@ -395,27 +423,32 @@ function showenv(io::IO, env::Environment)
             println(io, "        $k => $v")
         end
     end
-    return
+    return nothing
 end
 Base.show(io::IO, env::Environment) = showenv(io, env)
 
 ################################################################################
 
-# See <https://discourse.julialang.org/t/code-generation-unnecessary-comment-lines-when-using-quote/398/2>
-export filter_out_lineno
-filter_out_lineno(x) = x
-filter_out_lineno(::LineNumberNode) = nothing
-function filter_out_lineno(ex::Expr)
-    args = []
-    for arg in ex.args
-        if arg isa LineNumberNode
-            # do nothing
-        else
-            push!(args, filter_out_lineno(arg))
-        end
+# Remove line numbers. Line numbers are usually wrong because they
+# point to this file, instead of the file where the code originates.
+# See
+# <https://discourse.julialang.org/t/code-generation-unnecessary-comment-lines-when-using-quote/398/2>
+clean_code(expr) = expr
+function clean_code(expr::Expr)
+    head, args = expr.head, expr.args
+    # Remove line number nodes
+    if head ≢ :macrocall
+        args = filter(arg -> !(arg isa LineNumberNode), args)
     end
-    return Expr(ex.head, args...)
+    if head ≡ :block && length(args) == 1
+        # Remove blocks with only one element
+        return clean_code(args[1])
+    end
+    # Recursive calls
+    args = map(clean_code, args)
+    return Expr(head, args...)
 end
+export clean_code
 
 export AbstractStep, invars, outvars, code
 abstract type AbstractStep end
@@ -442,9 +475,9 @@ function Base.show(io::IO, step::AbstractStep)
         end
     end
     println(io, "#     Unused: [$(join(sort!(collect(unusedsymbols(step))), ", "))]")
-    # println(io, filter_out_lineno(code(step)))
-    println(io, code(step))
-    return
+    # println(io, code(step))
+    println(io, clean_code(code(step)))
+    return nothing
 end
 
 export Step
@@ -553,42 +586,56 @@ end
 ################################################################################
 
 export loop!
-function loop!(makebody, steps::Vector{AbstractStep}, env::Environment, loopVar::Symbol, loopRange::Code,
-               loopIndices::AbstractArray{<:Index})
+function loop!(
+    makebody, steps::Vector{AbstractStep}, env::Environment, loopVar::Symbol, loopRange::Code, loopIndices::AbstractArray{<:Index}
+)
     loop_steps = AbstractStep[]
     makebody(loop_steps, env)
     push!(steps, Nested("loop", loopVar, loopRange, Seq(loop_steps)))
-    return
+    return nothing
 end
 
 ################################################################################
 
 export sync_threads!
 function sync_threads!(steps::Vector{AbstractStep}, env::Environment)
-    push!(steps, Step("sync_threads", Variable[], Variable[], quote
-                          sync_threads()
-                      end))
-    return
+    push!(steps, Step(
+        "sync_threads",
+        Variable[],
+        Variable[],
+        quote
+            sync_threads()
+        end,
+    ))
+    return nothing
 end
 
 ################################################################################
 
 function assemble_int4(x0::Code, x1::Code, x2::Code, x3::Code, x4::Code, x5::Code, x6::Code, x7::Code)
-    return :((($x0 % Int8) & 0x0000000f |
-              (($x1 % Int8) << 0x04) & 0x000000f0 |
-              (($x2 % Int8) << 0x08) & 0x00000f00 |
-              (($x3 % Int8) << 0x0c) & 0x0000f000 |
-              (($x4 % Int8) << 0x10) & 0x000f0000 |
-              (($x5 % Int8) << 0x14) & 0x00f00000 |
-              (($x6 % Int8) << 0x18) & 0x0f000000 |
-              (($x7 % Int8) << 0x1c) & 0xf0000000) % Int32)
+    return :(
+        (
+            ($x0 % Int8) & 0x0000000f |
+            (($x1 % Int8) << 0x04) & 0x000000f0 |
+            (($x2 % Int8) << 0x08) & 0x00000f00 |
+            (($x3 % Int8) << 0x0c) & 0x0000f000 |
+            (($x4 % Int8) << 0x10) & 0x000f0000 |
+            (($x5 % Int8) << 0x14) & 0x00f00000 |
+            (($x6 % Int8) << 0x18) & 0x0f000000 |
+            (($x7 % Int8) << 0x1c) & 0xf0000000
+        ) % Int32
+    )
 end
 
 function assemble_int8(x0::Code, x1::Code, x2::Code, x3::Code)
-    return :((($x0 % Int8) & 0x000000ff |
-              (($x1 % Int8) << 0x08) & 0x0000ff00 |
-              (($x2 % Int8) << 0x10) & 0x00ff0000 |
-              (($x3 % Int8) << 0x18) & 0xff000000) % Int32)
+    return :(
+        (
+            ($x0 % Int8) & 0x000000ff |
+            (($x1 % Int8) << 0x08) & 0x0000ff00 |
+            (($x2 % Int8) << 0x10) & 0x00ff0000 |
+            (($x3 % Int8) << 0x18) & 0xff000000
+        ) % Int32
+    )
 end
 
 function assemble_int16(x0::Code, x1::Code)
@@ -631,8 +678,9 @@ function constant!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, l
                 # push!(stmts, :($lhsname = Int8x4($value, $value, $value, $value)))
             elseif simd_bits == 3
                 @assert lhsmap.type ≡ Int32
-                push!(stmts,
-                      :($lhsname = Int4x8($(assemble_int4(value, value, value, value, value, value, value, value)) % UInt32)))
+                push!(
+                    stmts, :($lhsname = Int4x8($(assemble_int4(value, value, value, value, value, value, value, value)) % UInt32))
+                )
                 # push!(stmts, :($lhsname = Int4x8($value, $value, $value, $value, $value, $value, $value, $value)))
             else
                 @assert false
@@ -640,10 +688,15 @@ function constant!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, l
         end
     end
 
-    push!(steps, Step("Set to constant", Variable[], Variable[lhs => lhsmap], quote
-                          $(stmts...)
-                      end))
-    return
+    push!(steps, Step(
+        "Set to constant",
+        Variable[],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
 end
 
 export assign!
@@ -665,10 +718,15 @@ function assign!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs
         end
     end
 
-    push!(steps, return Step("Assign to variable", Variable[rhs => rhsmap], Variable[lhs => lhsmap], quote
-                                 $(stmts...)
-                             end))
-    return
+    push!(steps, return Step(
+        "Assign to variable",
+        Variable[rhs => rhsmap],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
 end
 
 export split!
@@ -703,14 +761,20 @@ function split!(steps::Vector{AbstractStep}, env::Environment, lhs0::Symbol, lhs
         end
     end
 
-    push!(steps, Step("Split variable", Variable[rhs => rhsmap], Variable[lhs0 => lhsmap, lhs1 => lhsmap], quote
-                          $(stmts...)
-                      end))
-    return
+    push!(steps, Step(
+        "Split variable",
+        Variable[rhs => rhsmap],
+        Variable[lhs0 => lhsmap, lhs1 => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
 end
 
-function Base.merge!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs0::Symbol, rhs1::Symbol,
-                     indexmap::Pair{<:Index,Register})
+function Base.merge!(
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs0::Symbol, rhs1::Symbol, indexmap::Pair{<:Index,Register}
+)
     rhsmap = env[rhs0]
     @assert env[rhs1] == rhsmap
 
@@ -739,15 +803,21 @@ function Base.merge!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol,
         end
     end
 
-    push!(steps, Step("Join variables", Variable[rhs0 => rhsmap, rhs1 => rhsmap], Variable[lhs => lhsmap], quote
-                          $(stmts...)
-                      end))
-    return
+    push!(steps, Step(
+        "Join variables",
+        Variable[rhs0 => rhsmap, rhs1 => rhsmap],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
 end
 
 export apply!
-function apply!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, fun::Function;
-                newtype::Union{Nothing,Type}=nothing)
+function apply!(
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, fun::Function; newtype::Union{Nothing,Type}=nothing
+)
     rhsmap = env[rhs]
     @assert lhs ∉ keys(env)
     type = something(newtype, get_type(rhsmap))
@@ -768,14 +838,26 @@ function apply!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs:
         end
     end
 
-    push!(steps, Step("Apply function", Variable[rhs => rhsmap], Variable[lhs => lhsmap], quote
-                          $(stmts...)
-                      end))
-    return
+    push!(steps, Step(
+        "Apply function",
+        Variable[rhs => rhsmap],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
 end
 
-function apply!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs1::Symbol, rhs2::Symbol, fun::Function;
-                newtype::Union{Nothing,Type}=nothing)
+function apply!(
+    steps::Vector{AbstractStep},
+    env::Environment,
+    lhs::Symbol,
+    rhs1::Symbol,
+    rhs2::Symbol,
+    fun::Function;
+    newtype::Union{Nothing,Type}=nothing,
+)
     rhsmap = env[rhs1]
     # The other rhsmaps must be subsets of the first one
     @assert all(rhsmap[k] == v for (k, v) in env[rhs2] if k in keys(rhsmap))
@@ -802,14 +884,28 @@ function apply!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs1
         end
     end
 
-    push!(steps, Step("Apply function", Variable[rhs1 => rhsmap, rhs2 => env[rhs2]], Variable[lhs => lhsmap], quote
-                          $(stmts...)
-                      end))
-    return
+    push!(steps, Step(
+        "Apply function",
+        Variable[rhs1 => rhsmap, rhs2 => env[rhs2]],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
 end
 
-function apply!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs1::Symbol, rhs2::Symbol, rhs3::Symbol, rhs4::Symbol,
-                fun::Function; newtype::Union{Nothing,Type}=nothing)
+function apply!(
+    steps::Vector{AbstractStep},
+    env::Environment,
+    lhs::Symbol,
+    rhs1::Symbol,
+    rhs2::Symbol,
+    rhs3::Symbol,
+    rhs4::Symbol,
+    fun::Function;
+    newtype::Union{Nothing,Type}=nothing,
+)
     rhsmap = env[rhs1]
     # The other rhsmaps must be subsets of the first one
     @assert all(rhsmap[k] == v for (k, v) in env[rhs2] if k in keys(rhsmap))
@@ -842,17 +938,29 @@ function apply!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs1
             rname3 = register_mask3 == 0 ? "" : "_$(r & register_mask3)"
             rname4 = register_mask4 == 0 ? "" : "_$(r & register_mask4)"
             lhsname = Symbol(lhs, rname)
-            push!(stmts,
-                  :($lhsname = $(fun(Symbol(rhs1, rname), Symbol(rhs2, rname2), Symbol(rhs3, rname3), Symbol(rhs4, rname4))::Code)::$(lhsmap.type)))
+            push!(
+                stmts,
+                :(
+                    $lhsname = $(
+                        fun(Symbol(rhs1, rname), Symbol(rhs2, rname2), Symbol(rhs3, rname3), Symbol(rhs4, rname4))::Code
+                    )::$(lhsmap.type)
+                ),
+            )
         end
     end
 
-    push!(steps,
-          Step("Apply function", Variable[rhs1 => rhsmap, rhs2 => env[rhs2], rhs3 => env[rhs3], rhs4 => env[rhs4]],
-               Variable[lhs => lhsmap], quote
-                   $(stmts...)
-               end))
-    return
+    push!(
+        steps,
+        Step(
+            "Apply function",
+            Variable[rhs1 => rhsmap, rhs2 => env[rhs2], rhs3 => env[rhs3], rhs4 => env[rhs4]],
+            Variable[lhs => lhsmap],
+            quote
+                $(stmts...)
+            end,
+        ),
+    )
+    return nothing
 end
 
 ################################################################################
@@ -881,9 +989,10 @@ function movebits(code::Code, bitmap::Vector{BitMap}, code_mask::Integer=0)
         if expr isa Number
             expr = expr & mask
         else
-            if mask ≠ code_mask
-                expr = :($expr & $mask)
-            end
+            # TODO: Check whether this correction led to inefficient array indexing
+            # if mask ≠ code_mask
+            expr = :($expr & $mask)
+            # end
         end
         if expr isa Number
             expr = expr << distance
@@ -914,8 +1023,9 @@ function movebits(code::Code, bitmap::Vector{BitMap}, code_mask::Integer=0)
     return expr::Code
 end
 
-function make_indices(idxmap::Layout, memmap::Layout; ignore::Set{<:Index}=Set{Index}(), memory::Type{MemoryN}=Memory,
-                      offset::Code=Int32(0)) where {MemoryN}
+function make_indices(
+    idxmap::Layout, memmap::Layout; ignore::Set{<:Index}=Set{Index}(), memory::Type{MemoryN}=Memory, offset::Code=Int32(0)
+) where {MemoryN}
     loops1 = [v for (k, v) in idxmap if v isa Loop1]
     loop1_mask = sum(UInt[1 << lp.bit for lp in loops1])
     loops2 = [v for (k, v) in idxmap if v isa Loop2]
@@ -959,41 +1069,97 @@ function make_indices(idxmap::Layout, memmap::Layout; ignore::Set{<:Index}=Set{I
     for r in 0:register_mask
         if r & ~register_mask == 0
             expressions = Code[]
-            # TODO: This assumes a memory layout in `int`s, not bytes
+            # TODO: This assumes a memory layout in CUDA `int`s, not bytes
             # TODO: Check for aligned access
-            push!(expressions,
-                  movebits(:(loopIdx4 % $SizeT),
-                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit)
-                            for lp in loops4 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN], loop4_mask))
-            push!(expressions,
-                  movebits(:(loopIdx3 % $SizeT),
-                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit)
-                            for lp in loops3 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN], loop3_mask))
-            push!(expressions,
-                  movebits(:(loopIdx2 % $SizeT),
-                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit)
-                            for lp in loops2 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN], loop2_mask))
-            push!(expressions,
-                  movebits(:(loopIdx1 % $SizeT),
-                           [BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit)
-                            for lp in loops1 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN], loop1_mask))
-            push!(expressions,
-                  movebits(:((blockIdx().x - 1) % $SizeT),
-                           [BitMap(bl.bit, (memmap[inv_idxmap[bl]]::MemoryN).bit)
-                            for bl in blocks if inv_idxmap[bl] ∉ ignore && memmap[inv_idxmap[bl]] isa MemoryN], block_mask))
-            push!(expressions,
-                  movebits(:((threadIdx().y - 1) % $SizeT),
-                           [BitMap(wr.bit, (memmap[inv_idxmap[wr]]::MemoryN).bit)
-                            for wr in warps if inv_idxmap[wr] ∉ ignore && memmap[inv_idxmap[wr]] isa MemoryN], warp_mask))
-            push!(expressions,
-                  flag_if_bank_conflict(movebits(:((threadIdx().x - 1) % $SizeT),
-                                                 [BitMap(thr.bit, (memmap[inv_idxmap[thr]]::MemoryN).bit)
-                                                  for thr in threads
-                                                  if inv_idxmap[thr] ∉ ignore && memmap[inv_idxmap[thr]] isa MemoryN], thread_mask)))
-            push!(expressions,
-                  movebits(SizeT(r),
-                           [BitMap(reg.bit, (memmap[inv_idxmap[reg]]::MemoryN).bit)
-                            for reg in registers if inv_idxmap[reg] ∉ ignore && memmap[inv_idxmap[reg]] isa MemoryN]))
+            push!(
+                expressions,
+                movebits(
+                    :(loopIdx4 % $SizeT),
+                    [
+                        BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit) for
+                        lp in loops4 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN
+                    ],
+                    loop4_mask,
+                ),
+            )
+            push!(
+                expressions,
+                movebits(
+                    :(loopIdx3 % $SizeT),
+                    [
+                        BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit) for
+                        lp in loops3 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN
+                    ],
+                    loop3_mask,
+                ),
+            )
+            push!(
+                expressions,
+                movebits(
+                    :(loopIdx2 % $SizeT),
+                    [
+                        BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit) for
+                        lp in loops2 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN
+                    ],
+                    loop2_mask,
+                ),
+            )
+            push!(
+                expressions,
+                movebits(
+                    :(loopIdx1 % $SizeT),
+                    [
+                        BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit) for
+                        lp in loops1 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN
+                    ],
+                    loop1_mask,
+                ),
+            )
+            push!(
+                expressions,
+                movebits(
+                    :((blockIdx().x - 1) % $SizeT),
+                    [
+                        BitMap(bl.bit, (memmap[inv_idxmap[bl]]::MemoryN).bit) for
+                        bl in blocks if inv_idxmap[bl] ∉ ignore && memmap[inv_idxmap[bl]] isa MemoryN
+                    ],
+                    block_mask,
+                ),
+            )
+            push!(
+                expressions,
+                movebits(
+                    :((threadIdx().y - 1) % $SizeT),
+                    [
+                        BitMap(wr.bit, (memmap[inv_idxmap[wr]]::MemoryN).bit) for
+                        wr in warps if inv_idxmap[wr] ∉ ignore && memmap[inv_idxmap[wr]] isa MemoryN
+                    ],
+                    warp_mask,
+                ),
+            )
+            push!(
+                expressions,
+                flag_if_bank_conflict(
+                    movebits(
+                        :((threadIdx().x - 1) % $SizeT),
+                        [
+                            BitMap(thr.bit, (memmap[inv_idxmap[thr]]::MemoryN).bit) for
+                            thr in threads if inv_idxmap[thr] ∉ ignore && memmap[inv_idxmap[thr]] isa MemoryN
+                        ],
+                        thread_mask,
+                    ),
+                ),
+            )
+            push!(
+                expressions,
+                movebits(
+                    SizeT(r),
+                    [
+                        BitMap(reg.bit, (memmap[inv_idxmap[reg]]::MemoryN).bit) for
+                        reg in registers if inv_idxmap[reg] ∉ ignore && memmap[inv_idxmap[reg]] isa MemoryN
+                    ],
+                ),
+            )
             if offset ≠ 0
                 push!(expressions, offset)
             end
@@ -1039,24 +1205,37 @@ function load!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsma
             # `$expression + 1`, so that the added `1` can be combined
             # with the subtracted `1` in the `getindex` function.
             if have_memory3
-                push!(stmts, :(@inbounds $lhsname = $mem[1 + $index, 1 + $index2, 1 + $index3]::$type))
+                push!(stmts, :($lhsname = $mem[1 + $index, 1 + $index2, 1 + $index3]::$type))#=@inbounds=#
             elseif have_memory2
-                push!(stmts, :(@inbounds $lhsname = $mem[1 + $index, 1 + $index2]::$type))
+                push!(stmts, :($lhsname = $mem[1 + $index, 1 + $index2]::$type))#=@inbounds=#
             else
-                push!(stmts, :(@inbounds $lhsname = $mem[1 + $index]::$type))
+                push!(stmts, :($lhsname = $mem[1 + $index]::$type))#=@inbounds=#
             end
         end
     end
-    push!(steps, Step("Load from memory", Variable[], Variable[lhs => lhsmap], quote
-                          $(stmts...)
-                      end))
-    return
+    push!(steps, Step(
+        "Load from memory",
+        Variable[],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
 end
 
 export store!
 # TODO: We could introduce a version of `store!` with `ignore::Set{<:Target}`
-function store!(steps::Vector{AbstractStep}, env::Environment, rhs::Symbol, mem::Symbol, memmap::Layout; operator::Symbol=:(=),
-                ignore::Set{<:Index}=Set{Index}(), offset::Code=Int32(0))
+function store!(
+    steps::Vector{AbstractStep},
+    env::Environment,
+    rhs::Symbol,
+    mem::Symbol,
+    memmap::Layout;
+    operator::Symbol=:(=),
+    ignore::Set{<:Index}=Set{Index}(),
+    offset::Code=Int32(0),
+)
     rhsmap = env[rhs]
 
     registers = [v for (k, v) in rhsmap if v isa Register]
@@ -1082,25 +1261,30 @@ function store!(steps::Vector{AbstractStep}, env::Environment, rhs::Symbol, mem:
             # with the subtracted `1` in the `getindex` function.
             if operator === :(=)
                 if have_memory3
-                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2, 1 + $index3] = $rhsname))
+                    push!(stmts, :($mem[1 + $index + $offset, 1 + $index2, 1 + $index3] = $rhsname))#=@inbounds=#
                 elseif have_memory2
-                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2] = $rhsname))
+                    push!(stmts, :($mem[1 + $index + $offset, 1 + $index2] = $rhsname))#=@inbounds=#
                 else
-                    push!(stmts, :(@inbounds $mem[1 + $index + $offset] = $rhsname))
+                    push!(stmts, :($mem[1 + $index + $offset] = $rhsname))#=@inbounds=#
                 end
             elseif operator === :(+=)
                 @assert !have_memory2 && !have_memory3
-                push!(stmts, :(@inbounds $mem[1 + $index] += $rhsname))
+                push!(stmts, :($mem[1 + $index] += $rhsname))#=@inbounds=#
             else
                 @assert false
             end
         end
     end
     # TODO: If the offset is non-zero, mark it as input
-    push!(steps, Step("Store to memory", [rhs => rhsmap], Variable[], quote
-                          $(stmts...)
-                      end))
-    return
+    push!(steps, Step(
+        "Store to memory",
+        [rhs => rhsmap],
+        Variable[],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
 end
 
 ################################################################################
@@ -1138,20 +1322,29 @@ function move!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::
                 rhsrname1 = register_mask == 0 ? "" : "_$rhsr1"
                 lhsrname0 = register_mask == 0 ? "" : "_$lhsr0"
                 lhsrname1 = register_mask == 0 ? "" : "_$lhsr1"
-                push!(stmts, quote
-                          $(Symbol(lhs, lhsrname0)) = $(Symbol(rhs, rhsrname0))
-                          $(Symbol(lhs, lhsrname1)) = $(Symbol(rhs, rhsrname1))
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        $(Symbol(lhs, lhsrname0)) = $(Symbol(rhs, rhsrname0))
+                        $(Symbol(lhs, lhsrname1)) = $(Symbol(rhs, rhsrname1))
+                    end,
+                )
             end
         end
     end
 
-    push!(steps,
-          Step("Move Register($(rhsreg.bit)) => Register($(lhsreg.bit))", Variable[rhs => rhsmap], Variable[lhs => lhsmap],
-               quote
-                   $(stmts...)
-               end))
-    return
+    push!(
+        steps,
+        Step(
+            "Move Register($(rhsreg.bit)) => Register($(lhsreg.bit))",
+            Variable[rhs => rhsmap],
+            Variable[lhs => lhsmap],
+            quote
+                $(stmts...)
+            end,
+        ),
+    )
+    return nothing
 end
 
 ################################################################################
@@ -1207,23 +1400,29 @@ function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbo
                 rname0 = register_mask == 0 ? "" : "_$r0"
                 rname1 = register_mask == 0 ? "" : "_$r1"
                 if simd == SIMD(2)
-                    push!(stmts,
-                          quote
-                              $(Symbol(lhs, rname0)) = GPUIndexSpaces.get_lo4($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                              $(Symbol(lhs, rname1)) = GPUIndexSpaces.get_hi4($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                          end)
+                    push!(
+                        stmts,
+                        quote
+                            $(Symbol(lhs, rname0)) = GPUIndexSpaces.get_lo4($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
+                            $(Symbol(lhs, rname1)) = GPUIndexSpaces.get_hi4($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
+                        end,
+                    )
                 elseif simd == SIMD(3)
-                    push!(stmts,
-                          quote
-                              $(Symbol(lhs, rname0)) = GPUIndexSpaces.get_lo8($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                              $(Symbol(lhs, rname1)) = GPUIndexSpaces.get_hi8($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                          end)
+                    push!(
+                        stmts,
+                        quote
+                            $(Symbol(lhs, rname0)) = GPUIndexSpaces.get_lo8($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
+                            $(Symbol(lhs, rname1)) = GPUIndexSpaces.get_hi8($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
+                        end,
+                    )
                 elseif simd == SIMD(4)
-                    push!(stmts,
-                          quote
-                              $(Symbol(lhs, rname0)) = GPUIndexSpaces.get_lo16($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                              $(Symbol(lhs, rname1)) = GPUIndexSpaces.get_hi16($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                          end)
+                    push!(
+                        stmts,
+                        quote
+                            $(Symbol(lhs, rname0)) = GPUIndexSpaces.get_lo16($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
+                            $(Symbol(lhs, rname1)) = GPUIndexSpaces.get_hi16($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
+                        end,
+                    )
                 else
                     error("not implemented")
                 end
@@ -1231,16 +1430,23 @@ function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbo
         end
     end
 
-    push!(steps,
-          Step("Permute Register($(register.bit)) and SIMD($(simd.bit))", Variable[rhs => rhsmap], Variable[lhs => lhsmap],
-               quote
-                   $(stmts...)
-               end))
-    return
+    push!(
+        steps,
+        Step(
+            "Permute Register($(register.bit)) and SIMD($(simd.bit))",
+            Variable[rhs => rhsmap],
+            Variable[lhs => lhsmap],
+            quote
+                $(stmts...)
+            end,
+        ),
+    )
+    return nothing
 end
 
-function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, register1::Register,
-                       register2::Register)
+function Base.permute!(
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, register1::Register, register2::Register
+)
     rhsmap = env[rhs]
     @assert lhs ∉ keys(env)
     inv_rhsmap = inv(rhsmap)
@@ -1264,20 +1470,29 @@ function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbo
                 r1 = r | (1 << register1.bit)
                 rname0 = register_mask == 0 ? "" : "_$r0"
                 rname1 = register_mask == 0 ? "" : "_$r1"
-                push!(stmts, quote
-                          $(Symbol(lhs, rname0)) = $(Symbol(rhs, rname1))
-                          $(Symbol(lhs, rname1)) = $(Symbol(rhs, rname0))
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        $(Symbol(lhs, rname0)) = $(Symbol(rhs, rname1))
+                        $(Symbol(lhs, rname1)) = $(Symbol(rhs, rname0))
+                    end,
+                )
             end
         end
     end
 
-    push!(steps,
-          Step("Permute Register($(register1.bit)) and Register($(register2.bit))", Variable[rhs => rhsmap],
-               Variable[lhs => lhsmap], quote
-                   $(stmts...)
-               end))
-    return
+    push!(
+        steps,
+        Step(
+            "Permute Register($(register1.bit)) and Register($(register2.bit))",
+            Variable[rhs => rhsmap],
+            Variable[lhs => lhsmap],
+            quote
+                $(stmts...)
+            end,
+        ),
+    )
+    return nothing
 end
 
 function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, register::Register, thread::Thread)
@@ -1303,12 +1518,15 @@ function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbo
     from_UInt32(expr) = type ∈ (Float32, Int32) ? :(reinterpret($type, $expr)) : :($type($expr))
 
     stmts = Code[]
-    push!(stmts, quote
-              mask = $(UInt32(1 << thread.bit))
-              # Thread 0: exchange register 1
-              # Thread 1: exchange register 0
-              isthread1 = ((threadIdx().x - 1) % Int32) & mask ≠ 0
-          end)
+    push!(
+        stmts,
+        quote
+            mask = $(UInt32(1 << thread.bit))
+            # Thread 0: exchange register 1
+            # Thread 1: exchange register 0
+            isthread1 = ((threadIdx().x - 1) % Int32) & mask ≠ 0
+        end,
+    )
     for r in 0:register_mask
         if r & ~register_mask == 0
             if r & (1 << register.bit) == 0
@@ -1316,34 +1534,44 @@ function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbo
                 r1 = r | (1 << register.bit)
                 rname0 = register_mask == 0 ? "" : "_$r0"
                 rname1 = register_mask == 0 ? "" : "_$r1"
-                push!(stmts, quote
-                          $(Symbol(lhs, rname0)) = $(Symbol(rhs, rname0))
-                          $(Symbol(lhs, rname1)) = $(Symbol(rhs, rname1))
-                          src = isthread1 ? $(Symbol(rhs, rname0)) : $(Symbol(rhs, rname1))
-                          src′ = $(to_UInt32(:src))::UInt32
-                          dst′ = shfl_xor_sync($(~UInt32(0)), src′, mask)::UInt32
-                          dst = $(from_UInt32(:dst′))::$type
-                          if isthread1
-                              $(Symbol(lhs, rname0)) = dst
-                          else
-                              $(Symbol(lhs, rname1)) = dst
-                          end
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        $(Symbol(lhs, rname0)) = $(Symbol(rhs, rname0))
+                        $(Symbol(lhs, rname1)) = $(Symbol(rhs, rname1))
+                        src = isthread1 ? $(Symbol(rhs, rname0)) : $(Symbol(rhs, rname1))
+                        src′ = $(to_UInt32(:src))::UInt32
+                        dst′ = shfl_xor_sync($(~UInt32(0)), src′, mask)::UInt32
+                        dst = $(from_UInt32(:dst′))::$type
+                        if isthread1
+                            $(Symbol(lhs, rname0)) = dst
+                        else
+                            $(Symbol(lhs, rname1)) = dst
+                        end
+                    end,
+                )
             end
         end
     end
 
-    push!(steps,
-          Step("Permute Thread($(thread.bit)) and Register($(register.bit))", Variable[rhs => rhsmap], Variable[lhs => lhsmap],
-               quote
-                   $(stmts...)
-               end))
-    return
+    push!(
+        steps,
+        Step(
+            "Permute Thread($(thread.bit)) and Register($(register.bit))",
+            Variable[rhs => rhsmap],
+            Variable[lhs => lhsmap],
+            quote
+                $(stmts...)
+            end,
+        ),
+    )
+    return nothing
 end
 
 export addsub!
-function addsub!(steps::Vector{AbstractStep}, env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,<:Index};
-                 flipsignsub2::Bool=false)
+function addsub!(
+    steps::Vector{AbstractStep}, env::Environment, k::Symbol, x::Symbol, x2k::Pair{<:Index,<:Index}; flipsignsub2::Bool=false
+)
     xmap = env[x]
     @assert k ∉ keys(env)
 
@@ -1376,18 +1604,26 @@ function addsub!(steps::Vector{AbstractStep}, env::Environment, k::Symbol, x::Sy
                 # subop = flipsignsub2 ? :(+) : :(-)
                 subop = flipsignsub2 ? :unsafe_add : :unsafe_sub
 
-                push!(stmts, quote
-                          $(Symbol(k, rname0)) = $addop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
-                          $(Symbol(k, rname1)) = $subop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        $(Symbol(k, rname0)) = $addop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
+                        $(Symbol(k, rname1)) = $subop($(Symbol(x, rname0)), $(Symbol(x, rname1)))
+                    end,
+                )
             end
         end
     end
 
-    push!(steps, Step("addsub", Variable[x => xmap], Variable[k => kmap], quote
-                          $(stmts...)
-                      end))
-    return
+    push!(steps, Step(
+        "addsub",
+        Variable[x => xmap],
+        Variable[k => kmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
 end
 
 ################################################################################
@@ -1433,61 +1669,87 @@ function widen!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs:
 
             if rhssimd == SIMD(4)
                 if lhsmap.type ≡ Float32
-                    push!(stmts,
-                          quote
-                              $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Float32}, $(Symbol(rhs, rname)))
-                          end)
+                    push!(
+                        stmts,
+                        quote
+                            $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Float32}, $(Symbol(rhs, rname)))
+                        end,
+                    )
                 elseif lhsmap.type ≡ Int32
-                    push!(stmts,
-                          quote
-                              # $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) % Int16 % Int32
-                              # $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) % Int32) >> 0x10
-                              $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Int32}, $(Symbol(rhs, rname)))
-                          end)
+                    push!(
+                        stmts,
+                        quote
+                            # $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) % Int16 % Int32
+                            # $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) % Int32) >> 0x10
+                            $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Int32}, $(Symbol(rhs, rname)))
+                        end,
+                    )
                 else
                     @assert false
                 end
             elseif rhssimd == SIMD(3)
                 @assert lhsmap.type ≡ Int32
-                push!(stmts,
-                      quote
-                          # $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) & 0x00ff00ff ⊻ 0x00800080 + 0x7ff87ff8 ⊻ 0x80008000
-                          # $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) >> 0x08) & 0x00ff00ff ⊻ 0x00800080 + 0x7ff87ff8 ⊻
-                          #                           0x80008000
-                          $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Int16x2}, $(Symbol(rhs, rname)))
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        # $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) & 0x00ff00ff ⊻ 0x00800080 + 0x7ff87ff8 ⊻ 0x80008000
+                        # $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) >> 0x08) & 0x00ff00ff ⊻ 0x00800080 + 0x7ff87ff8 ⊻
+                        #                           0x80008000
+                        $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Int16x2}, $(Symbol(rhs, rname)))
+                    end,
+                )
             elseif rhssimd == SIMD(2)
                 @assert lhsmap.type ≡ Int32
-                push!(stmts,
-                      quote
-                          # $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) & 0x0f0f0f0f ⊻ 0x08080808 + 0x78787878 ⊻ 0x80808080
-                          # $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) >> 0x04) & 0x0f0f0f0f ⊻ 0x08080808 + 0x78787878 ⊻
-                          #                           0x80808080
-                          $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Int8x4}, $(Symbol(rhs, rname)))
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        # $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) & 0x0f0f0f0f ⊻ 0x08080808 + 0x78787878 ⊻ 0x80808080
+                        # $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) >> 0x04) & 0x0f0f0f0f ⊻ 0x08080808 + 0x78787878 ⊻
+                        #                           0x80808080
+                        $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Int8x4}, $(Symbol(rhs, rname)))
+                    end,
+                )
             else
                 @assert false
             end
         end
     end
 
-    push!(steps,
-          Step("widen SIMD($(targetmap[1])) => Register($(targetmap[2]))", Variable[rhs => rhsmap], Variable[lhs => lhsmap],
-               quote
-                   $(stmts...)
-               end))
-    return
+    push!(
+        steps,
+        Step(
+            "widen SIMD($(targetmap[1])) => Register($(targetmap[2]))",
+            Variable[rhs => rhsmap],
+            Variable[lhs => lhsmap],
+            quote
+                $(stmts...)
+            end,
+        ),
+    )
+    return nothing
 end
 
 export widen2!
-function widen2!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, indexmap1::Pair{<:Index,Register},
-                 indexmap2::Pair{<:Index,Register})
+function widen2!(
+    steps::Vector{AbstractStep},
+    env::Environment,
+    lhs::Symbol,
+    rhs::Symbol,
+    indexmap1::Pair{<:Index,Register},
+    indexmap2::Pair{<:Index,Register},
+)
     @assert indexmap1[1] ≠ indexmap2[1]
     return widen2!(steps, env, lhs, rhs, env[rhs][indexmap1[1]] => indexmap1[2], env[rhs][indexmap2[1]] => indexmap2[2])
 end
 
-function widen2!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, targetmap1::Pair{SIMD,Register},
-                 targetmap2::Pair{SIMD,Register})
+function widen2!(
+    steps::Vector{AbstractStep},
+    env::Environment,
+    lhs::Symbol,
+    rhs::Symbol,
+    targetmap1::Pair{SIMD,Register},
+    targetmap2::Pair{SIMD,Register},
+)
     rhsmap = env[rhs]
 
     rhssimd1 = targetmap1[1]::SIMD
@@ -1536,29 +1798,36 @@ function widen2!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs
 
             if (rhssimd1, rhssimd2) == (SIMD(3), SIMD(4))
                 @assert lhsmap.type ≡ Int32
-                push!(stmts,
-                      quote
-                          # $(Symbol(lhs, lname00)) = $(Symbol(rhs, rname)) % Int8 % Int32
-                          # $(Symbol(lhs, lname01)) = (($(Symbol(rhs, rname)) % Int32) >> 0x08) % Int8 % Int32
-                          # $(Symbol(lhs, lname10)) = (($(Symbol(rhs, rname)) % Int32) >> 0x10) % Int8 % Int32
-                          # $(Symbol(lhs, lname11)) = ($(Symbol(rhs, rname)) % Int32) >> 0x18
-                          $(Symbol(lhs, lname00)), $(Symbol(lhs, lname01)), $(Symbol(lhs, lname10)), $(Symbol(lhs, lname11)) = convert(NTuple{4,
-                                                                                                                                              Int32},
-                                                                                                                                       $(Symbol(rhs,
-                                                                                                                                                rname)))
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        # $(Symbol(lhs, lname00)) = $(Symbol(rhs, rname)) % Int8 % Int32
+                        # $(Symbol(lhs, lname01)) = (($(Symbol(rhs, rname)) % Int32) >> 0x08) % Int8 % Int32
+                        # $(Symbol(lhs, lname10)) = (($(Symbol(rhs, rname)) % Int32) >> 0x10) % Int8 % Int32
+                        # $(Symbol(lhs, lname11)) = ($(Symbol(rhs, rname)) % Int32) >> 0x18
+                        $(Symbol(lhs, lname00)), $(Symbol(lhs, lname01)), $(Symbol(lhs, lname10)), $(Symbol(lhs, lname11)) = convert(
+                            NTuple{4,Int32}, $(Symbol(rhs, rname))
+                        )
+                    end,
+                )
             else
                 @assert false
             end
         end
     end
 
-    push!(steps,
-          Step("widen2 SIMD($(targetmap1[1])),SIMD($(targetmap2[1])) => Register($(targetmap1[2])),Register($(targetmap2[2]))",
-               Variable[rhs => rhsmap], Variable[lhs => lhsmap], quote
-                   $(stmts...)
-               end))
-    return
+    push!(
+        steps,
+        Step(
+            "widen2 SIMD($(targetmap1[1])),SIMD($(targetmap2[1])) => Register($(targetmap1[2])),Register($(targetmap2[2]))",
+            Variable[rhs => rhsmap],
+            Variable[lhs => lhsmap],
+            quote
+                $(stmts...)
+            end,
+        ),
+    )
+    return nothing
 end
 
 export narrow!
@@ -1603,13 +1872,19 @@ function narrow!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs
 
                 if rhssimd == SIMD(4)
                     if lhsmap.type ≡ Float32
-                        push!(stmts, quote
-                                  $(Symbol(lhs, rname)) = Float16x2($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                              end)
+                        push!(
+                            stmts,
+                            quote
+                                $(Symbol(lhs, rname)) = Float16x2($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
+                            end,
+                        )
                     elseif lhsmap.type ≡ Float32
-                        push!(stmts, quote
-                                  $(Symbol(lhs, rname)) = Int16x2($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
-                              end)
+                        push!(
+                            stmts,
+                            quote
+                                $(Symbol(lhs, rname)) = Int16x2($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
+                            end,
+                        )
                     else
                         @assert false
                     end
@@ -1620,23 +1895,41 @@ function narrow!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs
         end
     end
 
-    push!(steps,
-          Step("narrow Register($(targetmap[1])) => SIMD($(targetmap[2]))", Variable[rhs => rhsmap], Variable[lhs => lhsmap],
-               quote
-                   $(stmts...)
-               end))
-    return
+    push!(
+        steps,
+        Step(
+            "narrow Register($(targetmap[1])) => SIMD($(targetmap[2]))",
+            Variable[rhs => rhsmap],
+            Variable[lhs => lhsmap],
+            quote
+                $(stmts...)
+            end,
+        ),
+    )
+    return nothing
 end
 
 export narrow2!
-function narrow2!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, indexmap1::Pair{<:Index,Register},
-                  indexmap2::Pair{<:Index,Register})
+function narrow2!(
+    steps::Vector{AbstractStep},
+    env::Environment,
+    lhs::Symbol,
+    rhs::Symbol,
+    indexmap1::Pair{<:Index,Register},
+    indexmap2::Pair{<:Index,Register},
+)
     @assert indexmap1[1] ≠ indexmap2[1]
     return narrow2!(steps, env, lhs, rhs, env[rhs][indexmap1[1]] => indexmap1[2], env[rhs][indexmap2[1]] => indexmap2[2])
 end
 
-function narrow2!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, targetmap1::Pair{Register,SIMD},
-                  targetmap2::Pair{Register,SIMD})
+function narrow2!(
+    steps::Vector{AbstractStep},
+    env::Environment,
+    lhs::Symbol,
+    rhs::Symbol,
+    targetmap1::Pair{Register,SIMD},
+    targetmap2::Pair{Register,SIMD},
+)
     rhsmap = env[rhs]
 
     rhsreg1 = targetmap1[1]::Register
@@ -1686,17 +1979,20 @@ function narrow2!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rh
 
                 if (rhssimd1, rhssimd2) == (SIMD(3), SIMD(4))
                     @assert lhsmap.type ≡ Int32
-                    push!(stmts,
-                          quote
-                              # $(Symbol(lhs, rname)) = CUDA.byte_perm(CUDA.byte_perm($(Symbol(rhs, rname11)) % UInt32,
-                              #                                                       $(Symbol(rhs, rname10)) % UInt32,
-                              #                                                       0x7200 % UInt32) % UInt32,
-                              #                                        CUDA.byte_perm($(Symbol(rhs, rname01)) % UInt32,
-                              #                                                       $(Symbol(rhs, rname00)) % UInt32,
-                              #                                                       0x0060 % UInt32) % UInt32, 0x7610 % UInt32)
-                              $(Symbol(lhs, rname)) = Int8x4($(Symbol(rhs, rname00)), $(Symbol(rhs, rname01)),
-                                                             $(Symbol(rhs, rname10)), $(Symbol(rhs, rname11)))
-                          end)
+                    push!(
+                        stmts,
+                        quote
+                            # $(Symbol(lhs, rname)) = CUDA.byte_perm(CUDA.byte_perm($(Symbol(rhs, rname11)) % UInt32,
+                            #                                                       $(Symbol(rhs, rname10)) % UInt32,
+                            #                                                       0x7200 % UInt32) % UInt32,
+                            #                                        CUDA.byte_perm($(Symbol(rhs, rname01)) % UInt32,
+                            #                                                       $(Symbol(rhs, rname00)) % UInt32,
+                            #                                                       0x0060 % UInt32) % UInt32, 0x7610 % UInt32)
+                            $(Symbol(lhs, rname)) = Int8x4(
+                                $(Symbol(rhs, rname00)), $(Symbol(rhs, rname01)), $(Symbol(rhs, rname10)), $(Symbol(rhs, rname11))
+                            )
+                        end,
+                    )
                 else
                     @assert false
                 end
@@ -1704,12 +2000,18 @@ function narrow2!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rh
         end
     end
 
-    push!(steps,
-          Step("narrow2 Register($(targetmap1[1])),Register($(targetmap2[1])) => SIMD($(targetmap1[2])),SIMD($(targetmap2[2]))",
-               Variable[rhs => rhsmap], Variable[lhs => lhsmap], quote
-                   $(stmts...)
-               end))
-    return
+    push!(
+        steps,
+        Step(
+            "narrow2 Register($(targetmap1[1])),Register($(targetmap2[1])) => SIMD($(targetmap1[2])),SIMD($(targetmap2[2]))",
+            Variable[rhs => rhsmap],
+            Variable[lhs => lhsmap],
+            quote
+                $(stmts...)
+            end,
+        ),
+    )
+    return nothing
 end
 
 ################################################################################
@@ -1737,34 +2039,48 @@ function div2!(steps::Vector{AbstractStep}, env::Environment, y::Symbol, x::Symb
             @assert ymap.type ≡ Int32
 
             if simd_bits == 0
-                push!(stmts, quote
-                          $(Symbol(y, rname)) = $(Symbol(x, rname)) >> 0x01
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        $(Symbol(y, rname)) = $(Symbol(x, rname)) >> 0x01
+                    end,
+                )
             elseif simd_bits == 1
-                push!(stmts,
-                      quote
-                          $(Symbol(y, rname)) = $(bitwise_merge(0x80008000, :($(Symbol(x, rname)) >>> 0x01), Symbol(x, rname)))
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        $(Symbol(y, rname)) = $(bitwise_merge(0x80008000, :($(Symbol(x, rname)) >>> 0x01), Symbol(x, rname)))
+                    end,
+                )
             elseif simd_bits == 2
-                push!(stmts,
-                      quote
-                          $(Symbol(y, rname)) = $(bitwise_merge(0x80808080, :($(Symbol(x, rname)) >>> 0x01), Symbol(x, rname)))
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        $(Symbol(y, rname)) = $(bitwise_merge(0x80808080, :($(Symbol(x, rname)) >>> 0x01), Symbol(x, rname)))
+                    end,
+                )
             elseif simd_bits == 3
-                push!(stmts,
-                      quote
-                          $(Symbol(y, rname)) = $(bitwise_merge(0x88888888, :($(Symbol(x, rname)) >>> 0x01), Symbol(x, rname)))
-                      end)
+                push!(
+                    stmts,
+                    quote
+                        $(Symbol(y, rname)) = $(bitwise_merge(0x88888888, :($(Symbol(x, rname)) >>> 0x01), Symbol(x, rname)))
+                    end,
+                )
             else
                 @assert 0
             end
         end
     end
 
-    push!(steps, Step("div2", Variable[x => xmap], Variable[y => ymap], quote
-                          $(stmts...)
-                      end))
-    return
+    push!(steps, Step(
+        "div2",
+        Variable[x => xmap],
+        Variable[y => ymap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
 end
 
 export wmma_mma_row_col_m16n16k16_s8!
@@ -1883,7 +2199,7 @@ function wmma_mma_row_col_m16n16k16_s8!(steps::Vector{AbstractStep}, env::Enviro
     end
 
     push!(steps, Step("WMMA::mma 16x16x16", Variable[A => Amap, B => Bmap, C => Cmap], Variable[D => Dmap], code))
-    return
+    return nothing
 end
 
 end

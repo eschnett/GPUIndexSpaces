@@ -8,64 +8,100 @@ const Mn = Index{:Mn}
 const Mk = Index{:Mk}
 
 # Layout of A in memory ([m,k] row major)
-const map_A_memory = Layout(Dict([Mk(0) => SIMD(4)
-                                  Mk(1) => SIMD(3)
-                                  Mk(2) => Memory(0)
-                                  Mk(3) => Memory(1)
-                                  Mm(0) => Memory(2)
-                                  Mm(1) => Memory(3)
-                                  Mm(2) => Memory(4)
-                                  Mm(3) => Memory(5)]))
+const map_A_memory = Layout(
+    Dict(
+        [
+            Mk(0) => SIMD(4)
+            Mk(1) => SIMD(3)
+            Mk(2) => Memory(0)
+            Mk(3) => Memory(1)
+            Mm(0) => Memory(2)
+            Mm(1) => Memory(3)
+            Mm(2) => Memory(4)
+            Mm(3) => Memory(5)
+        ],
+    ),
+)
 
 # Layout of B in memory ([k,n], column major)
-const map_B_memory = Layout(Dict([Mk(0) => SIMD(4)
-                                  Mk(1) => SIMD(3)
-                                  Mk(2) => Memory(0)
-                                  Mk(3) => Memory(1)
-                                  Mn(0) => Memory(2)
-                                  Mn(1) => Memory(3)
-                                  Mn(2) => Memory(4)
-                                  Mn(3) => Memory(5)]))
+const map_B_memory = Layout(
+    Dict(
+        [
+            Mk(0) => SIMD(4)
+            Mk(1) => SIMD(3)
+            Mk(2) => Memory(0)
+            Mk(3) => Memory(1)
+            Mn(0) => Memory(2)
+            Mn(1) => Memory(3)
+            Mn(2) => Memory(4)
+            Mn(3) => Memory(5)
+        ],
+    ),
+)
 
 # Layout of D in memory ([m,n], row major]
-const map_D_memory = Layout(Dict([Mn(0) => Memory(0)
-                                  Mn(1) => Memory(1)
-                                  Mn(2) => Memory(2)
-                                  Mn(3) => Memory(3)
-                                  Mm(0) => Memory(4)
-                                  Mm(1) => Memory(5)
-                                  Mm(2) => Memory(6)
-                                  Mm(3) => Memory(7)]))
+const map_D_memory = Layout(
+    Dict(
+        [
+            Mn(0) => Memory(0)
+            Mn(1) => Memory(1)
+            Mn(2) => Memory(2)
+            Mn(3) => Memory(3)
+            Mm(0) => Memory(4)
+            Mm(1) => Memory(5)
+            Mm(2) => Memory(6)
+            Mm(3) => Memory(7)
+        ],
+    ),
+)
 
 # Layout of A in registers ([m,k])
-const map_A_registers = Layout(Dict([Mk(0) => SIMD(4)
-                                     Mk(1) => SIMD(3)
-                                     Mk(2) => Thread(0)
-                                     Mk(3) => Thread(1)
-                                     Mm(0) => Thread(2)
-                                     Mm(1) => Thread(3)
-                                     Mm(2) => Thread(4)
-                                     Mm(3) => Register(0)]))
+const map_A_registers = Layout(
+    Dict(
+        [
+            Mk(0) => SIMD(4)
+            Mk(1) => SIMD(3)
+            Mk(2) => Thread(0)
+            Mk(3) => Thread(1)
+            Mm(0) => Thread(2)
+            Mm(1) => Thread(3)
+            Mm(2) => Thread(4)
+            Mm(3) => Register(0)
+        ],
+    ),
+)
 
 # Layout of B in registers ([k,n])
-const map_B_registers = Layout(Dict([Mk(0) => SIMD(4)
-                                     Mk(1) => SIMD(3)
-                                     Mk(2) => Thread(0)
-                                     Mk(3) => Thread(1)
-                                     Mn(0) => Thread(2)
-                                     Mn(1) => Thread(3)
-                                     Mn(2) => Thread(4)
-                                     Mn(3) => Register(0)]))
+const map_B_registers = Layout(
+    Dict(
+        [
+            Mk(0) => SIMD(4)
+            Mk(1) => SIMD(3)
+            Mk(2) => Thread(0)
+            Mk(3) => Thread(1)
+            Mn(0) => Thread(2)
+            Mn(1) => Thread(3)
+            Mn(2) => Thread(4)
+            Mn(3) => Register(0)
+        ],
+    ),
+)
 
 # Layout of C in registers ([m,n])
-const map_C_registers = Layout(Dict([Mn(0) => Register(0)
-                                     Mn(1) => Thread(0)
-                                     Mn(2) => Thread(1)
-                                     Mn(3) => Register(2)
-                                     Mm(0) => Thread(2)
-                                     Mm(1) => Thread(3)
-                                     Mm(2) => Thread(4)
-                                     Mm(3) => Register(1)]))
+const map_C_registers = Layout(
+    Dict(
+        [
+            Mn(0) => Register(0)
+            Mn(1) => Thread(0)
+            Mn(2) => Thread(1)
+            Mn(3) => Register(2)
+            Mm(0) => Thread(2)
+            Mm(1) => Thread(3)
+            Mm(2) => Thread(4)
+            Mm(3) => Register(1)
+        ],
+    ),
+)
 
 ################################################################################
 
