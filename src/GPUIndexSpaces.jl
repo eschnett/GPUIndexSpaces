@@ -33,6 +33,7 @@ end
 function Int4x8(a1::Int32, a2::Int32, a3::Int32, a4::Int32, a5::Int32, a6::Int32, a7::Int32, a8::Int32)
     return Int4x8(bitwise_merge(0x0f0f0f0f, Int8x4(a1, a3, a5, a7).val, Int8x4(a2, a4, a6, a8).val))
 end
+Base.convert(::Type{Int4x8}, a::NTuple{2,Int8x4}) = Int4x8(bitwise_merge(0x0f0f0f0f, a[2].val << 0x04, a[1].val))
 function Base.convert(::Type{NTuple{2,Int8x4}}, a::Int4x8)
     a1 = a.val ⊻ 0x88888888            # a + 8
     a2_lo = a1 & 0x0f0f0f0f            # extract low part
@@ -58,19 +59,19 @@ function Int8x4(a1::Int32, a2::Int32, a3::Int32, a4::Int32)
     return cvt_pack_s8(a2, a1, cvt_pack_s8(a4, a3))
 end
 
+Base.convert(::Type{Int8x4}, a::NTuple{2,Int16x2}) = Int8x4(cuda_prmt(a[1].val, a[2].val, 0x6240))
 function Base.convert(::Type{NTuple{2,Int16x2}}, a::Int8x4)
-    return (
-        Int16x2(CUDA.byte_perm(a.val, UInt32(0), 0x9180) % UInt32), Int16x2(CUDA.byte_perm(a.val, UInt32(0), 0xb3a2) % UInt32)
-    )::NTuple{2,Int16x2}
+    return (Int16x2(cuda_prmt(a.val, UInt32(0), 0xa280)), Int16x2(cuda_prmt(a.val, UInt32(0), 0xb391)))::NTuple{2,Int16x2}
 end
+Base.convert(::Type{Int8x4}, a::NTuple{4,Int32}) = cvt_pack_s8(a[2], a[1], cvt_pack_s8(a[4], a[3]))
 function Base.convert(::Type{NTuple{4,Int32}}, a::Int8x4)
     # return (a.val % Int8 % Int32, ((a.val % Int32) >> 0x08) % Int8 % Int32, ((a.val % Int32) >> 0x10) % Int8 % Int32,
     #         (a.val % Int32) >> 0x18)
     return (
-        CUDA.byte_perm(a.val, UInt32(0), 0x8880) % Int32,
-        CUDA.byte_perm(a.val, UInt32(0), 0x9991) % Int32,
-        CUDA.byte_perm(a.val, UInt32(0), 0xaaa2) % Int32,
-        CUDA.byte_perm(a.val, UInt32(0), 0xbbb3) % Int32,
+        cuda_prmt(a.val, UInt32(0), 0x8880) % Int32,
+        cuda_prmt(a.val, UInt32(0), 0x9991) % Int32,
+        cuda_prmt(a.val, UInt32(0), 0xaaa2) % Int32,
+        cuda_prmt(a.val, UInt32(0), 0xbbb3) % Int32,
     )::NTuple{4,Int32}
 end
 
@@ -121,9 +122,11 @@ unsafe_sub(a::Int8x4, b::Int8x4) = Int8x4(a.val - b.val)
 
 # Int16x2
 
+Int16x2(a1::Int32, a2::Int32) = cvt_pack_s16(a2, a1)
+
+Base.convert(::Type{Int16x2}, a::NTuple{2,Int32}) = cvt_pack_s16(a[2], a[1])
 Base.convert(::Type{NTuple{2,Int32}}, a::Int16x2) = (a.val % Int16 % Int32, (a.val % Int32) >> 0x10)::NTuple{2,Int32}
 
-Int16x2(a1::Int32, a2::Int32) = cvs_pack_s16(a2, a1)
 """
     d = cvt_pack_s16(a::Int32, b::Int32)
     d::Int16x2
@@ -237,6 +240,23 @@ function make_uint(i::Integer)
     @assert false
 end
 
+const Int_UInt_8_16_32 = Union{Int8,Int16,Int32,UInt8,UInt16,UInt32}
+
+export cuda_prmt
+function cuda_prmt(x::UInt32, y::UInt32, op::UInt32)
+    LLVM.Interop.@asmcall("prmt.b32 \$0, \$1, \$2, \$3;", "=r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32}, x, y, op)
+end
+
+function cuda_prmt(x::Int_UInt_8_16_32, y::Int_UInt_8_16_32, op::Int_UInt_8_16_32)
+    return cuda_prmt(x % UInt32, y % UInt32, op % UInt32)::UInt32
+end
+
+function cuda_prmt(x::Code, y::Code, op::Int_UInt_8_16_32)
+    return :(LLVM.Interop.@asmcall(
+        "prmt.b32 \$0, \$1, \$2, \$3;", "=r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32}, $x % UInt32, $y % UInt32, $(op % UInt32)
+    ))
+end
+
 export cuda_lop3
 function cuda_lop3(x::UInt32, y::UInt32, z::UInt32, op::UInt32)
     LLVM.Interop.@asmcall(
@@ -244,7 +264,6 @@ function cuda_lop3(x::UInt32, y::UInt32, z::UInt32, op::UInt32)
     )
 end
 
-const Int_UInt_8_16_32 = Union{Int8,Int16,Int32,UInt8,UInt16,UInt32}
 function cuda_lop3(x::Int_UInt_8_16_32, y::Int_UInt_8_16_32, z::Int_UInt_8_16_32, op::Int_UInt_8_16_32)
     return cuda_lop3(x % UInt32, y % UInt32, z % UInt32, op % UInt32)::UInt32
 end
@@ -1355,18 +1374,18 @@ const lomask4 = 0x0f0f0f0f
 get_lo4(r0::Int4x8, r1::Int4x8) = Int4x8(bitwise_merge(GPUIndexSpaces.lomask4, r1.val << 0x04, r0.val))
 get_hi4(r0::Int4x8, r1::Int4x8) = Int4x8(bitwise_merge(GPUIndexSpaces.lomask4, r1.val, r0.val >>> 0x04))
 
-# get_lo8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
-# get_hi8(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
-get_lo8(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4}} = T(CUDA.byte_perm(r0.val, r1.val, 0x6420 % UInt32) % UInt32)
-get_hi8(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4}} = T(CUDA.byte_perm(r0.val, r1.val, 0x7531 % UInt32) % UInt32)
+# get_lo8(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
+# get_hi8(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
+get_lo8(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4}} = T(cuda_prmt(r0.val, r1.val, 0x6420))
+get_hi8(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4}} = T(cuda_prmt(r0.val, r1.val, 0x7531))
 
-# get_lo16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x5410 % UInt32) % Int32)
-# get_hi16(r0::Code, r1::Code) = :(CUDA.byte_perm($r0 % UInt32, $r1 % UInt32, 0x7632 % UInt32) % Int32)
+# get_lo16(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x5410 % UInt32) % Int32)
+# get_hi16(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x7632 % UInt32) % Int32)
 function get_lo16(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4,Int16x2,Float16x2}}
-    return T(CUDA.byte_perm(r0.val, r1.val, 0x5410 % UInt32) % UInt32)
+    return T(cuda_prmt(r0.val, r1.val, 0x5410))
 end
 function get_hi16(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4,Int16x2,Float16x2}}
-    return T(CUDA.byte_perm(r0.val, r1.val, 0x7632 % UInt32) % UInt32)
+    return T(cuda_prmt(r0.val, r1.val, 0x7632))
 end
 
 function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, index1::Index, index2::Index)
@@ -1679,8 +1698,6 @@ function widen!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs:
                     push!(
                         stmts,
                         quote
-                            # $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) % Int16 % Int32
-                            # $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) % Int32) >> 0x10
                             $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Int32}, $(Symbol(rhs, rname)))
                         end,
                     )
@@ -1692,9 +1709,6 @@ function widen!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs:
                 push!(
                     stmts,
                     quote
-                        # $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) & 0x00ff00ff ⊻ 0x00800080 + 0x7ff87ff8 ⊻ 0x80008000
-                        # $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) >> 0x08) & 0x00ff00ff ⊻ 0x00800080 + 0x7ff87ff8 ⊻
-                        #                           0x80008000
                         $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Int16x2}, $(Symbol(rhs, rname)))
                     end,
                 )
@@ -1703,9 +1717,6 @@ function widen!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs:
                 push!(
                     stmts,
                     quote
-                        # $(Symbol(lhs, lnamelo)) = $(Symbol(rhs, rname)) & 0x0f0f0f0f ⊻ 0x08080808 + 0x78787878 ⊻ 0x80808080
-                        # $(Symbol(lhs, lnamehi)) = ($(Symbol(rhs, rname)) >> 0x04) & 0x0f0f0f0f ⊻ 0x08080808 + 0x78787878 ⊻
-                        #                           0x80808080
                         $(Symbol(lhs, lnamelo)), $(Symbol(lhs, lnamehi)) = convert(NTuple{2,Int8x4}, $(Symbol(rhs, rname)))
                     end,
                 )
@@ -1801,10 +1812,6 @@ function widen2!(
                 push!(
                     stmts,
                     quote
-                        # $(Symbol(lhs, lname00)) = $(Symbol(rhs, rname)) % Int8 % Int32
-                        # $(Symbol(lhs, lname01)) = (($(Symbol(rhs, rname)) % Int32) >> 0x08) % Int8 % Int32
-                        # $(Symbol(lhs, lname10)) = (($(Symbol(rhs, rname)) % Int32) >> 0x10) % Int8 % Int32
-                        # $(Symbol(lhs, lname11)) = ($(Symbol(rhs, rname)) % Int32) >> 0x18
                         $(Symbol(lhs, lname00)), $(Symbol(lhs, lname01)), $(Symbol(lhs, lname10)), $(Symbol(lhs, lname11)) = convert(
                             NTuple{4,Int32}, $(Symbol(rhs, rname))
                         )
@@ -1878,7 +1885,7 @@ function narrow!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs
                                 $(Symbol(lhs, rname)) = Float16x2($(Symbol(rhs, rname0)), $(Symbol(rhs, rname1)))
                             end,
                         )
-                    elseif lhsmap.type ≡ Float32
+                    elseif lhsmap.type ≡ Int32
                         push!(
                             stmts,
                             quote
@@ -1982,12 +1989,6 @@ function narrow2!(
                     push!(
                         stmts,
                         quote
-                            # $(Symbol(lhs, rname)) = CUDA.byte_perm(CUDA.byte_perm($(Symbol(rhs, rname11)) % UInt32,
-                            #                                                       $(Symbol(rhs, rname10)) % UInt32,
-                            #                                                       0x7200 % UInt32) % UInt32,
-                            #                                        CUDA.byte_perm($(Symbol(rhs, rname01)) % UInt32,
-                            #                                                       $(Symbol(rhs, rname00)) % UInt32,
-                            #                                                       0x0060 % UInt32) % UInt32, 0x7610 % UInt32)
                             $(Symbol(lhs, rname)) = Int8x4(
                                 $(Symbol(rhs, rname00)), $(Symbol(rhs, rname01)), $(Symbol(rhs, rname10)), $(Symbol(rhs, rname11))
                             )

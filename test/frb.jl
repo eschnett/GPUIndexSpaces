@@ -40,16 +40,14 @@ const PlMi = Index{:PlMi}       # 1 bit (0:+, 1:-)
 # - check for bank conflicts
 # - (use integer math after second FT)
 
-const debug_E_shared = true
-
-#TODO const F = Cint(8)               # Frequencies
-#TODO const K = Cint(256)             # Time loop iterations
-#TODO const M = Cint(3)               # BeamI loop iterations
-#TODO const N = Cint(3)               # BeamJ loop iterations
-const F = Cint(1)               # Frequencies
-const K = Cint(1)               # Time loop iterations
-const M = Cint(1)               # BeamI loop iterations
-const N = Cint(1)               # BeamJ loop iterations
+const F = Cint(8)               # Frequencies
+const K = Cint(256)             # Time loop iterations
+const M = Cint(3)               # BeamI loop iterations
+const N = Cint(3)               # BeamJ loop iterations
+#TODO const F = Cint(1)               # Frequencies
+#TODO const K = Cint(1)               # Time loop iterations
+#TODO const M = Cint(1)               # BeamI loop iterations
+#TODO const N = Cint(1)               # BeamJ loop iterations
 
 const map_E_global = Layout(
     Int32,
@@ -232,89 +230,46 @@ const map_K_registers = Layout(
 )
 
 # Layout of E in shared memory see (49)
-if !debug_E_shared
-    const E_shared_size = (5, 32, 32)
-    const map_E_shared = Layout(
-        Int32,
-        Dict(
-            Cplx(0) => SIMD(2),
-            Polr(0) => SIMD(3),
-            DishJ(0) => Memory2(0),
-            DishJ(1) => Memory2(1),
-            DishJ(2) => Memory2(2),
-            DishJ(3) => Memory2(3),
-            DishJ(4) => Memory2(4),
-            DishI(0) => Memory3(0),
-            DishI(1) => Memory3(1),
-            DishI(2) => Memory3(2),
-            DishI(3) => Memory3(3),
-            DishI(4) => Memory3(4),
-            Freq(0) => Ignore(0),
-            Freq(1) => Ignore(1),
-            Freq(2) => Ignore(2),
-            Freq(3) => Ignore(3),
-            Freq(4) => Ignore(4),
-            Freq(5) => Ignore(5),
-            Freq(6) => Ignore(6),
-            Time(0) => SIMD(4),
-            Time(1) => Memory(0),
-            Time(2) => Memory(1),
-            Time(3) => Ignore(7),
-            Time(4) => Ignore(8),
-            Time(5) => Ignore(9),
-            Time(6) => Ignore(10),
-            Time(7) => Ignore(11),
-            Time(8) => Ignore(12),
-            Time(9) => Ignore(13),
-            Time(10) => Ignore(14),
-            Time(11) => Ignore(15),
-            Time(12) => Ignore(16),
-            Time(13) => Ignore(17),
-            Time(14) => Ignore(18),
-        ),
-    )
-else
-    const E_shared_size = (4, 32, 2^23)
-    const map_E_shared = Layout(
-        Int32,
-        Dict(
-            Cplx(0) => SIMD(2),
-            Polr(0) => SIMD(3),
-            DishJ(0) => Memory2(0),
-            DishJ(1) => Memory2(1),
-            DishJ(2) => Memory2(2),
-            DishJ(3) => Memory2(3),
-            DishJ(4) => Memory2(4),
-            DishI(0) => Memory3(0),
-            DishI(1) => Memory3(1),
-            DishI(2) => Memory3(2),
-            DishI(3) => Memory3(3),
-            DishI(4) => Memory3(4),
-            Freq(0) => Memory3(5 + 0),
-            Freq(1) => Memory3(5 + 1),
-            Freq(2) => Memory3(5 + 2),
-            Freq(3) => Memory3(5 + 3),
-            Freq(4) => Memory3(5 + 4),
-            Freq(5) => Memory3(5 + 5),
-            Freq(6) => Memory3(5 + 6),
-            Time(0) => SIMD(4),
-            Time(1) => Memory(0),
-            Time(2) => Memory(1),
-            Time(3) => Memory3(5 + 7),
-            Time(4) => Memory3(5 + 8),
-            Time(5) => Memory3(5 + 9),
-            Time(6) => Memory3(5 + 10),
-            Time(7) => Memory3(5 + 11),
-            Time(8) => Memory3(5 + 12),
-            Time(9) => Memory3(5 + 13),
-            Time(10) => Memory3(5 + 14),
-            Time(11) => Memory3(5 + 15),
-            Time(12) => Memory3(5 + 16),
-            Time(13) => Memory3(5 + 17),
-            Time(14) => Memory3(5 + 18),
-        ),
-    )
-end
+const E_shared_size = (5, 32, 32)
+const map_E_shared = Layout(
+    Int32,
+    Dict(
+        Cplx(0) => SIMD(2),
+        Polr(0) => SIMD(3),
+        DishJ(0) => Memory2(0),
+        DishJ(1) => Memory2(1),
+        DishJ(2) => Memory2(2),
+        DishJ(3) => Memory2(3),
+        DishJ(4) => Memory2(4),
+        DishI(0) => Memory3(0),
+        DishI(1) => Memory3(1),
+        DishI(2) => Memory3(2),
+        DishI(3) => Memory3(3),
+        DishI(4) => Memory3(4),
+        Freq(0) => Ignore(0),
+        Freq(1) => Ignore(1),
+        Freq(2) => Ignore(2),
+        Freq(3) => Ignore(3),
+        Freq(4) => Ignore(4),
+        Freq(5) => Ignore(5),
+        Freq(6) => Ignore(6),
+        Time(0) => SIMD(4),
+        Time(1) => Memory(0),
+        Time(2) => Memory(1),
+        Time(3) => Ignore(7),
+        Time(4) => Ignore(8),
+        Time(5) => Ignore(9),
+        Time(6) => Ignore(10),
+        Time(7) => Ignore(11),
+        Time(8) => Ignore(12),
+        Time(9) => Ignore(13),
+        Time(10) => Ignore(14),
+        Time(11) => Ignore(15),
+        Time(12) => Ignore(16),
+        Time(13) => Ignore(17),
+        Time(14) => Ignore(18),
+    ),
+)
 
 # Layout of E to access the shared memory see (56)
 const map_E′_registers = Layout(
@@ -1164,6 +1119,7 @@ function frb!(steps::Vector{AbstractStep}, env::Environment)
             fourier2!(steps, env)
             return nothing
         end
+        return nothing
     end
     return nothing
 end
@@ -1298,22 +1254,18 @@ function load_fI(fI::Vector, bi::Integer, bj::Integer, f::Integer, t::Integer)
         getbit(bi, 2),
         getbit(bi, 1),
         getbit(bi, 0),
-        getbit(bj, 4),
-        getbit(bj, 3),
         getbit(bj, 2),
         getbit(bj, 1),
         getbit(bj, 0),
+        getbit(bj, 4),
+        getbit(bj, 3),
     ))
     return fI[ind + 1]
 end
 
 ################################################################################
 
-if !debug_E_shared
-    const E_shared_length = prod(E_shared_size)
-else
-    const E_shared_length = 0
-end
+const E_shared_length = prod(E_shared_size)
 const F̃_shared_length = prod(F̃_shared_size)
 
 const E_shared_offset = 0
@@ -1324,9 +1276,8 @@ const shmem_length = max(E_shared_offset + E_shared_length, F̃_shared_offset + 
 
 const shmem = sizeof(Int32) * shmem_length
 
-@eval function runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem, E_shared)
-    @assert debug_E_shared
-    #TODO E_shared = @cuDynamicSharedMem(Int4x8, $E_shared_size, $(sizeof(Int32) * E_shared_offset))
+@eval function runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem)
+    E_shared = @cuDynamicSharedMem(Int4x8, $E_shared_size, $(sizeof(Int32) * E_shared_offset))
     F̃_shared = @cuDynamicSharedMem(Int8x4, $F̃_shared_size, $(sizeof(Int32) * F̃_shared_offset))
     $(code(frb_allsteps))
     return nothing
@@ -1465,11 +1416,7 @@ function runcuda()
     noutputs = 128 * 128 * 128 * K
     fI_mem = CuArray{Float32}(undef, noutputs)
 
-    # 0x8 = -8
-    E_shared = fill(Int4x8(0x88888888), E_shared_size)
-    E_shared = CuArray(E_shared)
-
-    kernel = @cuda launch = false blocks_per_sm = 1 maxregs = 64 runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem, E_shared)
+    kernel = @cuda launch = false blocks_per_sm = 1 maxregs = 64 runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem)
     attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem
 
     # # sm_75
@@ -1483,19 +1430,19 @@ function runcuda()
 
     @assert nblocks == nfrequencies
 
-    kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem, E_shared; threads=(32, 32), blocks=nblocks, shmem=shmem)
+    kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
     synchronize()
-    CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem, E_shared; threads=(32, 32), blocks=nblocks, shmem=shmem)
+    CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
     # @btime CUDA.@sync $(kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem))
 
     fI_mem = Array(fI_mem)
-    E_shared = Array(E_shared)
     # println(fI_mem[1:32])
     println("nbeams_i,j=$nbeams_i,$nbeams_j   nfrequencies=$nfrequencies   ntimes=$ntimes")
     println(
         "polarization=$polarization   dish=$dish   dish_i,j=$dish_i,$dish_j",
         "   beam_i,j=$beam_i,$beam_j   frequency=$frequency   time=$time",
     )
+    println()
     println("Nonzero inputs:")
     E_mem = Array(E_mem)
     count = 0
@@ -1508,48 +1455,43 @@ function runcuda()
             count == 10 && break
         end
     end
+    println()
     println("Nonzero results:")
-    println("E_shared:")
-    count = 0
-    for p in 0:1, di in 0:31, dj in 0:31, f in 0:(nfrequencies - 1), t in 0:(ntimes - 1)
-        expected = 0x00
-        val = (E_shared[(t ÷ 2) % 4 + 1, dj + 1, di + 32 * (f + 128 * (t ÷ 8)) + 1].val >>> (16 * (t % 2) + 8 * (p % 2))) % UInt8
-        if val ≠ expected
-            @show p di dj f t val expected
-            count += 1
-            count == 10 && break
-        end
-    end
+    println()
     println("fI:")
     count = 0
     for bi in 0:(nbeams_i - 1), bj in 0:(nbeams_j - 1), f in 0:(nfrequencies - 1), t in 0:128:(ntimes - 1)
-        expected = 0x00
+        expected = 0.0f0
         val = load_fI(fI_mem, bi, bj, f, t)
         if val ≠ expected
             @show bi bj f t val expected
         end
     end
+    println()
     println("Unexpected results:")
-    # for bi in 0:(nbeams_i - 1), bj in 0:(nbeams_j - 1), f in 0:(nfrequencies - 1), t in 0:128:(ntimes - 1)
-    #     val = 0
-    #     if (bi & ~0x0010) == beam_i && (bj & ~0x0010) == beam_j && f == frequency && t == time & ~0x007f
-    #         @show :bingo
-    #         val = E_val
-    #         val *= Gin_val
-    #         val ÷= 16
-    #         val *= Ans_val
-    #         val ÷= 256
-    #         val *= Aew_val
-    #     end
-    #     val = abs2(val)
-    #     if !(load_fI(fI_mem, bi, bj, f, t) == val)
-    #         # @show polarization dish dish_i dish_j beam_i beam_j frequency time
-    #         @show bi bj f t
-    #         @show load_fI(fI_mem, bi, bj, f, t)
-    #         @show val
-    #     end
-    #     @assert load_fI(fI_mem, bi, bj, f, t) == val
-    # end
+    println()
+    println("fI:")
+    for bi in 0:(nbeams_i - 1), bj in 0:(nbeams_j - 1), f in 0:(nfrequencies - 1), t in 0:128:(ntimes - 1)
+        expected = 0.0f0
+        if (bi & ~0x0010) == beam_i && (bj & ~0x0010) == beam_j && f == frequency && t == time & ~0x007f
+            expected = Complex{Int32}(E_val)
+            expected *= Gin_val
+            expected ÷= 16
+            @assert -127 ≤ real(expected) ≤ 127
+            @assert -127 ≤ imag(expected) ≤ 127
+            expected *= Ans_val
+            expected ÷= 256
+            expected = Complex(max(-63, min(63, real(expected))), max(-63, min(63, imag(expected))))
+            expected *= Aew_val
+            expected = Complex{Float32}(expected)
+        end
+        expected = abs2(expected)
+        val = load_fI(fI_mem, bi, bj, f, t)
+        if val ≠ expected
+            @show bi bj f t val expected
+        end
+    end
+    println()
     println("Done.")
 
     return nothing
