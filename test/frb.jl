@@ -648,8 +648,6 @@ function grid_dishes!(steps::Vector{AbstractStep}, env::Environment)
     widen!(steps, env, :Kd, :K, Dish(0) => Register(0))
     split!(steps, env, :Kd0, :Kd1, :Kd, Dish(0))
     split!(steps, env, :E′d0, :E′d1, :E′, Dish(0))
-    #TRIGGER apply!(steps, env, :E′d0a, :E′d0, E -> :(@assert $E.val == 0; $E))
-    #TRIGGER apply!(steps, env, :E′d1a, :E′d1, E -> :(@assert $E.val == 0; $E))
     @assert env[:E′d0] == Layout(
         Int32,
         Dict(
@@ -687,26 +685,6 @@ function grid_dishes!(steps::Vector{AbstractStep}, env::Environment)
             Time(14) => Loop4(7),
         ),
     )
-    apply!(steps, env, :E′d0a, :E′d0, E -> :(
-        begin
-            Ex = $E.val
-            Kdx = Kd0
-            if Ex ≠ 0
-                @cuprintln "gd 0 E$Ex Kd$Kdx"
-            end
-            $E
-        end
-    ))
-    apply!(steps, env, :E′d1a, :E′d1, E -> :(
-        begin
-            Ex = $E.val
-            Kdx = Kd1
-            if Ex ≠ 0
-                @cuprintln "gd 1 E$Ex Kd$Kdx"
-            end
-            $E
-        end
-    ))
     store!(steps, env, :E′d0, :E_shared, map_E_shared; ignore=Set(Dish(d) for d in 1:8), offset=:(Kd0 * $(Cint(E_shared_size[1]))))
     store!(steps, env, :E′d1, :E_shared, map_E_shared; ignore=Set(Dish(d) for d in 1:8), offset=:(Kd1 * $(Cint(E_shared_size[1]))))
     return nothing
@@ -715,56 +693,9 @@ end
 function fourier1!(steps::Vector{AbstractStep}, env::Environment)
     # Load E
     load!(steps, env, :E0, map_E′_registers, :E_shared, map_E_shared)
-    apply!(steps, env, :E0a, :E0, E -> :(count = 0; $E))
-    apply!(steps, env, :E0b, :E0, E -> :(
-        begin
-            E = $E.val
-            thread = threadIdx().x - 1
-            warp = threadIdx().y - 1
-            block = blockIdx().x - 1
-            if E ≠ 0
-                @cuprintln "f1 re$count th$thread wa$warp bl$block l3=$loopIdx3 l4=$loopIdx4 E$E"
-            end
-            count += 1
-            $E
-        end
-    ))
-    #TRIGGER apply!(steps, env, :E0a, :E0, E -> :(@assert $E.val == 0; $E))
 
     permute!(steps, env, :E1, :E0, Register(0), SIMD(3))   # (57)
-    apply!(steps, env, :E1a, :E1, E -> :(count = 0; $E))
-    apply!(
-        steps, env, :E1b, :E1, E -> :(
-            begin
-                E = $E.val
-                thread = threadIdx().x - 1
-                warp = threadIdx().y - 1
-                block = blockIdx().x - 1
-                if E ≠ 0
-                    @cuprintln "f1.1 re$count th$thread wa$warp bl$block l3=$loopIdx3 l4=$loopIdx4 E$E"
-                end
-                count += 1
-                $E
-            end
-        )
-    )
     permute!(steps, env, :E2, :E1, Register(0), Thread(4)) # (58)
-    apply!(steps, env, :E2a, :E2, E -> :(count = 0; $E))
-    apply!(
-        steps, env, :E2b, :E2, E -> :(
-            begin
-                E = $E.val
-                thread = threadIdx().x - 1
-                warp = threadIdx().y - 1
-                block = blockIdx().x - 1
-                if E ≠ 0
-                    @cuprintln "f1.2 re$count th$thread wa$warp bl$block l3=$loopIdx3 l4=$loopIdx4 E$E"
-                end
-                count += 1
-                $E
-            end
-        )
-    )
     permute!(steps, env, :E3, :E2, Register(0), SIMD(4))   # (59)
     @assert env[:E3] == Layout(
         Int32,
@@ -806,7 +737,6 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
         ),
     )
     widen!(steps, env, :E4, :E3, Cplx(0) => Register(2))
-    #TRIGGER apply!(steps, env, :E4a, :E4, E -> :(@assert $E.val == 0; $E))
 
     # Load Gin
     load!(steps, env, :Gin0, map_Gin_registers, :Gin_mem, map_Gin_memory)
@@ -815,125 +745,15 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
     # TODO: Use a sparse matrix tensor core multiplication instead
     # TODO: As alternative, keep values as `int8` and multiply two at a time
     # TODO: Investigate dp4a and dp2a
-    #TRIGGER apply!(steps, env, :Gin0a, :Gin0, G -> :(@assert $G.val == 0; $G))
-    #NOTRIGGER apply!(steps, env, :Gin0b, :Gin0, G -> :(@assert $G.val == 0 || $G.val == 0x00100000; $G))
-    #MAYBETRIGGER apply!(steps, env, :E4a, :E4, E -> :(@assert $E.val == 0; $E))
     widen2!(steps, env, :Gin1, :Gin0, SIMD(3) => Register(3), SIMD(4) => Register(4))
-    #NOTRIGGER apply!(steps, env, :Gin1a, :Gin1, G -> :(@assert $G == 0 || $G == 16; $G))
     widen2!(steps, env, :E5, :E4, SIMD(3) => Register(3), SIMD(4) => Register(4))
-    #TRIGGER apply!(steps, env, :E5a, :E5, E -> :(@assert $E == 0; $E))
     split!(steps, env, :Ginre, :Ginim, :Gin1, Cplx(0))
-    #NOTRIGGER apply!(steps, env, :Ginrea, :Ginre, G -> :(@assert $G == 0 || $G == 16; $G))
-    #NOTRIGGER apply!(steps, env, :Ginima, :Ginim, G -> :(@assert $G == 0; $G))
     split!(steps, env, :Ere, :Eim, :E5, Cplx(0))
-    #NOTRIGGER apply!(steps, env, :Erea, :Ere, E -> :(@assert $E == 0 || $E==4; $E))
-    #NOTRIGGER apply!(steps, env, :Eima, :Eim, E -> :(@assert $E == 0; $E))
     # TODO: Use dp4a
-    #TODO apply!(steps, env, :Ẽre, :Ere, :Eim, :Ginre, :Ginim, (Ere, Eim, Gre, Gim) -> :(($Gre * $Ere - $Gim * $Eim) >> 0x04))
-    @assert env[:Ere] == Layout(
-        Int32,
-        Dict(
-            Polr(0) => Thread(4),
-            DishI(0) => Register(3),
-            DishI(1) => Register(4),
-            DishI(2) => Thread(0),
-            DishI(3) => Thread(1),
-            DishI(4) => Register(1),
-            DishJ(0) => Thread(2),
-            DishJ(1) => Thread(3),
-            DishJ(2) => Warp(2),
-            DishJ(3) => Warp(3),
-            DishJ(4) => Warp(4),
-            Freq(0) => Block(0),
-            Freq(1) => Block(1),
-            Freq(2) => Block(2),
-            Freq(3) => Block(3),
-            Freq(4) => Block(4),
-            Freq(5) => Block(5),
-            Freq(6) => Block(6),
-            Time(0) => Register(0),
-            Time(1) => Warp(0),
-            Time(2) => Warp(1),
-            Time(3) => Loop3(0),
-            Time(4) => Loop3(1),
-            Time(5) => Loop3(2),
-            Time(6) => Loop3(3),
-            Time(7) => Loop4(0),
-            Time(8) => Loop4(1),
-            Time(9) => Loop4(2),
-            Time(10) => Loop4(3),
-            Time(11) => Loop4(4),
-            Time(12) => Loop4(5),
-            Time(13) => Loop4(6),
-            Time(14) => Loop4(7),
-        ),
-    )
-    @assert env[:Ginre] == Layout(
-        Int32,
-        Dict(
-            Polr(0) => Thread(4),
-            DishI(0) => Register(3),
-            DishI(1) => Register(4),
-            DishI(2) => Thread(0),
-            DishI(3) => Thread(1),
-            DishI(4) => Register(1),
-            DishJ(0) => Thread(2),
-            DishJ(1) => Thread(3),
-            DishJ(2) => Warp(2),
-            DishJ(3) => Warp(3),
-            DishJ(4) => Warp(4),
-        ),
-    )
-    apply!(steps, env, :Ẽre0, :Ere, :Eim, :Ginre, :Ginim, (Ere, Eim, Gre, Gim) -> :(
-        begin
-            count = 0
-            $Ere
-        end
-    ))
-    apply!(
-        steps,
-        env,
-        :Ẽre,
-        :Ere,
-        :Eim,
-        :Ginre,
-        :Ginim,
-        (Ere, Eim, Gre, Gim) -> :(
-            begin
-                @assert $Gre == 0 || $Gre == 16
-                @assert $Ere == 0 || $Ere == 4
-                # if $Ere == 4
-                #     @assert $Gre == 16
-                # end
-                thread = threadIdx().x - 1
-                warp = threadIdx().y - 1
-                block = blockIdx().x - 1
-                Ere = $Ere
-                Gre = $Gre
-                dishi = (((count >> 1) & 1) << 4) | (((count >> 2) & 1) << 0) | (((count >> 3) & 1) << 1)
-                if loopIdx3 == 0 && loopIdx4 == 0 && thread == 4 && warp == 13 && block == 6
-                    @cuprintln "tic $count dishi=$dishi"
-                    count += 1
-                end
-                if Ere ≠ 0
-                    @cuprintln "th$thread wa$warp bl$block l3=$loopIdx3 l4=$loopIdx4 E$Ere"
-                end
-                if Gre ≠ 0 && loopIdx3 == 0 && loopIdx4 == 0 && warp == 13 && block == 6
-                    @cuprintln "th$thread wa$warp bl$block l3=$loopIdx3 l4=$loopIdx4 G$Gre"
-                end
-                x = ($Gre * $Ere - $Gim * $Eim) >> 0x04
-                # @assert x == 0
-                x
-            end
-        ),
-    )
+    apply!(steps, env, :Ẽre, :Ere, :Eim, :Ginre, :Ginim, (Ere, Eim, Gre, Gim) -> :(($Gre * $Ere - $Gim * $Eim) >> 0x04))
     apply!(steps, env, :Ẽim, :Ere, :Eim, :Ginre, :Ginim, (Ere, Eim, Gre, Gim) -> :(($Gre * $Eim + $Gim * $Ere) >> 0x04))
-    #NOTRIGGER apply!(steps, env, :Ẽrea, :Ẽre, E -> :(@assert $E == 0; $E))
-    #NOTRIGGER apply!(steps, env, :Ẽima, :Ẽim, E -> :(@assert $E == 0; $E))
     merge!(steps, env, :Ẽ0, :Ẽre, :Ẽim, Cplx(0) => Register(2))
-    #MAYBETRIGGER apply!(steps, env, :Ẽ0a, :Ẽ0, E -> :(@assert $E == 0; $E))
     narrow2!(steps, env, :Ẽ1, :Ẽ0, Register(3) => SIMD(3), Register(4) => SIMD(4))
-    #NOTRIGGER apply!(steps, env, :Ẽ1a, :Ẽ1, E -> :(@assert $E.val == 0; $E))
 
     permute!(steps, env, :Ẽ2, :Ẽ1, Register(1), Register(2)) # (63)
     @assert env[:Ẽ2] == Layout(
@@ -1494,12 +1314,6 @@ const shmem = sizeof(Int32) * shmem_length
 end
 
 function runcuda()
-    # K_mem = reinterpret(Int16x2, Int16[4 + round(Int, sqrt(2) * ij) for ij in 0:511])
-    # E_mem = Int4x8[Int4x8(0x01010101) for i in 1:(2^30)]
-    # Gin_mem = Int8x4[Int8x4(0x02020202) for i in 1:(2^10)]
-    # Ans_mem = Int8x4[Int8x4(0x03030303) for i in 1:(2^9)]
-    # Aew_mem = Int8x4[Int8x4(0x04040404) for i in 1:(2^9)]
-
     Random.seed!(100)
     for iter in 1:100
         println("Test iteration $iter:")
@@ -1534,19 +1348,6 @@ function runcuda()
         beam_j &= ~0x0010           # bit 4 must be 0
         frequency = rand(0:(nfrequencies - 1))
         time = rand(0:(ntimes - 1))
-
-        #TODO
-        polarization = 0
-        dish = 90
-        dish_i, dish_j = 2, 13
-        beam_i, beam_j = 4, 11
-        frequency = 6
-        time = 27673              # bad
-        time = 0                  # good
-        time = 27648              # good
-        time = 1                  # bad
-        time = 2                  # good
-        time = 3                  # bad
 
         # Select values
         E_val = 4 + 0im             # 4 bit
@@ -1638,7 +1439,6 @@ function runcuda()
         # @btime CUDA.@sync $(kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem))
 
         fI_mem = Array(fI_mem)
-        # println(fI_mem[1:32])
         println()
         println("Nonzero inputs:")
         E_mem = Array(E_mem)
