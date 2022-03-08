@@ -52,27 +52,58 @@ unsafe_sub(a::Int4x8, b::Int4x8) = Int4x8(a.val - b.val)
 # Int8x4
 
 function Int8x4(a1::Int32, a2::Int32, a3::Int32, a4::Int32)
-    # return Int8x4((a4 % UInt8 % UInt32) << 0x18 |
-    #               (a3 % UInt8 % UInt32) << 0x10 |
-    #               (a2 % UInt8 % UInt32) << 0x8 |
-    #               (a1 % UInt8 % UInt32))
-    return cvt_pack_s8(a2, a1, cvt_pack_s8(a4, a3))
+    #TODO 
+    x = Int8x4((a4 % UInt8 % UInt32) << 0x18 | (a3 % UInt8 % UInt32) << 0x10 | (a2 % UInt8 % UInt32) << 0x8 | (a1 % UInt8 % UInt32))
+    y = cvt_pack_s8(a2, a1, cvt_pack_s8(a4, a3))
+    @assert y == x
+    return y
 end
 
-Base.convert(::Type{Int8x4}, a::NTuple{2,Int16x2}) = Int8x4(cuda_prmt(a[1].val, a[2].val, 0x6240))
-function Base.convert(::Type{NTuple{2,Int16x2}}, a::Int8x4)
-    return (Int16x2(cuda_prmt(a.val, UInt32(0), 0xa280)), Int16x2(cuda_prmt(a.val, UInt32(0), 0xb391)))::NTuple{2,Int16x2}
+function Base.convert(::Type{Int8x4}, a::NTuple{2,Int16x2})
+    x = Int8x4((a[1].val >>> 0x00) % Int32, (a[1].val >>> 0x10) % Int32, (a[2].val >>> 0x00) % Int32, (a[2].val >>> 0x10) % Int32)
+    return x
 end
-Base.convert(::Type{Int8x4}, a::NTuple{4,Int32}) = cvt_pack_s8(a[2], a[1], cvt_pack_s8(a[4], a[3]))
+CUDA.@device_override function Base.convert(::Type{Int8x4}, a::NTuple{2,Int16x2})
+    #TODO
+    x = Int8x4((a[1].val >>> 0x00) % Int32, (a[1].val >>> 0x10) % Int32, (a[2].val >>> 0x00) % Int32, (a[2].val >>> 0x10) % Int32)
+    y = Int8x4(cuda_prmt(a[1].val, a[2].val, 0x6240))
+    @assert y == x
+    return y
+end
+function Base.convert(::Type{NTuple{2,Int16x2}}, a::Int8x4)
+    #TODO 
+    a1 = ((a.val >>> 0x00) & 0xff) % Int8 % Int32
+    a2 = ((a.val >>> 0x08) & 0xff) % Int8 % Int32
+    a3 = ((a.val >>> 0x10) & 0xff) % Int8 % Int32
+    a4 = ((a.val >>> 0x18) & 0xff) % Int8 % Int32
+    x = (Int16x2(a1, a3), Int16x2(a2, a4))::NTuple{2,Int16x2}
+    y = (Int16x2(cuda_prmt(a.val, UInt32(0), 0xa280)), Int16x2(cuda_prmt(a.val, UInt32(0), 0xb391)))::NTuple{2,Int16x2}
+    @assert y == x
+    return y
+end
+function Base.convert(::Type{Int8x4}, a::NTuple{4,Int32})
+    #TODO
+    x = Int8x4(a[1], a[2], a[3], a[4])
+    y = cvt_pack_s8(a[2], a[1], cvt_pack_s8(a[4], a[3]))
+    @assert y == x
+    return y
+end
 function Base.convert(::Type{NTuple{4,Int32}}, a::Int8x4)
-    # return (a.val % Int8 % Int32, ((a.val % Int32) >> 0x08) % Int8 % Int32, ((a.val % Int32) >> 0x10) % Int8 % Int32,
-    #         (a.val % Int32) >> 0x18)
-    return (
+    #TODO
+    x = (
+        (a.val >>> 0x00) % Int8 % Int32,
+        (a.val >>> 0x08) % Int8 % Int32,
+        (a.val >>> 0x10) % Int8 % Int32,
+        (a.val >>> 0x18) % Int8 % Int32,
+    )::NTuple{4,Int32}
+    y = (
         cuda_prmt(a.val, UInt32(0), 0x8880) % Int32,
         cuda_prmt(a.val, UInt32(0), 0x9991) % Int32,
         cuda_prmt(a.val, UInt32(0), 0xaaa2) % Int32,
         cuda_prmt(a.val, UInt32(0), 0xbbb3) % Int32,
     )::NTuple{4,Int32}
+    @assert y == x
+    return y
 end
 
 """
@@ -122,10 +153,18 @@ unsafe_sub(a::Int8x4, b::Int8x4) = Int8x4(a.val - b.val)
 
 # Int16x2
 
-Int16x2(a1::Int32, a2::Int32) = cvt_pack_s16(a2, a1)
+function Int16x2(a1::Int32, a2::Int32)
+    #TODO
+    x = ((a1 % UInt32) & 0xffff) + ((a2 % UInt32) & 0xffff) << 0x10
+    y = cvt_pack_s16(a2, a1)
+    @assert y == x
+    return y
+end
 
-Base.convert(::Type{Int16x2}, a::NTuple{2,Int32}) = cvt_pack_s16(a[2], a[1])
-Base.convert(::Type{NTuple{2,Int32}}, a::Int16x2) = (a.val % Int16 % Int32, (a.val % Int32) >> 0x10)::NTuple{2,Int32}
+Base.convert(::Type{Int16x2}, a::NTuple{2,Int32}) = Int16x2(a[1], a[2])
+function Base.convert(::Type{NTuple{2,Int32}}, a::Int16x2)
+    return ((a.val >>> 0x00) % Int16 % Int32, (a.val >>> 0x10) % Int16 % Int32)::NTuple{2,Int32}
+end
 
 """
     d = cvt_pack_s16(a::Int32, b::Int32)
@@ -415,6 +454,11 @@ function get_type(f::Mapping{Index,Target})
     else
         @assert false
     end
+end
+function unget_type(T::Type)
+    T ∈ (Float32, Float16x2) && return Float32
+    T ∈ (Int32, Int16x2, Int8x4, Int4x8) && return Int32
+    @assert false
 end
 retype(type::Type, f::Mapping{A,B}) where {A,B} = Mapping{A,B}(type, f.mapping)
 
@@ -840,20 +884,20 @@ function apply!(
     rhsmap = env[rhs]
     @assert lhs ∉ keys(env)
     type = something(newtype, get_type(rhsmap))
-    lhsmap = retype(type, rhsmap)
+    lhsmap = retype(unget_type(type), rhsmap)
     env[lhs] = lhsmap
 
     registers = [v for (k, v) in rhsmap if v isa Register]
     register_mask = sum(UInt[1 << reg.bit for reg in registers])
     simds = [v for (k, v) in rhsmap if v isa SIMD]
-    @assert isempty(simds)
+    # @assert isempty(simds)
 
     stmts = Code[]
     for r in 0:register_mask
         if r & ~register_mask == 0
             rname = register_mask == 0 ? "" : "_$r"
             lhsname = Symbol(lhs, rname)
-            push!(stmts, :($lhsname = $(fun(Symbol(rhs, rname))::Code)::$(lhsmap.type)))
+            push!(stmts, :($lhsname = $(fun(Symbol(rhs, rname))::Code)::$type))
         end
     end
 
@@ -1374,19 +1418,19 @@ const lomask4 = 0x0f0f0f0f
 get_lo4(r0::Int4x8, r1::Int4x8) = Int4x8(bitwise_merge(GPUIndexSpaces.lomask4, r1.val << 0x04, r0.val))
 get_hi4(r0::Int4x8, r1::Int4x8) = Int4x8(bitwise_merge(GPUIndexSpaces.lomask4, r1.val, r0.val >>> 0x04))
 
-# get_lo8(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
-# get_hi8(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
-get_lo8(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4}} = T(cuda_prmt(r0.val, r1.val, 0x6420))
-get_hi8(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4}} = T(cuda_prmt(r0.val, r1.val, 0x7531))
+# # get_lo8(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x6420 % UInt32) % Int32)
+# # get_hi8(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x7531 % UInt32) % Int32)
+# get_lo8(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4}} = T(cuda_prmt(r0.val, r1.val, 0x6420))
+# get_hi8(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4}} = T(cuda_prmt(r0.val, r1.val, 0x7531))
+# get_lo8(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x6240 % UInt32) % Int32)
+# get_hi8(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x7351 % UInt32) % Int32)
+get_lo8(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4}} = T(cuda_prmt(r0.val, r1.val, 0x6240))
+get_hi8(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4}} = T(cuda_prmt(r0.val, r1.val, 0x7351))
 
 # get_lo16(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x5410 % UInt32) % Int32)
 # get_hi16(r0::Code, r1::Code) = :(cuda_prmt($r0 % UInt32, $r1 % UInt32, 0x7632 % UInt32) % Int32)
-function get_lo16(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4,Int16x2,Float16x2}}
-    return T(cuda_prmt(r0.val, r1.val, 0x5410))
-end
-function get_hi16(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4,Int16x2,Float16x2}}
-    return T(cuda_prmt(r0.val, r1.val, 0x7632))
-end
+get_lo16(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4,Int16x2,Float16x2}} = T(cuda_prmt(r0.val, r1.val, 0x5410))
+get_hi16(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4,Int16x2,Float16x2}} = T(cuda_prmt(r0.val, r1.val, 0x7632))
 
 function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, index1::Index, index2::Index)
     return permute!(steps, env, lhs, rhs, sort([env[rhs][index1], env[rhs][index2]])...)

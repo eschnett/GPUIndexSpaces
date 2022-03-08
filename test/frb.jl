@@ -645,10 +645,68 @@ function grid_dishes!(steps::Vector{AbstractStep}, env::Environment)
     load!(steps, env, :E, map_E_registers, :E_mem, map_E_global)
     permute!(steps, env, :E′, :E, Register(0), SIMD(4))
     load!(steps, env, :K, map_K_registers, :K_mem, map_K_memory)
-    store!(steps, env, :K, :K_mem, map_K_memory)
     widen!(steps, env, :Kd, :K, Dish(0) => Register(0))
     split!(steps, env, :Kd0, :Kd1, :Kd, Dish(0))
     split!(steps, env, :E′d0, :E′d1, :E′, Dish(0))
+    #TRIGGER apply!(steps, env, :E′d0a, :E′d0, E -> :(@assert $E.val == 0; $E))
+    #TRIGGER apply!(steps, env, :E′d1a, :E′d1, E -> :(@assert $E.val == 0; $E))
+    @assert env[:E′d0] == Layout(
+        Int32,
+        Dict(
+            Cplx(0) => SIMD(2),
+            Polr(0) => SIMD(3),
+            Dish(1) => Thread(0),
+            Dish(2) => Thread(1),
+            Dish(3) => Thread(2),
+            Dish(4) => Thread(3),
+            Dish(5) => Thread(4),
+            Dish(6) => Warp(0),
+            Dish(7) => Warp(1),
+            Dish(8) => Warp(2),
+            Freq(0) => Block(0),
+            Freq(1) => Block(1),
+            Freq(2) => Block(2),
+            Freq(3) => Block(3),
+            Freq(4) => Block(4),
+            Freq(5) => Block(5),
+            Freq(6) => Block(6),
+            Time(0) => SIMD(4),
+            Time(1) => Warp(3),
+            Time(2) => Warp(4),
+            Time(3) => Loop3(0),
+            Time(4) => Loop3(1),
+            Time(5) => Loop3(2),
+            Time(6) => Loop3(3),
+            Time(7) => Loop4(0),
+            Time(8) => Loop4(1),
+            Time(9) => Loop4(2),
+            Time(10) => Loop4(3),
+            Time(11) => Loop4(4),
+            Time(12) => Loop4(5),
+            Time(13) => Loop4(6),
+            Time(14) => Loop4(7),
+        ),
+    )
+    apply!(steps, env, :E′d0a, :E′d0, E -> :(
+        begin
+            Ex = $E.val
+            Kdx = Kd0
+            if Ex ≠ 0
+                @cuprintln "gd 0 E$Ex Kd$Kdx"
+            end
+            $E
+        end
+    ))
+    apply!(steps, env, :E′d1a, :E′d1, E -> :(
+        begin
+            Ex = $E.val
+            Kdx = Kd1
+            if Ex ≠ 0
+                @cuprintln "gd 1 E$Ex Kd$Kdx"
+            end
+            $E
+        end
+    ))
     store!(steps, env, :E′d0, :E_shared, map_E_shared; ignore=Set(Dish(d) for d in 1:8), offset=:(Kd0 * $(Cint(E_shared_size[1]))))
     store!(steps, env, :E′d1, :E_shared, map_E_shared; ignore=Set(Dish(d) for d in 1:8), offset=:(Kd1 * $(Cint(E_shared_size[1]))))
     return nothing
@@ -657,8 +715,56 @@ end
 function fourier1!(steps::Vector{AbstractStep}, env::Environment)
     # Load E
     load!(steps, env, :E0, map_E′_registers, :E_shared, map_E_shared)
+    apply!(steps, env, :E0a, :E0, E -> :(count = 0; $E))
+    apply!(steps, env, :E0b, :E0, E -> :(
+        begin
+            E = $E.val
+            thread = threadIdx().x - 1
+            warp = threadIdx().y - 1
+            block = blockIdx().x - 1
+            if E ≠ 0
+                @cuprintln "f1 re$count th$thread wa$warp bl$block l3=$loopIdx3 l4=$loopIdx4 E$E"
+            end
+            count += 1
+            $E
+        end
+    ))
+    #TRIGGER apply!(steps, env, :E0a, :E0, E -> :(@assert $E.val == 0; $E))
+
     permute!(steps, env, :E1, :E0, Register(0), SIMD(3))   # (57)
+    apply!(steps, env, :E1a, :E1, E -> :(count = 0; $E))
+    apply!(
+        steps, env, :E1b, :E1, E -> :(
+            begin
+                E = $E.val
+                thread = threadIdx().x - 1
+                warp = threadIdx().y - 1
+                block = blockIdx().x - 1
+                if E ≠ 0
+                    @cuprintln "f1.1 re$count th$thread wa$warp bl$block l3=$loopIdx3 l4=$loopIdx4 E$E"
+                end
+                count += 1
+                $E
+            end
+        )
+    )
     permute!(steps, env, :E2, :E1, Register(0), Thread(4)) # (58)
+    apply!(steps, env, :E2a, :E2, E -> :(count = 0; $E))
+    apply!(
+        steps, env, :E2b, :E2, E -> :(
+            begin
+                E = $E.val
+                thread = threadIdx().x - 1
+                warp = threadIdx().y - 1
+                block = blockIdx().x - 1
+                if E ≠ 0
+                    @cuprintln "f1.2 re$count th$thread wa$warp bl$block l3=$loopIdx3 l4=$loopIdx4 E$E"
+                end
+                count += 1
+                $E
+            end
+        )
+    )
     permute!(steps, env, :E3, :E2, Register(0), SIMD(4))   # (59)
     @assert env[:E3] == Layout(
         Int32,
@@ -700,6 +806,7 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
         ),
     )
     widen!(steps, env, :E4, :E3, Cplx(0) => Register(2))
+    #TRIGGER apply!(steps, env, :E4a, :E4, E -> :(@assert $E.val == 0; $E))
 
     # Load Gin
     load!(steps, env, :Gin0, map_Gin_registers, :Gin_mem, map_Gin_memory)
@@ -708,15 +815,125 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
     # TODO: Use a sparse matrix tensor core multiplication instead
     # TODO: As alternative, keep values as `int8` and multiply two at a time
     # TODO: Investigate dp4a and dp2a
+    #TRIGGER apply!(steps, env, :Gin0a, :Gin0, G -> :(@assert $G.val == 0; $G))
+    #NOTRIGGER apply!(steps, env, :Gin0b, :Gin0, G -> :(@assert $G.val == 0 || $G.val == 0x00100000; $G))
+    #MAYBETRIGGER apply!(steps, env, :E4a, :E4, E -> :(@assert $E.val == 0; $E))
     widen2!(steps, env, :Gin1, :Gin0, SIMD(3) => Register(3), SIMD(4) => Register(4))
+    #NOTRIGGER apply!(steps, env, :Gin1a, :Gin1, G -> :(@assert $G == 0 || $G == 16; $G))
     widen2!(steps, env, :E5, :E4, SIMD(3) => Register(3), SIMD(4) => Register(4))
+    #TRIGGER apply!(steps, env, :E5a, :E5, E -> :(@assert $E == 0; $E))
     split!(steps, env, :Ginre, :Ginim, :Gin1, Cplx(0))
+    #NOTRIGGER apply!(steps, env, :Ginrea, :Ginre, G -> :(@assert $G == 0 || $G == 16; $G))
+    #NOTRIGGER apply!(steps, env, :Ginima, :Ginim, G -> :(@assert $G == 0; $G))
     split!(steps, env, :Ere, :Eim, :E5, Cplx(0))
+    #NOTRIGGER apply!(steps, env, :Erea, :Ere, E -> :(@assert $E == 0 || $E==4; $E))
+    #NOTRIGGER apply!(steps, env, :Eima, :Eim, E -> :(@assert $E == 0; $E))
     # TODO: Use dp4a
-    apply!(steps, env, :Ẽre, :Ere, :Eim, :Ginre, :Ginim, (Ere, Eim, Gre, Gim) -> :(($Gre * $Ere - $Gim * $Eim) >> 0x04))
+    #TODO apply!(steps, env, :Ẽre, :Ere, :Eim, :Ginre, :Ginim, (Ere, Eim, Gre, Gim) -> :(($Gre * $Ere - $Gim * $Eim) >> 0x04))
+    @assert env[:Ere] == Layout(
+        Int32,
+        Dict(
+            Polr(0) => Thread(4),
+            DishI(0) => Register(3),
+            DishI(1) => Register(4),
+            DishI(2) => Thread(0),
+            DishI(3) => Thread(1),
+            DishI(4) => Register(1),
+            DishJ(0) => Thread(2),
+            DishJ(1) => Thread(3),
+            DishJ(2) => Warp(2),
+            DishJ(3) => Warp(3),
+            DishJ(4) => Warp(4),
+            Freq(0) => Block(0),
+            Freq(1) => Block(1),
+            Freq(2) => Block(2),
+            Freq(3) => Block(3),
+            Freq(4) => Block(4),
+            Freq(5) => Block(5),
+            Freq(6) => Block(6),
+            Time(0) => Register(0),
+            Time(1) => Warp(0),
+            Time(2) => Warp(1),
+            Time(3) => Loop3(0),
+            Time(4) => Loop3(1),
+            Time(5) => Loop3(2),
+            Time(6) => Loop3(3),
+            Time(7) => Loop4(0),
+            Time(8) => Loop4(1),
+            Time(9) => Loop4(2),
+            Time(10) => Loop4(3),
+            Time(11) => Loop4(4),
+            Time(12) => Loop4(5),
+            Time(13) => Loop4(6),
+            Time(14) => Loop4(7),
+        ),
+    )
+    @assert env[:Ginre] == Layout(
+        Int32,
+        Dict(
+            Polr(0) => Thread(4),
+            DishI(0) => Register(3),
+            DishI(1) => Register(4),
+            DishI(2) => Thread(0),
+            DishI(3) => Thread(1),
+            DishI(4) => Register(1),
+            DishJ(0) => Thread(2),
+            DishJ(1) => Thread(3),
+            DishJ(2) => Warp(2),
+            DishJ(3) => Warp(3),
+            DishJ(4) => Warp(4),
+        ),
+    )
+    apply!(steps, env, :Ẽre0, :Ere, :Eim, :Ginre, :Ginim, (Ere, Eim, Gre, Gim) -> :(
+        begin
+            count = 0
+            $Ere
+        end
+    ))
+    apply!(
+        steps,
+        env,
+        :Ẽre,
+        :Ere,
+        :Eim,
+        :Ginre,
+        :Ginim,
+        (Ere, Eim, Gre, Gim) -> :(
+            begin
+                @assert $Gre == 0 || $Gre == 16
+                @assert $Ere == 0 || $Ere == 4
+                # if $Ere == 4
+                #     @assert $Gre == 16
+                # end
+                thread = threadIdx().x - 1
+                warp = threadIdx().y - 1
+                block = blockIdx().x - 1
+                Ere = $Ere
+                Gre = $Gre
+                dishi = (((count >> 1) & 1) << 4) | (((count >> 2) & 1) << 0) | (((count >> 3) & 1) << 1)
+                if loopIdx3 == 0 && loopIdx4 == 0 && thread == 4 && warp == 13 && block == 6
+                    @cuprintln "tic $count dishi=$dishi"
+                    count += 1
+                end
+                if Ere ≠ 0
+                    @cuprintln "th$thread wa$warp bl$block l3=$loopIdx3 l4=$loopIdx4 E$Ere"
+                end
+                if Gre ≠ 0 && loopIdx3 == 0 && loopIdx4 == 0 && warp == 13 && block == 6
+                    @cuprintln "th$thread wa$warp bl$block l3=$loopIdx3 l4=$loopIdx4 G$Gre"
+                end
+                x = ($Gre * $Ere - $Gim * $Eim) >> 0x04
+                # @assert x == 0
+                x
+            end
+        ),
+    )
     apply!(steps, env, :Ẽim, :Ere, :Eim, :Ginre, :Ginim, (Ere, Eim, Gre, Gim) -> :(($Gre * $Eim + $Gim * $Ere) >> 0x04))
+    #NOTRIGGER apply!(steps, env, :Ẽrea, :Ẽre, E -> :(@assert $E == 0; $E))
+    #NOTRIGGER apply!(steps, env, :Ẽima, :Ẽim, E -> :(@assert $E == 0; $E))
     merge!(steps, env, :Ẽ0, :Ẽre, :Ẽim, Cplx(0) => Register(2))
+    #MAYBETRIGGER apply!(steps, env, :Ẽ0a, :Ẽ0, E -> :(@assert $E == 0; $E))
     narrow2!(steps, env, :Ẽ1, :Ẽ0, Register(3) => SIMD(3), Register(4) => SIMD(4))
+    #NOTRIGGER apply!(steps, env, :Ẽ1a, :Ẽ1, E -> :(@assert $E.val == 0; $E))
 
     permute!(steps, env, :Ẽ2, :Ẽ1, Register(1), Register(2)) # (63)
     @assert env[:Ẽ2] == Layout(
@@ -1142,13 +1359,12 @@ mergebits(arr) = foldl((x, y) -> 2 * x + y, arr; init=0)
 @assert getbit(0b1011, 1) == 1
 @assert getbit(0b1011, 0) == 1
 
-function store_Gin!(Gin::Vector, val, c::Integer, p::Integer, di::Integer, dj::Integer)
+function Gin_index(c::Integer, p::Integer, di::Integer, dj::Integer)
     @assert 0 ≤ c < 2^1
     @assert 0 ≤ p < 2^1
     @assert 0 ≤ di < 2^5
     @assert 0 ≤ dj < 2^5
     # see map_Gin_memory
-    @assert length(Gin) == 2^12
     ind = mergebits((
         getbit(dj, 4),
         getbit(dj, 3),
@@ -1163,16 +1379,14 @@ function store_Gin!(Gin::Vector, val, c::Integer, p::Integer, di::Integer, dj::I
         getbit(di, 1),
         getbit(di, 0),
     ))
-    Gin[ind + 1] = val
-    return nothing
+    return ind + 1
 end
 
-function store_Ans!(Ans::Vector, val, c::Integer, di::Integer, bi::Integer)
+function Ans_index(c::Integer, di::Integer, bi::Integer)
     @assert 0 ≤ c < 2^1
     @assert 0 ≤ di < 2^5
     @assert 0 ≤ bi < 2^7
     # see map_Ans_memory
-    @assert length(Ans) == 2^11
     @assert getbit(di, 4) == 0
     @assert getbit(bi, 4) == 0
     ind = mergebits((
@@ -1190,16 +1404,14 @@ function store_Ans!(Ans::Vector, val, c::Integer, di::Integer, bi::Integer)
         getbit(di, 1),
         getbit(di, 0),
     ))
-    Ans[ind + 1] = val
-    return nothing
+    return ind + 1
 end
 
-function store_Aew!(Aew::Vector, val, c::Integer, dj::Integer, bj::Integer)
+function Aew_index(c::Integer, dj::Integer, bj::Integer)
     @assert 0 ≤ c < 2^1
     @assert 0 ≤ dj < 2^5
-    @assert 0 ≤ bj < 2^6
+    @assert 0 ≤ bj < 2^7
     # see map_Aew_memory
-    @assert length(Aew) == 2^11
     @assert getbit(dj, 4) == 0
     @assert getbit(bj, 4) == 0
     ind = mergebits((
@@ -1217,17 +1429,15 @@ function store_Aew!(Aew::Vector, val, c::Integer, dj::Integer, bj::Integer)
         getbit(dj, 1),
         getbit(dj, 0),
     ))
-    Aew[ind + 1] = val
-    return nothing
+    return ind + 1
 end
 
-function load_fI(fI::Vector, bi::Integer, bj::Integer, f::Integer, t::Integer)
+function fI_index(bi::Integer, bj::Integer, f::Integer, t::Integer)
     @assert 0 ≤ bi < 2^7
     @assert 0 ≤ bj < 2^7
     @assert 0 ≤ f < 2^7
     @assert 0 ≤ t < 2^15
     # see map_fI_memory
-    @assert length(fI) == 2^21 * K
     @assert all(getbit(t, i) == 0 for i in 0:6)
     ind = mergebits((
         getbit(t, 14),
@@ -1260,7 +1470,7 @@ function load_fI(fI::Vector, bi::Integer, bj::Integer, f::Integer, t::Integer)
         getbit(bj, 4),
         getbit(bj, 3),
     ))
-    return fI[ind + 1]
+    return ind + 1
 end
 
 ################################################################################
@@ -1290,59 +1500,65 @@ function runcuda()
     # Ans_mem = Int8x4[Int8x4(0x03030303) for i in 1:(2^9)]
     # Aew_mem = Int8x4[Int8x4(0x04040404) for i in 1:(2^9)]
 
-    K_input = NTuple{2,Int8}[(0, 0) for i in 0:511]
-    for d in 0:511
-        d′ = round(Int, d * 1023 / 511)
-        dish_i = d′ % 32
-        dish_j = d′ ÷ 32
-        K_input[d + 1] = (dish_i, dish_j)
-    end
-    E_input = zeros(Int8, 2, 512, 128, 32768)
-    nfrequencies = 1 * F
-    ntimes = 128 * K
-    for p in 0:1, d in 0:511, f in 0:nfrequencies, t in 0:(ntimes - 1)
-        E_input[p + 1, d + 1, f + 1, t + 1] = 0
-    end
-    Gin_input = zeros(Int8, 2 * 2 * 32 * 32)
-    for c in 0:1, p in 0:1, di in 0:31, dj in 0:31
-        store_Gin!(Gin_input, 0, c, p, di, dj)
-    end
-    Ans_input = zeros(Int8, 2 * (32 ÷ 2) * (128 ÷ 2))
-    nbeams_i = M * 32
-    for c in 0:1, di in 0:31, bi in 0:(M - 1)
-        if getbit(di, 4) == 0 && getbit(bi, 4) == 0
-            store_Ans!(Ans_input, 0, c, di, bi)
-        end
-    end
-    Aew_input = zeros(Int8, 2 * (32 ÷ 2) * (128 ÷ 2))
-    nbeams_j = N * 32
-    for c in 0:1, dj in 0:31, bj in 0:(N - 1)
-        if getbit(dj, 4) == 0 && getbit(bj, 4) == 0
-            store_Aew!(Aew_input, 0, c, dj, bj)
-        end
-    end
-
-    # Select path
     Random.seed!(100)
-    polarization = rand(0:1)
-    dish = rand(0:511)
-    dish_i = rand(0:31)
-    dish_j = rand(0:31)
-    dish_i &= ~0x0010           # bit 4 must be 0
-    dish_j &= ~0x0010           # bit 4 must be 0
-    beam_i = rand(0:(nbeams_i - 1))
-    beam_j = rand(0:(nbeams_j - 1))
-    beam_i &= ~0x0010           # bit 4 must be 0
-    beam_j &= ~0x0010           # bit 4 must be 0
-    frequency = rand(0:(nfrequencies - 1))
-    time = rand(0:(ntimes - 1))
-    # Select values
-    E_val = 4 + 0im             # 4 bit
-    Gin_val = 16 + 0im          # 8 bit
-    Ans_val = 64 + 0im          # 8 bit
-    Aew_val = 1 + 0im           # 8 bit
+    for iter in 1:100
+        println("Test iteration $iter:")
+        println()
 
-    if true
+        K_input = NTuple{2,Int8}[(0, 0) for i in 0:511]
+        for d in 0:511
+            d′ = round(Int, d * 1023 / 511)
+            dish_i = d′ % 32
+            dish_j = d′ ÷ 32
+            K_input[d + 1] = (dish_i, dish_j)
+        end
+        E_input = zeros(Int8, 2, 512, 128, 32768)
+        nfrequencies = 1 * F
+        ntimes = 128 * K
+        Gin_input = zeros(Int8, 2 * 2 * 32 * 32)
+        Ans_input = zeros(Int8, 2 * (32 ÷ 2) * (128 ÷ 2))
+        nbeams_i = M * 32
+        Aew_input = zeros(Int8, 2 * (32 ÷ 2) * (128 ÷ 2))
+        nbeams_j = N * 32
+
+        # Select path
+        polarization = rand(0:1)
+        dish = rand(0:511)
+        dish_i = rand(0:31)
+        dish_j = rand(0:31)
+        dish_i &= ~0x0010           # bit 4 must be 0
+        dish_j &= ~0x0010           # bit 4 must be 0
+        beam_i = rand(0:(nbeams_i - 1))
+        beam_j = rand(0:(nbeams_j - 1))
+        beam_i &= ~0x0010           # bit 4 must be 0
+        beam_j &= ~0x0010           # bit 4 must be 0
+        frequency = rand(0:(nfrequencies - 1))
+        time = rand(0:(ntimes - 1))
+
+        #TODO
+        polarization = 0
+        dish = 90
+        dish_i, dish_j = 2, 13
+        beam_i, beam_j = 4, 11
+        frequency = 6
+        time = 27673              # bad
+        time = 0                  # good
+        time = 27648              # good
+        time = 1                  # bad
+        time = 2                  # good
+        time = 3                  # bad
+
+        # Select values
+        E_val = 4 + 0im             # 4 bit
+        Gin_val = 16 + 0im          # 8 bit
+        Ans_val = 64 + 0im          # 8 bit
+        Aew_val = 1 + 0im           # 8 bit
+        println("nbeams_i,j=$nbeams_i,$nbeams_j   nfrequencies=$nfrequencies   ntimes=$ntimes")
+        println(
+            "polarization=$polarization   dish=$dish   dish_i,j=$dish_i,$dish_j",
+            "   beam_i,j=$beam_i,$beam_j   frequency=$frequency   time=$time",
+        )
+
         # Set one dish
         E_input[polarization + 1, dish + 1, frequency + 1, time + 1] = ((imag(E_val) << 4) & 0xf0) + (real(E_val) & 0x0f)
         dish′ = findfirst(==((dish_i, dish_j)), K_input)
@@ -1358,13 +1574,12 @@ function runcuda()
         dish′ = findfirst(==((dish_i, dish_j)), K_input)
         @assert dish′ ≡ nothing
         K_input[dish + 1] = (dish_i, dish_j)
-        # TODO: Is this the correct real/imag mapping?
-        store_Gin!(Gin_input, real(Gin_val), 0, polarization, dish_i, dish_j)
-        store_Gin!(Gin_input, imag(Gin_val), 1, polarization, dish_i, dish_j)
-        store_Ans!(Ans_input, real(Ans_val), 0, dish_i, beam_i)
-        store_Ans!(Ans_input, imag(Ans_val), 1, dish_i, beam_i)
-        store_Aew!(Aew_input, real(Aew_val), 0, dish_j, beam_j)
-        store_Aew!(Aew_input, imag(Aew_val), 1, dish_j, beam_j)
+        Gin_input[Gin_index(0, polarization, dish_i, dish_j)] = real(Gin_val)
+        Gin_input[Gin_index(1, polarization, dish_i, dish_j)] = imag(Gin_val)
+        Ans_input[Ans_index(0, dish_i, beam_i)] = real(Ans_val)
+        Ans_input[Ans_index(1, dish_i, beam_i)] = imag(Ans_val)
+        Aew_input[Aew_index(0, dish_j, beam_j)] = real(Aew_val)
+        Aew_input[Aew_index(1, dish_j, beam_j)] = imag(Aew_val)
 
         used = falses(32, 32)
         for (di, dj) in K_input
@@ -1373,124 +1588,110 @@ function runcuda()
             @assert !used[di + 1, dj + 1]
             used[di + 1, dj + 1] = true
         end
-    else
-        # Set all dishes
-        for d in 0:511
-            E_input[:, polarization + 1, d + 1, frequency + 1, time + 1] .= (real(E_val), imag(E_val))
+
+        @assert all(0 ≤ di < 32 && 0 ≤ dj < 32 for (di, dj) in K_input)
+        K_mem = reinterpret(Int16x2, Int16[32 * di + dj for (di, dj) in K_input])
+        @assert length(K_mem) == 256
+        E_mem = reinterpret(Int4x8, reshape(E_input, :))
+        Gin_mem = reinterpret(Int8x4, Gin_input)
+        for dj in 0:31, di in 0:31, p in 0:1, c in 0:1
+            idx = Gin_index(c, p, di, dj)
+            (idx - 1) % 4 ≠ 0 && continue
+            val = Gin_mem[(idx - 1) ÷ 4 + 1].val
+            if val ≠ 0
+                println("c$c p$p di$di dj$dj Gin$(string(val; base=16, pad=8))")
+            end
+            # vals = convert(NTuple{4,Int32}, Int8x4(val))
+            # if val ≠ 0
+            #     println("c$c p$p di$di dj$dj Gin$(string(val; base=16, pad=8)) Gin($(vals[1]),$(vals[2]),$(vals[3]),$(vals[4]))")
+            # end
         end
-        for dj in 0:31, di in 0:31
-            if getbit(di, 4) == 0 && getbit(dj, 4) == 0
-                # TODO: Is this the correct real/imag mapping?
-                store_Gin!(Gin_input, real(Gin_val), 0, polarization, di, dj)
-                store_Gin!(Gin_input, imag(Gin_val), 1, polarization, di, dj)
+        Ans_mem = reinterpret(Int8x4, Ans_input)
+        Aew_mem = reinterpret(Int8x4, Aew_input)
+
+        K_mem = CuArray(K_mem)
+        E_mem = CuArray(E_mem)
+        Gin_mem = CuArray(Gin_mem)
+        Ans_mem = CuArray(Ans_mem)
+        Aew_mem = CuArray(Aew_mem)
+        # noutputs = maxnbeams_i * maxnbeams_j * maxnfrequencies * (ntimes ÷ 128)
+        noutputs = 128 * 128 * 128 * K
+        fI_mem = CuArray{Float32}(undef, noutputs)
+
+        kernel = @cuda launch = false blocks_per_sm = 1 maxregs = 64 runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem)
+        attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem
+
+        # # sm_75
+        # nblocks = 68
+        # @assert shmem ≤ 48 * 1024   # NVIDIA GeForce RTX 2080 Ti has 48 kB shared memory
+
+        # sm_86
+        # nblocks = 84
+        nblocks = nfrequencies
+        @assert shmem ≤ 99 * 1024   # NVIDIA A10 has 99 kB shared memory
+
+        @assert nblocks == nfrequencies
+
+        kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
+        synchronize()
+        # CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
+        # @btime CUDA.@sync $(kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem))
+
+        fI_mem = Array(fI_mem)
+        # println(fI_mem[1:32])
+        println()
+        println("Nonzero inputs:")
+        E_mem = Array(E_mem)
+        for p in 0:1, d in 0:511, f in 0:(nfrequencies - 1), t in 0:(ntimes - 1)
+            expected = 0x00
+            val = (E_mem[d ÷ 2 + f * 2^8 + t * 2^15 + 1].val >>> (16 * (d % 2) + 8 * (p % 2))) % UInt8
+            if val ≠ expected
+                @show p d f t val expected
             end
         end
-        for di in 0:31
-            if getbit(di, 4) == 0
-                store_Ans!(Ans_input, real(Ans_val), 0, di, beam_i)
-                store_Ans!(Ans_input, imag(Ans_val), 1, di, beam_i)
+        println()
+        println("Nonzero results:")
+        println()
+        println("fI:")
+        count = 0
+        for bi in 0:(nbeams_i - 1), bj in 0:(nbeams_j - 1), f in 0:(nfrequencies - 1), t in 0:128:(ntimes - 1)
+            expected = 0.0f0
+            val = fI_mem[fI_index(bi, bj, f, t)]
+            if val ≠ expected
+                @show bi bj f t val expected
             end
         end
-        for dj in 0:31
-            if getbit(dj, 4) == 0
-                store_Aew!(Aew_input, real(Aew_val), 0, dj, beam_j)
-                store_Aew!(Aew_input, imag(Aew_val), 1, dj, beam_j)
+        println()
+        println("Unexpected results:")
+        println()
+        println("fI:")
+        count = 0
+        for bi in 0:(nbeams_i - 1), bj in 0:(nbeams_j - 1), f in 0:(nfrequencies - 1), t in 0:128:(ntimes - 1)
+            isactive = (bi & ~0x0010) == beam_i && (bj & ~0x0010) == beam_j && f == frequency && t == time - time % 128
+            if isactive
+                expected = Complex{Int32}(E_val)
+                expected *= Gin_val
+                expected ÷= 16
+                @assert -127 ≤ real(expected) ≤ 127
+                @assert -127 ≤ imag(expected) ≤ 127
+                expected *= Ans_val
+                expected ÷= 256
+                expected = Complex(max(-63, min(63, real(expected))), max(-63, min(63, imag(expected))))
+                expected *= Aew_val
+                expected = Complex{Float32}(expected)
+                expected = abs2(expected)
+            else
+                expected = 0.0f0
+            end
+            val = fI_mem[fI_index(bi, bj, f, t)]
+            if val ≠ expected
+                @show bi bj f t isactive val expected
+                count += 1
             end
         end
-    end
+        count ≠ 0 && break
+    end                         # iter
 
-    @assert all(0 ≤ di < 32 && 0 ≤ dj < 32 for (di, dj) in K_input)
-    K_mem = reinterpret(Int16x2, Int16[32 * di + dj for (di, dj) in K_input])
-    @assert length(K_mem) == 256
-    E_mem = reinterpret(Int4x8, reshape(E_input, :))
-    Gin_mem = reinterpret(Int8x4, Gin_input)
-    Ans_mem = reinterpret(Int8x4, Ans_input)
-    Aew_mem = reinterpret(Int8x4, Aew_input)
-
-    K_mem = CuArray(K_mem)
-    E_mem = CuArray(E_mem)
-    Gin_mem = CuArray(Gin_mem)
-    Ans_mem = CuArray(Ans_mem)
-    Aew_mem = CuArray(Aew_mem)
-    # noutputs = maxnbeams_i * maxnbeams_j * maxnfrequencies * (ntimes ÷ 128)
-    noutputs = 128 * 128 * 128 * K
-    fI_mem = CuArray{Float32}(undef, noutputs)
-
-    kernel = @cuda launch = false blocks_per_sm = 1 maxregs = 64 runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem)
-    attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem
-
-    # # sm_75
-    # nblocks = 68
-    # @assert shmem ≤ 48 * 1024   # NVIDIA GeForce RTX 2080 Ti has 48 kB shared memory
-
-    # sm_86
-    # nblocks = 84
-    nblocks = nfrequencies
-    @assert shmem ≤ 99 * 1024   # NVIDIA A10 has 99 kB shared memory
-
-    @assert nblocks == nfrequencies
-
-    kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
-    synchronize()
-    CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
-    # @btime CUDA.@sync $(kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem))
-
-    fI_mem = Array(fI_mem)
-    # println(fI_mem[1:32])
-    println("nbeams_i,j=$nbeams_i,$nbeams_j   nfrequencies=$nfrequencies   ntimes=$ntimes")
-    println(
-        "polarization=$polarization   dish=$dish   dish_i,j=$dish_i,$dish_j",
-        "   beam_i,j=$beam_i,$beam_j   frequency=$frequency   time=$time",
-    )
-    println()
-    println("Nonzero inputs:")
-    E_mem = Array(E_mem)
-    count = 0
-    for p in 0:1, d in 0:511, f in 0:(nfrequencies - 1), t in 0:(ntimes - 1)
-        expected = 0x00
-        val = (E_mem[d ÷ 2 + f * 2^8 + t * 2^15 + 1].val >>> (16 * (d % 2) + 8 * (p % 2))) % UInt8
-        if val ≠ expected
-            @show p d f t val expected
-            count += 1
-            count == 10 && break
-        end
-    end
-    println()
-    println("Nonzero results:")
-    println()
-    println("fI:")
-    count = 0
-    for bi in 0:(nbeams_i - 1), bj in 0:(nbeams_j - 1), f in 0:(nfrequencies - 1), t in 0:128:(ntimes - 1)
-        expected = 0.0f0
-        val = load_fI(fI_mem, bi, bj, f, t)
-        if val ≠ expected
-            @show bi bj f t val expected
-        end
-    end
-    println()
-    println("Unexpected results:")
-    println()
-    println("fI:")
-    for bi in 0:(nbeams_i - 1), bj in 0:(nbeams_j - 1), f in 0:(nfrequencies - 1), t in 0:128:(ntimes - 1)
-        expected = 0.0f0
-        if (bi & ~0x0010) == beam_i && (bj & ~0x0010) == beam_j && f == frequency && t == time & ~0x007f
-            expected = Complex{Int32}(E_val)
-            expected *= Gin_val
-            expected ÷= 16
-            @assert -127 ≤ real(expected) ≤ 127
-            @assert -127 ≤ imag(expected) ≤ 127
-            expected *= Ans_val
-            expected ÷= 256
-            expected = Complex(max(-63, min(63, real(expected))), max(-63, min(63, imag(expected))))
-            expected *= Aew_val
-            expected = Complex{Float32}(expected)
-        end
-        expected = abs2(expected)
-        val = load_fI(fI_mem, bi, bj, f, t)
-        if val ≠ expected
-            @show bi bj f t val expected
-        end
-    end
     println()
     println("Done.")
 
