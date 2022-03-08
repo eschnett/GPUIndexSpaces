@@ -52,58 +52,56 @@ unsafe_sub(a::Int4x8, b::Int4x8) = Int4x8(a.val - b.val)
 # Int8x4
 
 function Int8x4(a1::Int32, a2::Int32, a3::Int32, a4::Int32)
-    #TODO 
-    x = Int8x4((a4 % UInt8 % UInt32) << 0x18 | (a3 % UInt8 % UInt32) << 0x10 | (a2 % UInt8 % UInt32) << 0x8 | (a1 % UInt8 % UInt32))
-    y = cvt_pack_s8(a2, a1, cvt_pack_s8(a4, a3))
-    @assert y == x
-    return y
+    return Int8x4(
+        (a4 % UInt8 % UInt32) << 0x18 | (a3 % UInt8 % UInt32) << 0x10 | (a2 % UInt8 % UInt32) << 0x8 | (a1 % UInt8 % UInt32)
+    )
+end
+CUDA.@device_override function Int8x4(a1::Int32, a2::Int32, a3::Int32, a4::Int32)
+    return cvt_pack_s8(a2, a1, cvt_pack_s8(a4, a3))
 end
 
 function Base.convert(::Type{Int8x4}, a::NTuple{2,Int16x2})
-    x = Int8x4((a[1].val >>> 0x00) % Int32, (a[1].val >>> 0x10) % Int32, (a[2].val >>> 0x00) % Int32, (a[2].val >>> 0x10) % Int32)
-    return x
+    return Int8x4(
+        (a[1].val >>> 0x00) % Int32, (a[1].val >>> 0x10) % Int32, (a[2].val >>> 0x00) % Int32, (a[2].val >>> 0x10) % Int32
+    )
 end
 CUDA.@device_override function Base.convert(::Type{Int8x4}, a::NTuple{2,Int16x2})
-    #TODO
-    x = Int8x4((a[1].val >>> 0x00) % Int32, (a[1].val >>> 0x10) % Int32, (a[2].val >>> 0x00) % Int32, (a[2].val >>> 0x10) % Int32)
-    y = Int8x4(cuda_prmt(a[1].val, a[2].val, 0x6240))
-    @assert y == x
-    return y
+    return Int8x4(cuda_prmt(a[1].val, a[2].val, 0x6240))
 end
+
 function Base.convert(::Type{NTuple{2,Int16x2}}, a::Int8x4)
-    #TODO 
     a1 = ((a.val >>> 0x00) & 0xff) % Int8 % Int32
     a2 = ((a.val >>> 0x08) & 0xff) % Int8 % Int32
     a3 = ((a.val >>> 0x10) & 0xff) % Int8 % Int32
     a4 = ((a.val >>> 0x18) & 0xff) % Int8 % Int32
-    x = (Int16x2(a1, a3), Int16x2(a2, a4))::NTuple{2,Int16x2}
-    y = (Int16x2(cuda_prmt(a.val, UInt32(0), 0xa280)), Int16x2(cuda_prmt(a.val, UInt32(0), 0xb391)))::NTuple{2,Int16x2}
-    @assert y == x
-    return y
+    return (Int16x2(a1, a3), Int16x2(a2, a4))::NTuple{2,Int16x2}
 end
+CUDA.@device_override function Base.convert(::Type{NTuple{2,Int16x2}}, a::Int8x4)
+    return (Int16x2(cuda_prmt(a.val, UInt32(0), 0xa280)), Int16x2(cuda_prmt(a.val, UInt32(0), 0xb391)))::NTuple{2,Int16x2}
+end
+
 function Base.convert(::Type{Int8x4}, a::NTuple{4,Int32})
-    #TODO
-    x = Int8x4(a[1], a[2], a[3], a[4])
-    y = cvt_pack_s8(a[2], a[1], cvt_pack_s8(a[4], a[3]))
-    @assert y == x
-    return y
+    return Int8x4(a[1], a[2], a[3], a[4])
 end
+CUDA.@device_override function Base.convert(::Type{Int8x4}, a::NTuple{4,Int32})
+    return cvt_pack_s8(a[2], a[1], cvt_pack_s8(a[4], a[3]))
+end
+
 function Base.convert(::Type{NTuple{4,Int32}}, a::Int8x4)
-    #TODO
-    x = (
+    return (
         (a.val >>> 0x00) % Int8 % Int32,
         (a.val >>> 0x08) % Int8 % Int32,
         (a.val >>> 0x10) % Int8 % Int32,
         (a.val >>> 0x18) % Int8 % Int32,
     )::NTuple{4,Int32}
-    y = (
+end
+CUDA.@device_override function Base.convert(::Type{NTuple{4,Int32}}, a::Int8x4)
+    return (
         cuda_prmt(a.val, UInt32(0), 0x8880) % Int32,
         cuda_prmt(a.val, UInt32(0), 0x9991) % Int32,
         cuda_prmt(a.val, UInt32(0), 0xaaa2) % Int32,
         cuda_prmt(a.val, UInt32(0), 0xbbb3) % Int32,
     )::NTuple{4,Int32}
-    @assert y == x
-    return y
 end
 
 """
@@ -154,11 +152,10 @@ unsafe_sub(a::Int8x4, b::Int8x4) = Int8x4(a.val - b.val)
 # Int16x2
 
 function Int16x2(a1::Int32, a2::Int32)
-    #TODO
-    x = ((a1 % UInt32) & 0xffff) + ((a2 % UInt32) & 0xffff) << 0x10
-    y = cvt_pack_s16(a2, a1)
-    @assert y == x
-    return y
+    return ((a1 % UInt32) & 0xffff) + ((a2 % UInt32) & 0xffff) << 0x10
+end
+CUDA.@device_override function Int16x2(a1::Int32, a2::Int32)
+    return cvt_pack_s16(a2, a1)
 end
 
 Base.convert(::Type{Int16x2}, a::NTuple{2,Int32}) = Int16x2(a[1], a[2])
@@ -1268,11 +1265,11 @@ function load!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsma
             # `$expression + 1`, so that the added `1` can be combined
             # with the subtracted `1` in the `getindex` function.
             if have_memory3
-                push!(stmts, :($lhsname = $mem[1 + $index, 1 + $index2, 1 + $index3]::$type))#=@inbounds=#
+                push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2, 1 + $index3]::$type))#=@inbounds=#
             elseif have_memory2
-                push!(stmts, :($lhsname = $mem[1 + $index, 1 + $index2]::$type))#=@inbounds=#
+                push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2]::$type))#=@inbounds=#
             else
-                push!(stmts, :($lhsname = $mem[1 + $index]::$type))#=@inbounds=#
+                push!(stmts, :($lhsname = @inbounds $mem[1 + $index]::$type))#=@inbounds=#
             end
         end
     end
@@ -1324,15 +1321,15 @@ function store!(
             # with the subtracted `1` in the `getindex` function.
             if operator === :(=)
                 if have_memory3
-                    push!(stmts, :($mem[1 + $index + $offset, 1 + $index2, 1 + $index3] = $rhsname))#=@inbounds=#
+                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2, 1 + $index3] = $rhsname))#=@inbounds=#
                 elseif have_memory2
-                    push!(stmts, :($mem[1 + $index + $offset, 1 + $index2] = $rhsname))#=@inbounds=#
+                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2] = $rhsname))#=@inbounds=#
                 else
-                    push!(stmts, :($mem[1 + $index + $offset] = $rhsname))#=@inbounds=#
+                    push!(stmts, :(@inbounds $mem[1 + $index + $offset] = $rhsname))#=@inbounds=#
                 end
             elseif operator === :(+=)
                 @assert !have_memory2 && !have_memory3
-                push!(stmts, :($mem[1 + $index] += $rhsname))#=@inbounds=#
+                push!(stmts, :(@inbounds $mem[1 + $index] += $rhsname))#=@inbounds=#
             else
                 @assert false
             end
