@@ -11,12 +11,11 @@ Base.div(x::Complex{<:Integer}, y::Integer) = Complex(div(real(x), y), div(imag(
 
 const Cplx = Index{:Cplx}       # 1 bit (0:re, 1:im)
 const Polr = Index{:Polr}       # 1 bit
-const Dish = Index{:Dish}       # 9 bits (only 4 during FT)
-const DishI = Index{:DishI}     # 5 bits
-const DishJ = Index{:DishJ}     # 5 bits
-const DishIJ = Index{:DishIJ}   # 10 bits
-const Freq = Index{:Freq}       # 4 bits here (0 bits used)
-const Time = Index{:Time}       # many bits here (3 bits used)
+const Dish = Index{:Dish}       # 9 bits
+const DishI = Index{:DishI}     # 5 bits (only 4 during FT)
+const DishJ = Index{:DishJ}     # 5 bits (only 4 during FT)
+const Freq = Index{:Freq}       # 8 bits here (0 bits used)
+const Time = Index{:Time}       # 15 bits here (3 bits used)
 const BeamI = Index{:BeamI}     # 7 bits (using 4 during FT, 1 via FFT, 2 via loop)
 const BeamJ = Index{:BeamJ}     # 7 bits (using 4 during FT, 1 via FFT, 2 via loop)
 const PlMi = Index{:PlMi}       # 1 bit (0:+, 1:-)
@@ -33,6 +32,12 @@ const PlMi = Index{:PlMi}       # 1 bit (0:+, 1:-)
 
 # Current state for 84 frequencies is 91 ms.
 
+# 2022-03-09:
+# -    8 frequencies: 0.081697 seconds (519 CPU allocations: 34.766 KiB)
+# -   84 frequencies: 0.081796 seconds (519 CPU allocations: 34.766 KiB)
+# - 2*84 frequencies: 0.162504 seconds (71 CPU allocations: 4.516 KiB)
+# - 3*84 frequencies: 0.243574 seconds (71 CPU allocations: 4.516 KiB)
+
 # Missing optimizations:
 # - shared memory layout for E, use only 24 warps
 # - store A in shared memory
@@ -41,6 +46,9 @@ const PlMi = Index{:PlMi}       # 1 bit (0:+, 1:-)
 # - (use integer math after second FT)
 
 const F = Cint(8)               # Frequencies
+# const F = Cint(84)              # Frequencies
+# const F = Cint(2 * 84)          # Frequencies
+# const F = Cint(3 * 84)          # Frequencies
 const K = Cint(256)             # Time loop iterations
 const M = Cint(3)               # BeamI loop iterations
 const N = Cint(3)               # BeamJ loop iterations
@@ -70,21 +78,22 @@ const map_E_global = Layout(
         Freq(4) => Memory(12),
         Freq(5) => Memory(13),
         Freq(6) => Memory(14),
-        Time(0) => Memory(15),
-        Time(1) => Memory(16),
-        Time(2) => Memory(17),
-        Time(3) => Memory(18),
-        Time(4) => Memory(19),
-        Time(5) => Memory(20),
-        Time(6) => Memory(21),
-        Time(7) => Memory(22),
-        Time(8) => Memory(23),
-        Time(9) => Memory(24),
-        Time(10) => Memory(25),
-        Time(11) => Memory(26),
-        Time(12) => Memory(27),
-        Time(13) => Memory(28),
-        Time(14) => Memory(29),
+        Freq(7) => Memory(15),  # TODO
+        Time(0) => Memory(16),
+        Time(1) => Memory(17),
+        Time(2) => Memory(18),
+        Time(3) => Memory(19),
+        Time(4) => Memory(20),
+        Time(5) => Memory(21),
+        Time(6) => Memory(22),
+        Time(7) => Memory(23),
+        Time(8) => Memory(24),
+        Time(9) => Memory(25),
+        Time(10) => Memory(26),
+        Time(11) => Memory(27),
+        Time(12) => Memory(28),
+        Time(13) => Memory(29),
+        Time(14) => Memory(30),
     ),
 )
 
@@ -113,6 +122,7 @@ const map_fI_registers = Layout(
         Freq(4) => Block(4),
         Freq(5) => Block(5),
         Freq(6) => Block(6),
+        Freq(7) => Block(7),
         Time(7) => Loop4(0),
         Time(8) => Loop4(1),
         Time(9) => Loop4(2),
@@ -149,14 +159,15 @@ const map_fI_memory = Layout(
         Freq(4) => Memory(18),
         Freq(5) => Memory(19),
         Freq(6) => Memory(20),
-        Time(7) => Memory(21),
-        Time(8) => Memory(22),
-        Time(9) => Memory(23),
-        Time(10) => Memory(24),
-        Time(11) => Memory(25),
-        Time(12) => Memory(26),
-        Time(13) => Memory(27),
-        Time(14) => Memory(28),
+        Freq(7) => Memory(21),
+        Time(7) => Memory(22),
+        Time(8) => Memory(23),
+        Time(9) => Memory(24),
+        Time(10) => Memory(25),
+        Time(11) => Memory(26),
+        Time(12) => Memory(27),
+        Time(13) => Memory(28),
+        Time(14) => Memory(29),
     ),
 )
 
@@ -182,6 +193,7 @@ const map_E_registers = Layout(
         Freq(4) => Block(4),
         Freq(5) => Block(5),
         Freq(6) => Block(6),
+        Freq(7) => Block(7),
         Time(0) => Register(0),
         Time(1) => Warp(3),
         Time(2) => Warp(4),
@@ -253,21 +265,22 @@ const map_E_shared = Layout(
         Freq(4) => Ignore(4),
         Freq(5) => Ignore(5),
         Freq(6) => Ignore(6),
+        Freq(7) => Ignore(7),
         Time(0) => SIMD(4),
         Time(1) => Memory(0),
         Time(2) => Memory(1),
-        Time(3) => Ignore(7),
-        Time(4) => Ignore(8),
-        Time(5) => Ignore(9),
-        Time(6) => Ignore(10),
-        Time(7) => Ignore(11),
-        Time(8) => Ignore(12),
-        Time(9) => Ignore(13),
-        Time(10) => Ignore(14),
-        Time(11) => Ignore(15),
-        Time(12) => Ignore(16),
-        Time(13) => Ignore(17),
-        Time(14) => Ignore(18),
+        Time(3) => Ignore(8),
+        Time(4) => Ignore(9),
+        Time(5) => Ignore(10),
+        Time(6) => Ignore(11),
+        Time(7) => Ignore(12),
+        Time(8) => Ignore(13),
+        Time(9) => Ignore(14),
+        Time(10) => Ignore(15),
+        Time(11) => Ignore(16),
+        Time(12) => Ignore(17),
+        Time(13) => Ignore(18),
+        Time(14) => Ignore(19),
     ),
 )
 
@@ -294,6 +307,7 @@ const map_E′_registers = Layout(
         Freq(4) => Block(4),
         Freq(5) => Block(5),
         Freq(6) => Block(6),
+        Freq(7) => Block(7),
         Time(0) => SIMD(4),
         Time(1) => Warp(0),
         Time(2) => Warp(1),
@@ -409,6 +423,7 @@ const map_Fpre_registers = Layout(
         Freq(4) => Block(4),
         Freq(5) => Block(5),
         Freq(6) => Block(6),
+        Freq(7) => Block(7),
         Time(0) => Thread(0),
         Time(1) => Warp(0),
         Time(2) => Warp(1),
@@ -453,21 +468,22 @@ const map_F̃_shared = Layout(
         Freq(4) => Ignore(4),
         Freq(5) => Ignore(5),
         Freq(6) => Ignore(6),
+        Freq(7) => Ignore(7),
         Time(0) => Memory2(0 + 1),
         Time(1) => Memory2(0 + 2),
         Time(2) => Memory2(0 + 3),
-        Time(3) => Ignore(7),
-        Time(4) => Ignore(8),
-        Time(5) => Ignore(9),
-        Time(6) => Ignore(10),
-        Time(7) => Ignore(11),
-        Time(8) => Ignore(12),
-        Time(9) => Ignore(13),
-        Time(10) => Ignore(14),
-        Time(11) => Ignore(15),
-        Time(12) => Ignore(16),
-        Time(13) => Ignore(17),
-        Time(14) => Ignore(18),
+        Time(3) => Ignore(8),
+        Time(4) => Ignore(9),
+        Time(5) => Ignore(10),
+        Time(6) => Ignore(11),
+        Time(7) => Ignore(12),
+        Time(8) => Ignore(13),
+        Time(9) => Ignore(14),
+        Time(10) => Ignore(15),
+        Time(11) => Ignore(16),
+        Time(12) => Ignore(17),
+        Time(13) => Ignore(18),
+        Time(14) => Ignore(19),
     ),
 )
 
@@ -496,6 +512,7 @@ const map_F̃_registers = Layout(
         Freq(4) => Block(4),
         Freq(5) => Block(5),
         Freq(6) => Block(6),
+        Freq(7) => Block(7),
         Time(0) => Thread(3),
         Time(1) => Thread(2),
         Time(2) => Register(0),
@@ -576,6 +593,7 @@ const map_Jpre_registers = Layout(
         Freq(4) => Block(4),
         Freq(5) => Block(5),
         Freq(6) => Block(6),
+        Freq(7) => Block(7),
         Time(0) => Thread(0),
         Time(1) => Register(0),
         Time(2) => Register(2),
@@ -620,6 +638,7 @@ function zero_dishes!(steps::Vector{AbstractStep}, env::Environment)
             Freq(4) => Block(4),
             Freq(5) => Block(5),
             Freq(6) => Block(6),
+            Freq(7) => Block(7),
             Time(0) => SIMD(4),
             Time(1) => Warp(0),
             Time(2) => Warp(1),
@@ -668,6 +687,7 @@ function grid_dishes!(steps::Vector{AbstractStep}, env::Environment)
             Freq(4) => Block(4),
             Freq(5) => Block(5),
             Freq(6) => Block(6),
+            Freq(7) => Block(7),
             Time(0) => SIMD(4),
             Time(1) => Warp(3),
             Time(2) => Warp(4),
@@ -719,6 +739,7 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
             Freq(4) => Block(4),
             Freq(5) => Block(5),
             Freq(6) => Block(6),
+            Freq(7) => Block(7),
             Time(0) => Register(0),
             Time(1) => Warp(0),
             Time(2) => Warp(1),
@@ -778,6 +799,7 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
             Freq(4) => Block(4),
             Freq(5) => Block(5),
             Freq(6) => Block(6),
+            Freq(7) => Block(7),
             Time(0) => Register(0),
             Time(1) => Warp(0),
             Time(2) => Warp(1),
@@ -855,6 +877,7 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
                 Freq(4) => Block(4),
                 Freq(5) => Block(5),
                 Freq(6) => Block(6),
+                Freq(7) => Block(7),
                 Time(0) => Thread(0),
                 Time(1) => Warp(0),
                 Time(2) => Warp(1),
@@ -904,6 +927,7 @@ function fourier1!(steps::Vector{AbstractStep}, env::Environment)
                 Freq(4) => Block(4),
                 Freq(5) => Block(5),
                 Freq(6) => Block(6),
+                Freq(7) => Block(7),
                 Time(0) => Thread(0),
                 Time(1) => Warp(0),
                 Time(2) => Warp(1),
@@ -1005,6 +1029,7 @@ function fourier2!(steps::Vector{AbstractStep}, env::Environment)
                     Freq(4) => Block(4),
                     Freq(5) => Block(5),
                     Freq(6) => Block(6),
+                    Freq(7) => Block(7),
                     Time(0) => Thread(0),
                     Time(1) => Register(0),
                     Time(2) => Register(2),
@@ -1057,6 +1082,7 @@ function fourier2!(steps::Vector{AbstractStep}, env::Environment)
                     Freq(4) => Block(4),
                     Freq(5) => Block(5),
                     Freq(6) => Block(6),
+                    Freq(7) => Block(7),
                     Time(0) => Thread(0),
                     Time(3) => Loop3(0),
                     Time(4) => Loop3(1),
@@ -1106,6 +1132,7 @@ function fourier2!(steps::Vector{AbstractStep}, env::Environment)
                     Freq(4) => Block(4),
                     Freq(5) => Block(5),
                     Freq(6) => Block(6),
+                    Freq(7) => Block(7),
                     Time(3) => Loop3(0),
                     Time(4) => Loop3(1),
                     Time(5) => Loop3(2),
@@ -1167,7 +1194,7 @@ frb_steps = AbstractStep[]
 frb_env = Environment()
 frb!(frb_steps, frb_env)
 frb_allsteps = Seq(frb_steps)
-println(frb_allsteps)
+# println(frb_allsteps)
 
 ################################################################################
 
@@ -1255,7 +1282,7 @@ end
 function fI_index(bi::Integer, bj::Integer, f::Integer, t::Integer)
     @assert 0 ≤ bi < 2^7
     @assert 0 ≤ bj < 2^7
-    @assert 0 ≤ f < 2^7
+    @assert 0 ≤ f < 2^8
     @assert 0 ≤ t < 2^15
     # see map_fI_memory
     @assert all(getbit(t, i) == 0 for i in 0:6)
@@ -1268,6 +1295,7 @@ function fI_index(bi::Integer, bj::Integer, f::Integer, t::Integer)
         getbit(t, 9),
         getbit(t, 8),
         getbit(t, 7),
+        getbit(f, 7),
         getbit(f, 6),
         getbit(f, 5),
         getbit(f, 4),
@@ -1315,7 +1343,7 @@ end
 
 function runcuda()
     Random.seed!(100)
-    for iter in 1:100
+    for iter in 1:1 # 100
         println("Test iteration $iter:")
         println()
 
@@ -1326,7 +1354,7 @@ function runcuda()
             dish_j = d′ ÷ 32
             K_input[d + 1] = (dish_i, dish_j)
         end
-        E_input = zeros(Int8, 2, 512, 128, 32768)
+        E_input = zeros(Int8, 2, 512, 256, 32768)
         nfrequencies = 1 * F
         ntimes = 128 * K
         Gin_input = zeros(Int8, 2 * 2 * 32 * 32)
@@ -1416,7 +1444,7 @@ function runcuda()
         Ans_mem = CuArray(Ans_mem)
         Aew_mem = CuArray(Aew_mem)
         # noutputs = maxnbeams_i * maxnbeams_j * maxnfrequencies * (ntimes ÷ 128)
-        noutputs = 128 * 128 * 128 * K
+        noutputs = 128 * 128 * 256 * K
         fI_mem = CuArray{Float32}(undef, noutputs)
 
         kernel = @cuda launch = false blocks_per_sm = 1 maxregs = 64 runsteps(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem)
@@ -1435,7 +1463,7 @@ function runcuda()
 
         kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
         synchronize()
-        # CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
+        CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
         # @btime CUDA.@sync $(kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem))
 
         fI_mem = Array(fI_mem)

@@ -3262,8 +3262,8 @@ for loopIdx4 in Int32(0):Int32(K - 1)
     for loopIdx2 in Int32(0):Int32(N - 1)
         for loopIdx1 in Int32(0):Int32(M - 1)
             fIzero = Float32(0)::Float32
-            fI_mem[1 + (((loopIdx4 % Int32) & 0xff) << 0x15 + ((loopIdx2 % Int32) & 0x03) << 0x0a + ((loopIdx1 % Int32) & 0x03) << 0x0c + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x0e + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f) + 0] =
-                fIzero
+            @inbounds fI_mem[1 + (((loopIdx4 % Int32) & 0xff) << 0x15 + ((loopIdx2 % Int32) & 0x03) << 0x0a + ((loopIdx1 % Int32) & 0x03) << 0x0c + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x0e + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f) + 0] =
+                fIzero            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1328 =#
         end
     end
     for loopIdx3 in Int32(0):Int32(15)
@@ -3342,39 +3342,42 @@ for loopIdx4 in Int32(0):Int32(K - 1)
             )
         end
         begin
-            E_shared[
+            @inbounds E_shared[
                 1 + (((threadIdx()).y - 1) % Int32) & 0x03 + 0,
                 1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
                 1 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02),
-            ] = Ezero_0
-            E_shared[
+            ] = Ezero_0            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+            @inbounds E_shared[
                 1 + (((threadIdx()).y - 1) % Int32) & 0x03 + 0,
                 1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
                 1 + ((((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02) + 1),
-            ] = Ezero_1
-            E_shared[
+            ] = Ezero_1            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+            @inbounds E_shared[
                 1 + (((threadIdx()).y - 1) % Int32) & 0x03 + 0,
                 1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
                 1 + ((((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02) + 16),
-            ] = Ezero_2
-            E_shared[
+            ] = Ezero_2            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+            @inbounds E_shared[
                 1 + (((threadIdx()).y - 1) % Int32) & 0x03 + 0,
                 1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
                 1 + ((((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02) + (1 + 16)),
-            ] = Ezero_3
+            ] = Ezero_3            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
         end
         begin
-            E_0 =
+            E_0 = @inbounds(
                 E_mem[1 + (((loopIdx4 % Int32) & 0xff) << 0x16 + ((loopIdx3 % Int32) & 0x0f) << 0x12 + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x08 + (((((threadIdx()).y - 1) % Int32) & 0x07) << 0x05 + ((((threadIdx()).y - 1) % Int32) & 0x18) << 0x0d) + (((threadIdx()).x - 1) % Int32) & 0x1f)]::Int4x8
-            E_1 =
+            ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
+            E_1 = @inbounds(
                 E_mem[1 + (((loopIdx4 % Int32) & 0xff) << 0x16 + ((loopIdx3 % Int32) & 0x0f) << 0x12 + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x08 + (((((threadIdx()).y - 1) % Int32) & 0x07) << 0x05 + ((((threadIdx()).y - 1) % Int32) & 0x18) << 0x0d) + (((threadIdx()).x - 1) % Int32) & 0x1f + 32768)]::Int4x8
+            ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
         end
         begin
             E′_0 = GPUIndexSpaces.get_lo16(E_0, E_1)
             E′_1 = GPUIndexSpaces.get_hi16(E_0, E_1)
         end
-        K = K_mem[1 + (((((threadIdx()).y - 1) % Int32) & 0x07) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f)]::Int16x2
-        K_mem[1 + (((((threadIdx()).y - 1) % Int32) & 0x07) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f) + 0] = K
+        K = @inbounds(
+            K_mem[1 + (((((threadIdx()).y - 1) % Int32) & 0x07) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f)]::Int16x2
+        ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
         (Kd_0, Kd_1) = convert(NTuple{2,Int32}, K)
         begin
             Kd0 = Kd_0
@@ -3384,30 +3387,38 @@ for loopIdx4 in Int32(0):Int32(K - 1)
             E′d0 = E′_0
             E′d1 = E′_1
         end
-        E_shared[1 + ((((threadIdx()).y - 1) % Int32) & 0x18) >>> 0x03 + Kd0 * 5, 1 + 0x00, 1 + 0x00] = E′d0
-        E_shared[1 + ((((threadIdx()).y - 1) % Int32) & 0x18) >>> 0x03 + Kd1 * 5, 1 + 0x00, 1 + 0x00] = E′d1
+        @inbounds E_shared[1 + ((((threadIdx()).y - 1) % Int32) & 0x18) >>> 0x03 + Kd0 * 5, 1 + 0x00, 1 + 0x00] = E′d0        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+        @inbounds E_shared[1 + ((((threadIdx()).y - 1) % Int32) & 0x18) >>> 0x03 + Kd1 * 5, 1 + 0x00, 1 + 0x00] = E′d1        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
         sync_threads()
         begin
-            E0_0 = E_shared[
-                1 + (((threadIdx()).y - 1) % Int32) & 0x03,
-                1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
-                1 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02),
-            ]::Int4x8
-            E0_1 = E_shared[
-                1 + (((threadIdx()).y - 1) % Int32) & 0x03,
-                1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
-                1 + ((((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02) + 1),
-            ]::Int4x8
-            E0_2 = E_shared[
-                1 + (((threadIdx()).y - 1) % Int32) & 0x03,
-                1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
-                1 + ((((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02) + 16),
-            ]::Int4x8
-            E0_3 = E_shared[
-                1 + (((threadIdx()).y - 1) % Int32) & 0x03,
-                1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
-                1 + ((((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02) + (1 + 16)),
-            ]::Int4x8
+            E0_0 = @inbounds(
+                E_shared[
+                    1 + (((threadIdx()).y - 1) % Int32) & 0x03,
+                    1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
+                    1 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02),
+                ]::Int4x8
+            ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
+            E0_1 = @inbounds(
+                E_shared[
+                    1 + (((threadIdx()).y - 1) % Int32) & 0x03,
+                    1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
+                    1 + ((((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02) + 1),
+                ]::Int4x8
+            ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
+            E0_2 = @inbounds(
+                E_shared[
+                    1 + (((threadIdx()).y - 1) % Int32) & 0x03,
+                    1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
+                    1 + ((((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02) + 16),
+                ]::Int4x8
+            ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
+            E0_3 = @inbounds(
+                E_shared[
+                    1 + (((threadIdx()).y - 1) % Int32) & 0x03,
+                    1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x0c) >>> 0x02),
+                    1 + ((((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x02) + (1 + 16)),
+                ]::Int4x8
+            ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
         end
         begin
             begin
@@ -3476,14 +3487,18 @@ for loopIdx4 in Int32(0):Int32(K - 1)
             (E4_3, E4_7) = convert(NTuple{2,Int8x4}, E3_3)
         end
         begin
-            Gin0_0 =
+            Gin0_0 = @inbounds(
                 Gin_mem[1 + (((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f)]::Int8x4
-            Gin0_2 =
+            ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
+            Gin0_2 = @inbounds(
                 Gin_mem[1 + (((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f + 64)]::Int8x4
-            Gin0_4 =
+            ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
+            Gin0_4 = @inbounds(
                 Gin_mem[1 + (((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f + 32)]::Int8x4
-            Gin0_6 =
+            ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
+            Gin0_6 = @inbounds(
                 Gin_mem[1 + (((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f + (32 + 64))]::Int8x4
+            ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
         end
         begin
             (Gin1_0, Gin1_8, Gin1_16, Gin1_24) = convert(NTuple{4,Int32}, Gin0_0)
@@ -3554,294 +3569,22 @@ for loopIdx4 in Int32(0):Int32(K - 1)
             Eim_27 = E5_31
         end
         begin
-            Ẽre_0 = begin
-                @assert Ginre_0 == 0 || Ginre_0 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_0 == 0 || Ere_0 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_0
-                Gre = Ginre_0
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_0 * Ere_0 - Ginim_0 * Eim_0) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_1 = begin
-                @assert Ginre_0 == 0 || Ginre_0 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_1 == 0 || Ere_1 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_1
-                Gre = Ginre_0
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_0 * Ere_1 - Ginim_0 * Eim_1) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_2 = begin
-                @assert Ginre_2 == 0 || Ginre_2 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_2 == 0 || Ere_2 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_2
-                Gre = Ginre_2
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_2 * Ere_2 - Ginim_2 * Eim_2) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_3 = begin
-                @assert Ginre_2 == 0 || Ginre_2 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_3 == 0 || Ere_3 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_3
-                Gre = Ginre_2
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_2 * Ere_3 - Ginim_2 * Eim_3) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_8 = begin
-                @assert Ginre_8 == 0 || Ginre_8 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_8 == 0 || Ere_8 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_8
-                Gre = Ginre_8
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_8 * Ere_8 - Ginim_8 * Eim_8) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_9 = begin
-                @assert Ginre_8 == 0 || Ginre_8 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_9 == 0 || Ere_9 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_9
-                Gre = Ginre_8
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_8 * Ere_9 - Ginim_8 * Eim_9) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_10 = begin
-                @assert Ginre_10 == 0 || Ginre_10 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_10 == 0 || Ere_10 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_10
-                Gre = Ginre_10
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_10 * Ere_10 - Ginim_10 * Eim_10) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_11 = begin
-                @assert Ginre_10 == 0 || Ginre_10 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_11 == 0 || Ere_11 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_11
-                Gre = Ginre_10
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_10 * Ere_11 - Ginim_10 * Eim_11) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_16 = begin
-                @assert Ginre_16 == 0 || Ginre_16 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_16 == 0 || Ere_16 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_16
-                Gre = Ginre_16
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_16 * Ere_16 - Ginim_16 * Eim_16) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_17 = begin
-                @assert Ginre_16 == 0 || Ginre_16 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_17 == 0 || Ere_17 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_17
-                Gre = Ginre_16
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_16 * Ere_17 - Ginim_16 * Eim_17) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_18 = begin
-                @assert Ginre_18 == 0 || Ginre_18 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_18 == 0 || Ere_18 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_18
-                Gre = Ginre_18
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_18 * Ere_18 - Ginim_18 * Eim_18) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_19 = begin
-                @assert Ginre_18 == 0 || Ginre_18 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_19 == 0 || Ere_19 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_19
-                Gre = Ginre_18
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_18 * Ere_19 - Ginim_18 * Eim_19) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_24 = begin
-                @assert Ginre_24 == 0 || Ginre_24 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_24 == 0 || Ere_24 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_24
-                Gre = Ginre_24
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_24 * Ere_24 - Ginim_24 * Eim_24) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_25 = begin
-                @assert Ginre_24 == 0 || Ginre_24 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_25 == 0 || Ere_25 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_25
-                Gre = Ginre_24
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_24 * Ere_25 - Ginim_24 * Eim_25) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_26 = begin
-                @assert Ginre_26 == 0 || Ginre_26 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_26 == 0 || Ere_26 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_26
-                Gre = Ginre_26
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_26 * Ere_26 - Ginim_26 * Eim_26) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
-            Ẽre_27 = begin
-                @assert Ginre_26 == 0 || Ginre_26 == 16                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:824 =#
-                @assert Ere_27 == 0 || Ere_27 == 4                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:825 =#
-                thread = (threadIdx()).x - 1
-                warp = (threadIdx()).y - 1
-                block = (blockIdx()).x - 1
-                Ere = Ere_27
-                Gre = Ginre_26
-                if Ere ≠ 0
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) E$(Ere)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:835 =#
-                end
-                if Gre ≠ 0 && (loopIdx3 == 0 && (loopIdx4 == 0 && (warp == 13 && block == 6)))
-                    @cuprintln "th$(thread) wa$(warp) bl$(block) l3=$(loopIdx3) l4=$(loopIdx4) G$(Gre)"                            #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:838 =#
-                end
-                x = (Ginre_26 * Ere_27 - Ginim_26 * Eim_27) >> 0x04
-                @assert x == 0                        #= /home/eschnett/src/jl/GPUIndexSpaces.jl/test/frb.jl:841 =#
-                x
-            end::Int32
+            Ẽre_0 = ((Ginre_0 * Ere_0 - Ginim_0 * Eim_0) >> 0x04)::Int32
+            Ẽre_1 = ((Ginre_0 * Ere_1 - Ginim_0 * Eim_1) >> 0x04)::Int32
+            Ẽre_2 = ((Ginre_2 * Ere_2 - Ginim_2 * Eim_2) >> 0x04)::Int32
+            Ẽre_3 = ((Ginre_2 * Ere_3 - Ginim_2 * Eim_3) >> 0x04)::Int32
+            Ẽre_8 = ((Ginre_8 * Ere_8 - Ginim_8 * Eim_8) >> 0x04)::Int32
+            Ẽre_9 = ((Ginre_8 * Ere_9 - Ginim_8 * Eim_9) >> 0x04)::Int32
+            Ẽre_10 = ((Ginre_10 * Ere_10 - Ginim_10 * Eim_10) >> 0x04)::Int32
+            Ẽre_11 = ((Ginre_10 * Ere_11 - Ginim_10 * Eim_11) >> 0x04)::Int32
+            Ẽre_16 = ((Ginre_16 * Ere_16 - Ginim_16 * Eim_16) >> 0x04)::Int32
+            Ẽre_17 = ((Ginre_16 * Ere_17 - Ginim_16 * Eim_17) >> 0x04)::Int32
+            Ẽre_18 = ((Ginre_18 * Ere_18 - Ginim_18 * Eim_18) >> 0x04)::Int32
+            Ẽre_19 = ((Ginre_18 * Ere_19 - Ginim_18 * Eim_19) >> 0x04)::Int32
+            Ẽre_24 = ((Ginre_24 * Ere_24 - Ginim_24 * Eim_24) >> 0x04)::Int32
+            Ẽre_25 = ((Ginre_24 * Ere_25 - Ginim_24 * Eim_25) >> 0x04)::Int32
+            Ẽre_26 = ((Ginre_26 * Ere_26 - Ginim_26 * Eim_26) >> 0x04)::Int32
+            Ẽre_27 = ((Ginre_26 * Ere_27 - Ginim_26 * Eim_27) >> 0x04)::Int32
         end
         begin
             Ẽim_0 = ((Ginre_0 * Eim_0 + Ginim_0 * Ere_0) >> 0x04)::Int32
@@ -3999,10 +3742,18 @@ for loopIdx4 in Int32(0):Int32(K - 1)
         end
         for loopIdx1 in Int32(0):Int32(M - 1)
             begin
-                Ans_0 = Ans_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f)]::Int8x4
-                Ans_1 = Ans_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 32)]::Int8x4
-                Ans_2 = Ans_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 64)]::Int8x4
-                Ans_3 = Ans_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 96)]::Int8x4
+                Ans_0 = @inbounds(
+                    Ans_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f)]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
+                Ans_1 = @inbounds(
+                    Ans_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 32)]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
+                Ans_2 = @inbounds(
+                    Ans_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 64)]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
+                Ans_3 = @inbounds(
+                    Ans_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 96)]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
             end
             begin
                 Ansre_0 = Ans_0
@@ -4363,98 +4114,122 @@ for loopIdx4 in Int32(0):Int32(K - 1)
                 end
             end
             begin
-                F̃_shared[
+                @inbounds F̃_shared[
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c) >>> 0x02 + 0,
                     1 + (((loopIdx1 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x02 + (((((threadIdx()).x - 1) % Int32) & 0x02) >>> 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x02)),
                     1 + 0x00,
-                ] = F̃4_0
-                F̃_shared[
+                ] = F̃4_0                #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+                @inbounds F̃_shared[
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c) >>> 0x02 + 0,
                     1 + (((loopIdx1 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x02 + (((((threadIdx()).x - 1) % Int32) & 0x02) >>> 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x02) + 128),
                     1 + 0x00,
-                ] = F̃4_1
-                F̃_shared[
+                ] = F̃4_1                #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+                @inbounds F̃_shared[
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c) >>> 0x02 + 0,
                     1 + (((loopIdx1 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x02 + (((((threadIdx()).x - 1) % Int32) & 0x02) >>> 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x02) + 256),
                     1 + 0x00,
-                ] = F̃4_2
-                F̃_shared[
+                ] = F̃4_2                #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+                @inbounds F̃_shared[
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c) >>> 0x02 + 0,
                     1 + (((loopIdx1 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x02 + (((((threadIdx()).x - 1) % Int32) & 0x02) >>> 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x02) + 384),
                     1 + 0x00,
-                ] = F̃4_3
-                F̃_shared[
+                ] = F̃4_3                #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+                @inbounds F̃_shared[
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c) >>> 0x02 + 0,
                     1 + (((loopIdx1 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x02 + (((((threadIdx()).x - 1) % Int32) & 0x02) >>> 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x02)),
                     1 + 1,
-                ] = F̃4_4
-                F̃_shared[
+                ] = F̃4_4                #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+                @inbounds F̃_shared[
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c) >>> 0x02 + 0,
                     1 + (((loopIdx1 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x02 + (((((threadIdx()).x - 1) % Int32) & 0x02) >>> 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x02) + 128),
                     1 + 1,
-                ] = F̃4_5
-                F̃_shared[
+                ] = F̃4_5                #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+                @inbounds F̃_shared[
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c) >>> 0x02 + 0,
                     1 + (((loopIdx1 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x02 + (((((threadIdx()).x - 1) % Int32) & 0x02) >>> 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x02) + 256),
                     1 + 1,
-                ] = F̃4_6
-                F̃_shared[
+                ] = F̃4_6                #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
+                @inbounds F̃_shared[
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c) >>> 0x02 + 0,
                     1 + (((loopIdx1 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x02 + (((((threadIdx()).x - 1) % Int32) & 0x02) >>> 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x02) + 384),
                     1 + 1,
-                ] = F̃4_7
+                ] = F̃4_7                #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1324 =#
             end
         end
         sync_threads()
         for loopIdx2 in Int32(0):Int32(M - 1)
             begin
-                F̃_0 = F̃_shared[
-                    1 + (((threadIdx()).x - 1) % Int32) & 0x03,
-                    1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04)),
-                    1 + 0x00,
-                ]::Int8x4
-                F̃_1 = F̃_shared[
-                    1 + (((threadIdx()).x - 1) % Int32) & 0x03,
-                    1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04) + 8),
-                    1 + 0x00,
-                ]::Int8x4
-                F̃_2 = F̃_shared[
-                    1 + (((threadIdx()).x - 1) % Int32) & 0x03,
-                    1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04)),
-                    1 + 1,
-                ]::Int8x4
-                F̃_3 = F̃_shared[
-                    1 + (((threadIdx()).x - 1) % Int32) & 0x03,
-                    1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04) + 8),
-                    1 + 1,
-                ]::Int8x4
-                F̃_4 = F̃_shared[
-                    1 + ((((threadIdx()).x - 1) % Int32) & 0x03 + 4),
-                    1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04)),
-                    1 + 0x00,
-                ]::Int8x4
-                F̃_5 = F̃_shared[
-                    1 + ((((threadIdx()).x - 1) % Int32) & 0x03 + 4),
-                    1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04) + 8),
-                    1 + 0x00,
-                ]::Int8x4
-                F̃_6 = F̃_shared[
-                    1 + ((((threadIdx()).x - 1) % Int32) & 0x03 + 4),
-                    1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04)),
-                    1 + 1,
-                ]::Int8x4
-                F̃_7 = F̃_shared[
-                    1 + ((((threadIdx()).x - 1) % Int32) & 0x03 + 4),
-                    1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04) + 8),
-                    1 + 1,
-                ]::Int8x4
+                F̃_0 = @inbounds(
+                    F̃_shared[
+                        1 + (((threadIdx()).x - 1) % Int32) & 0x03,
+                        1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04)),
+                        1 + 0x00,
+                    ]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
+                F̃_1 = @inbounds(
+                    F̃_shared[
+                        1 + (((threadIdx()).x - 1) % Int32) & 0x03,
+                        1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04) + 8),
+                        1 + 0x00,
+                    ]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
+                F̃_2 = @inbounds(
+                    F̃_shared[
+                        1 + (((threadIdx()).x - 1) % Int32) & 0x03,
+                        1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04)),
+                        1 + 1,
+                    ]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
+                F̃_3 = @inbounds(
+                    F̃_shared[
+                        1 + (((threadIdx()).x - 1) % Int32) & 0x03,
+                        1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04) + 8),
+                        1 + 1,
+                    ]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
+                F̃_4 = @inbounds(
+                    F̃_shared[
+                        1 + ((((threadIdx()).x - 1) % Int32) & 0x03 + 4),
+                        1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04)),
+                        1 + 0x00,
+                    ]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
+                F̃_5 = @inbounds(
+                    F̃_shared[
+                        1 + ((((threadIdx()).x - 1) % Int32) & 0x03 + 4),
+                        1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04) + 8),
+                        1 + 0x00,
+                    ]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
+                F̃_6 = @inbounds(
+                    F̃_shared[
+                        1 + ((((threadIdx()).x - 1) % Int32) & 0x03 + 4),
+                        1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04)),
+                        1 + 1,
+                    ]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
+                F̃_7 = @inbounds(
+                    F̃_shared[
+                        1 + ((((threadIdx()).x - 1) % Int32) & 0x03 + 4),
+                        1 + (((loopIdx2 % Int32) & 0x03) << 0x09 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x04 + (((((threadIdx()).x - 1) % Int32) & 0x10) >>> 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x08) >>> 0x02 + (((threadIdx()).x - 1) % Int32) & 0x04) + 8),
+                        1 + 1,
+                    ]::Int8x4
+                ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1268 =#
             end
             for loopIdx1 in Int32(0):Int32(N - 1)
                 begin
-                    Aew_0 = Aew_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f)]::Int8x4
-                    Aew_1 = Aew_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 32)]::Int8x4
-                    Aew_2 = Aew_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 64)]::Int8x4
-                    Aew_3 = Aew_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 96)]::Int8x4
+                    Aew_0 = @inbounds(
+                        Aew_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f)]::Int8x4
+                    ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
+                    Aew_1 = @inbounds(
+                        Aew_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 32)]::Int8x4
+                    ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
+                    Aew_2 = @inbounds(
+                        Aew_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 64)]::Int8x4
+                    ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
+                    Aew_3 = @inbounds(
+                        Aew_mem[1 + (((loopIdx1 % Int32) & 0x03) << 0x07 + (((threadIdx()).x - 1) % Int32) & 0x1f + 96)]::Int8x4
+                    ) #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1272 =#
                 end
                 begin
                     Aewre_0 = Aew_0
@@ -4954,8 +4729,8 @@ for loopIdx4 in Int32(0):Int32(K - 1)
                     fI7b = fI7_2
                 end
                 fI8 = (fI7a + fI7b)::Float32
-                fI_mem[1 + (((loopIdx4 % Int32) & 0xff) << 0x15 + ((loopIdx2 % Int32) & 0x03) << 0x0c + ((loopIdx1 % Int32) & 0x03) << 0x0a + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x0e + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f)] +=
-                    fI8
+                @inbounds fI_mem[1 + (((loopIdx4 % Int32) & 0xff) << 0x15 + ((loopIdx2 % Int32) & 0x03) << 0x0c + ((loopIdx1 % Int32) & 0x03) << 0x0a + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x0e + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x05 + (((threadIdx()).x - 1) % Int32) & 0x1f)] +=
+                    fI8                #= /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1332 =#
             end
         end
     end
