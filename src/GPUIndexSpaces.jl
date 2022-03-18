@@ -31,7 +31,7 @@ end
 # Int4x8
 
 function Int4x8(a1::Int32, a2::Int32, a3::Int32, a4::Int32, a5::Int32, a6::Int32, a7::Int32, a8::Int32)
-    return Int4x8(bitwise_merge(0x0f0f0f0f, Int8x4(a1, a3, a5, a7).val, Int8x4(a2, a4, a6, a8).val))
+    return Int4x8(bitwise_merge(0x0f0f0f0f, Int8x4(a1, a3, a5, a7).val << 0x04, Int8x4(a2, a4, a6, a8).val << 0x00))
 end
 Base.convert(::Type{Int4x8}, a::NTuple{2,Int8x4}) = Int4x8(bitwise_merge(0x0f0f0f0f, a[2].val << 0x04, a[1].val))
 function Base.convert(::Type{NTuple{2,Int8x4}}, a::Int4x8)
@@ -43,6 +43,12 @@ function Base.convert(::Type{NTuple{2,Int8x4}}, a::Int4x8)
     a3_hi = a2_hi + 0x78787878         # a + 128
     a4_hi = a3_hi ⊻ 0x80808080         # a
     return (Int8x4(a4_lo), Int8x4(a4_hi))::NTuple{2,Int8x4}
+end
+function Base.convert(::Type{NTuple{8,Int32}}, a::Int4x8)
+    alo8, ahi8 = convert(NTuple{2,Int8x4}, a)
+    alo32 = convert(NTuple{4,Int32}, alo8)
+    ahi32 = convert(NTuple{4,Int32}, ahi8)
+    return (alo32[1], ahi32[1], alo32[2], ahi32[2], alo32[3], ahi32[3], alo32[4], ahi32[4])
 end
 
 export unsafe_add, unsafe_sub
@@ -184,9 +190,15 @@ unsafe_sub(a::Int32, b::Int32) = a - b
 # Float16x2
 
 function Float16x2(a1::Float32, a2::Float32)
+    return Float16x2((reinterpret(UInt16, Float16(a1)) % UInt32) << 0x00 | (reinterpret(UInt16, Float16(a2)) % UInt32) << 0x10)
+end
+CUDA.@device_override function Float16x2(a1::Float32, a2::Float32)
     return Float16x2(LLVM.Interop.@asmcall("cvt.rn.f16x2.f32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Float32,Float32}, a2, a1))
 end
 function Base.convert(::Type{NTuple{2,Float32}}, a::Float16x2)
+    return (Float32(reinterpret(Float16, (a.val >> 0x00) % UInt16)), Float32(reinterpret(Float16, (a.val >> 0x10) % UInt16)))
+end
+CUDA.@device_override function Base.convert(::Type{NTuple{2,Float32}}, a::Float16x2)
     return (
         LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val),
         LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10)
@@ -338,8 +350,11 @@ See <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#logic-and
     (a & c) | (b & ~c)
     (ta & tc) | (tb & ~tc) = 0xe4
 """
-bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = cuda_lop3(iftrue, iffalse, mask, 0xe4)::UInt32
-bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = cuda_lop3(iftrue, iffalse, mask, 0xe4) % Int32
+function bitwise_merge end
+bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = (~mask & iffalse) | (mask & iftrue)
+bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = bitwise_merge(mask, iffalse % UInt32, iftrue % UInt32) % Int32
+CUDA.@device_override bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = cuda_lop3(iftrue, iffalse, mask, 0xe4)::UInt32
+CUDA.@device_override bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = cuda_lop3(iftrue, iffalse, mask, 0xe4) % Int32
 export bitwise_merge
 
 bitwise_merge(mask::Code, iffalse::Code, iftrue::Code) = :(cuda_lop3($iftrue, $iffalse, $mask, 0xe4)::UInt32)

@@ -19,15 +19,15 @@ rsync -Paz sky.lwlab:src/jl/GPUIndexSpaces.jl/output/frb.sass output/
 
 Run with profiling:
 ```sh
-nv-nsight-cu-cli --target-processes all --set full --export profile5 env LD_LIBRARY_PATH=/opt/nvidia/nsight-compute/2021.2.2/target/linux-desktop-glibc_2_11_3-x64:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:/usr/local/lib:/home/eschnett/julia-1.6/lib/julia ~/julia-1.6/bin/julia --project=@. test/frb.jl
+nv-nsight-cu-cli --target-processes all --set full --export profile20 env LD_LIBRARY_PATH=/opt/nvidia/nsight-compute/2021.2.2/target/linux-desktop-glibc_2_11_3-x64:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:/usr/local/lib:/home/eschnett/julia-1.7/lib/julia ~/julia-1.7/bin/julia --project=@. test/frb.jl
 ```
 Note that we need to add the Julia directory
-`/home/eschnett/julia-1.6/lib/julia` to `LD_LIBRARY_PATH`.
+`/home/eschnett/julia-1.7/lib/julia` to `LD_LIBRARY_PATH`.
 One cannot extract PTX or SASS while profiling.
 
 Copy profiles from Sky:
 ```sh
-rsync -Paz sky.lwlab:src/jl/GPUIndexSpaces.jl/profile16.ncu-rep profiles/
+rsync -Paz sky.lwlab:src/jl/GPUIndexSpaces.jl/profile20.ncu-rep profiles/
 ```
 
 ## How to run on Symmetry

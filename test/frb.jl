@@ -45,7 +45,7 @@ const PlMi = Index{:PlMi}       # 1 bit (0:+, 1:-)
 # - check for bank conflicts
 # - (use integer math after second FT)
 
-const F = Cint(8)               # Frequencies
+const F = Cint(16)              # Frequencies
 # const F = Cint(84)              # Frequencies
 # const F = Cint(2 * 84)          # Frequencies
 # const F = Cint(3 * 84)          # Frequencies
@@ -284,7 +284,7 @@ const map_E_shared = Layout(
     ),
 )
 
-# Layout of E to access the shared memory see (56)
+# Layout of E to access the shared memory, see (56)
 const map_E′_registers = Layout(
     Int32,
     Dict(
@@ -1463,7 +1463,7 @@ function runcuda()
 
         kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
         synchronize()
-        CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
+        # CUDA.@time kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem)
         # @btime CUDA.@sync $(kernel(K_mem, E_mem, Gin_mem, Ans_mem, Aew_mem, fI_mem; threads=(32, 32), blocks=nblocks, shmem=shmem))
 
         fI_mem = Array(fI_mem)
