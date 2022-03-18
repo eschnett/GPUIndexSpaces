@@ -3,17 +3,21 @@ using CUDA
 using GPUIndexSpaces
 using Random
 
-function s4tofp16(A, B)
+function go(A, B)
     t = (threadIdx().x - 1) % UInt32
     w = (threadIdx().y - 1) % UInt32
 
     # Read input
     @inbounds A0 = A[(t + UInt32(32) * w) + 1]
 
-    B0 = Float16x2(0.0f0, 4.0f0)
-    B1 = Float16x2(1.0f0, 5.0f0)
-    B2 = Float16x2(2.0f0, 6.0f0)
-    B3 = Float16x2(3.0f0, 7.0f0)
+    B0 = Float16x2(0.0f0, 0.0f0)
+    B1 = Float16x2(0.0f0, 0.0f0)
+    B2 = Float16x2(0.0f0, 0.0f0)
+    B3 = Float16x2(0.0f0, 0.0f0)
+    # B0 = Float16x2(0.0f0, 4.0f0)
+    # B1 = Float16x2(1.0f0, 5.0f0)
+    # B2 = Float16x2(2.0f0, 6.0f0)
+    # B3 = Float16x2(3.0f0, 7.0f0)
 
     for iter in Int32(0):Int32(1 << 24 - 1)
         offset = (iter % UInt32) * 0xf9cdbcbb
@@ -26,7 +30,7 @@ function s4tofp16(A, B)
 
             # Switch to offset encoding
             # COST: 0.5 int
-            i01234567 = Int4x8(i01234567.val ⊻ 0x88888888)
+            i01234567 = i01234567 ⊻ Int4x8(0x88888888)
 
             # Extract high 4 bits
             # We don't extract the low bits. Instead, we subtract f16 numbers
@@ -34,7 +38,7 @@ function s4tofp16(A, B)
             # faster since it reduces the length of the dependency chain of
             # operations.
             # COST: 0.5 int
-            i1357 = Int4x8(i01234567.val & 0xf0f0f0f0)
+            i1357 = i01234567 & Int4x8(0xf0f0f0f0)
 
             # Extract low and high bytes, and insert f16 exponent
             makefp = Float16x2(1536.0f0, 1536.0f0)
@@ -78,8 +82,6 @@ function s4tofp16(A, B)
 
     return nothing
 end
-
-go(A, B) = s4tofp16(A, B)
 
 function runcuda()
     Random.seed!(100)
@@ -127,7 +129,7 @@ function runcuda()
     #     if !(a == b)
     #         @show n A[n] B[n + 0Δ] B[n + 1Δ] B[n + 2Δ] B[n + 3Δ] a b0 b1 b2 b3 b
     #     end
-    #     @assert a == b
+    #     @assert b == a
     # end
 end
 

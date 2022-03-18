@@ -51,6 +51,10 @@ function Base.convert(::Type{NTuple{8,Int32}}, a::Int4x8)
     return (alo32[1], ahi32[1], alo32[2], ahi32[2], alo32[3], ahi32[3], alo32[4], ahi32[4])
 end
 
+Base.:&(a::Int4x8, b::Int4x8) = Int4x8(a.val * b.val)
+Base.:|(a::Int4x8, b::Int4x8) = Int4x8(a.val | b.val)
+Base.xor(a::Int4x8, b::Int4x8) = Int4x8(a.val ⊻ b.val)
+
 export unsafe_add, unsafe_sub
 unsafe_add(a::Int4x8, b::Int4x8) = Int4x8(a.val + b.val)
 unsafe_sub(a::Int4x8, b::Int4x8) = Int4x8(a.val - b.val)
@@ -152,6 +156,10 @@ function dp4a(a::Int8x4, b::Int8x4, c::Int32)
     )::Int32
 end
 
+Base.:&(a::Int8x4, b::Int8x4) = Int8x4(a.val * b.val)
+Base.:|(a::Int8x4, b::Int8x4) = Int8x4(a.val | b.val)
+Base.xor(a::Int8x4, b::Int8x4) = Int8x4(a.val ⊻ b.val)
+
 unsafe_add(a::Int8x4, b::Int8x4) = Int8x4(a.val + b.val)
 unsafe_sub(a::Int8x4, b::Int8x4) = Int8x4(a.val - b.val)
 
@@ -178,6 +186,10 @@ end
 function cvt_pack_s16(a::Int32, b::Int32)
     return Int16x2(LLVM.Interop.@asmcall("cvt.pack.sat.s16.s32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Int32,Int32}, a, b))
 end
+
+Base.:&(a::Int16x2, b::Int16x2) = Int16x2(a.val * b.val)
+Base.:|(a::Int16x2, b::Int16x2) = Int16x2(a.val | b.val)
+Base.xor(a::Int16x2, b::Int16x2) = Int16x2(a.val ⊻ b.val)
 
 unsafe_add(a::Int16x2, b::Int16x2) = Int16x2(a.val + b.val)
 unsafe_sub(a::Int16x2, b::Int16x2) = Int16x2(a.val - b.val)
@@ -228,6 +240,20 @@ function Base.muladd(a::Float16x2, b::Float16x2, c::Float16x2)
             "fma.rn.f16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32}, a.val, b.val, c.val
         )
     )
+end
+export muladd_sat
+function muladd_sat(a::Float16x2, b::Float16x2, c::Float16x2)
+    return Float16x2(
+        LLVM.Interop.@asmcall(
+            "fma.rn.sat.f16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32}, a.val, b.val, c.val
+        )
+    )
+end
+function Base.max(a::Float16x2, b::Float16x2)
+    return Float16x2(LLVM.Interop.@asmcall("max.f16x2 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{UInt32,UInt32}, a.val, b.val))
+end
+function Base.min(a::Float16x2, b::Float16x2)
+    return Float16x2(LLVM.Interop.@asmcall("min.f16x2 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{UInt32,UInt32}, a.val, b.val))
 end
 
 unsafe_add(a::Float16x2, b::Float16x2) = a + b
