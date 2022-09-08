@@ -96,7 +96,7 @@ function go(A, B, Z)
             # COST: 0.5 int
             i01234567 = i01234567 ⊻ Int4x8(0x88888888)
 
-            # TOTAL COST: 1 int + 3 fp = 4 cycles
+            # TOTAL COST: 1 int + 3 fp ≤ 4 cycles
             # (assuming 1 warp can use 1 SM fully)
             # MEASURED: 6.5 cycles + overhead
             # BENCHMARK HARNESS OVERHEAD: 2.0 cycles
