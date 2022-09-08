@@ -9,7 +9,7 @@ rsync -Paz --exclude .git --exclude *.toml ~/src/jl/GPUIndexSpaces.jl sky.lwlab:
 
 Run normally:
 ```sh
-~/julia-1.7/bin/julia --project=@. test/frb.jl
+julia --project=@. test/frb.jl
 ```
 
 Copy output from Sky:
