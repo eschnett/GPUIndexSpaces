@@ -57,45 +57,48 @@ const N = Cint(3)               # BeamJ loop iterations
 #TODO const M = Cint(1)               # BeamI loop iterations
 #TODO const N = Cint(1)               # BeamJ loop iterations
 
-const map_E_global = Layout(
-    Int32,
-    Dict(
-        Cplx(0) => SIMD(2),
-        Polr(0) => SIMD(3),
-        Dish(0) => SIMD(4),
-        Dish(1) => Memory(0),
-        Dish(2) => Memory(1),
-        Dish(3) => Memory(2),
-        Dish(4) => Memory(3),
-        Dish(5) => Memory(4),
-        Dish(6) => Memory(5),
-        Dish(7) => Memory(6),
-        Dish(8) => Memory(7),
-        Freq(0) => Memory(8),
-        Freq(1) => Memory(9),
-        Freq(2) => Memory(10),
-        Freq(3) => Memory(11),
-        Freq(4) => Memory(12),
-        Freq(5) => Memory(13),
-        Freq(6) => Memory(14),
-        Freq(7) => Memory(15),  # TODO
-        Time(0) => Memory(16),
-        Time(1) => Memory(17),
-        Time(2) => Memory(18),
-        Time(3) => Memory(19),
-        Time(4) => Memory(20),
-        Time(5) => Memory(21),
-        Time(6) => Memory(22),
-        Time(7) => Memory(23),
-        Time(8) => Memory(24),
-        Time(9) => Memory(25),
-        Time(10) => Memory(26),
-        Time(11) => Memory(27),
-        Time(12) => Memory(28),
-        Time(13) => Memory(29),
-        Time(14) => Memory(30),
-    ),
-)
+const map_E_global = let
+    m = -1
+    Layout(
+        Int32,
+        Dict(
+            Cplx(0) => SIMD(2),
+            Polr(0) => SIMD(3),
+            Dish(0) => SIMD(4),
+            Dish(1) => Memory(m += 1),
+            Dish(2) => Memory(m += 1),
+            Dish(3) => Memory(m += 1),
+            Dish(4) => Memory(m += 1),
+            Dish(5) => Memory(m += 1),
+            Dish(6) => Memory(m += 1),
+            Dish(7) => Memory(m += 1),
+            Dish(8) => Memory(m += 1),
+            Freq(0) => Memory(m += 1),
+            Freq(1) => Memory(m += 1),
+            Freq(2) => Memory(m += 1),
+            Freq(3) => Memory(m += 1),
+            Freq(4) => Memory(m += 1),
+            Freq(5) => Memory(m += 1),
+            Freq(6) => Memory(m += 1),
+            Freq(7) => Memory(m += 1),
+            Time(0) => Memory(m += 1),
+            Time(1) => Memory(m += 1),
+            Time(2) => Memory(m += 1),
+            Time(3) => Memory(m += 1),
+            Time(4) => Memory(m += 1),
+            Time(5) => Memory(m += 1),
+            Time(6) => Memory(m += 1),
+            Time(7) => Memory(m += 1),
+            Time(8) => Memory(m += 1),
+            Time(9) => Memory(m += 1),
+            Time(10) => Memory(m += 1),
+            Time(11) => Memory(m += 1),
+            Time(12) => Memory(m += 1),
+            Time(13) => Memory(m += 1),
+            Time(14) => Memory(m += 1),
+        ),
+    )
+end
 
 # Layout of fI in registers
 const map_fI_registers = Layout(
@@ -135,41 +138,44 @@ const map_fI_registers = Layout(
 )
 
 # Layout of fI in global memory
-const map_fI_memory = Layout(
-    Float32,
-    Dict(
-        BeamI(0) => Memory(5 + 0),
-        BeamI(1) => Memory(5 + 1),
-        BeamI(2) => Memory(5 + 2),
-        BeamI(3) => Memory(5 + 3),
-        BeamI(4) => Memory(5 + 4),
-        BeamI(5) => Memory(10 + 2),
-        BeamI(6) => Memory(10 + 3),
-        BeamJ(0) => Memory(0 + 2),
-        BeamJ(1) => Memory(0 + 3),
-        BeamJ(2) => Memory(0 + 4),
-        BeamJ(3) => Memory(0 + 0),
-        BeamJ(4) => Memory(0 + 1),
-        BeamJ(5) => Memory(10 + 0),
-        BeamJ(6) => Memory(10 + 1),
-        Freq(0) => Memory(14),
-        Freq(1) => Memory(15),
-        Freq(2) => Memory(16),
-        Freq(3) => Memory(17),
-        Freq(4) => Memory(18),
-        Freq(5) => Memory(19),
-        Freq(6) => Memory(20),
-        Freq(7) => Memory(21),
-        Time(7) => Memory(22),
-        Time(8) => Memory(23),
-        Time(9) => Memory(24),
-        Time(10) => Memory(25),
-        Time(11) => Memory(26),
-        Time(12) => Memory(27),
-        Time(13) => Memory(28),
-        Time(14) => Memory(29),
-    ),
-)
+const map_fI_memory = let
+    m = 13
+    Layout(
+        Float32,
+        Dict(
+            BeamI(0) => Memory(5 + 0),
+            BeamI(1) => Memory(5 + 1),
+            BeamI(2) => Memory(5 + 2),
+            BeamI(3) => Memory(5 + 3),
+            BeamI(4) => Memory(5 + 4),
+            BeamI(5) => Memory(10 + 2),
+            BeamI(6) => Memory(10 + 3),
+            BeamJ(0) => Memory(0 + 2),
+            BeamJ(1) => Memory(0 + 3),
+            BeamJ(2) => Memory(0 + 4),
+            BeamJ(3) => Memory(0 + 0),
+            BeamJ(4) => Memory(0 + 1),
+            BeamJ(5) => Memory(10 + 0),
+            BeamJ(6) => Memory(10 + 1),
+            Freq(0) => Memory(m += 1),
+            Freq(1) => Memory(m += 1),
+            Freq(2) => Memory(m += 1),
+            Freq(3) => Memory(m += 1),
+            Freq(4) => Memory(m += 1),
+            Freq(5) => Memory(m += 1),
+            Freq(6) => Memory(m += 1),
+            Freq(7) => Memory(m += 1),
+            Time(7) => Memory(m += 1),
+            Time(8) => Memory(m += 1),
+            Time(9) => Memory(m += 1),
+            Time(10) => Memory(m += 1),
+            Time(11) => Memory(m += 1),
+            Time(12) => Memory(m += 1),
+            Time(13) => Memory(m += 1),
+            Time(14) => Memory(m += 1),
+        ),
+    )
+end
 
 # Layout of E in registers; see (48)
 const map_E_registers = Layout(
@@ -1354,12 +1360,16 @@ function runcuda()
             dish_j = d′ ÷ 32
             K_input[d + 1] = (dish_i, dish_j)
         end
+        # Polr, Dish, Freq, Time
         E_input = zeros(Int8, 2, 512, 256, 32768)
         nfrequencies = 1 * F
         ntimes = 128 * K
+        # Cplx, Polr, DishJ, DishI
         Gin_input = zeros(Int8, 2 * 2 * 32 * 32)
+        # Cplx, DishI ÷ 2, BeamI ÷ 2
         Ans_input = zeros(Int8, 2 * (32 ÷ 2) * (128 ÷ 2))
         nbeams_i = M * 32
+        # Cplx, DishJ ÷ 2, BeamJ ÷ 2
         Aew_input = zeros(Int8, 2 * (32 ÷ 2) * (128 ÷ 2))
         nbeams_j = N * 32
 
