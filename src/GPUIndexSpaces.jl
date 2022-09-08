@@ -1306,11 +1306,11 @@ function load!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsma
             # `$expression + 1`, so that the added `1` can be combined
             # with the subtracted `1` in the `getindex` function.
             if have_memory3
-                push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2, 1 + $index3]::$type))#=@inbounds=#
+                push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2, 1 + $index3]::$type))
             elseif have_memory2
-                push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2]::$type))#=@inbounds=#
+                push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2]::$type))
             else
-                push!(stmts, :($lhsname = @inbounds $mem[1 + $index]::$type))#=@inbounds=#
+                push!(stmts, :($lhsname = @inbounds $mem[1 + $index]::$type))
             end
         end
     end
@@ -1362,15 +1362,15 @@ function store!(
             # with the subtracted `1` in the `getindex` function.
             if operator === :(=)
                 if have_memory3
-                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2, 1 + $index3] = $rhsname))#=@inbounds=#
+                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2, 1 + $index3] = $rhsname))
                 elseif have_memory2
-                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2] = $rhsname))#=@inbounds=#
+                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2] = $rhsname))
                 else
-                    push!(stmts, :(@inbounds $mem[1 + $index + $offset] = $rhsname))#=@inbounds=#
+                    push!(stmts, :(@inbounds $mem[1 + $index + $offset] = $rhsname))
                 end
             elseif operator === :(+=)
                 @assert !have_memory2 && !have_memory3
-                push!(stmts, :(@inbounds $mem[1 + $index] += $rhsname))#=@inbounds=#
+                push!(stmts, :(@inbounds $mem[1 + $index] += $rhsname))
             else
                 @assert false
             end
