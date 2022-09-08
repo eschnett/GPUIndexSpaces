@@ -66,7 +66,8 @@ function store_global!(ptr::Core.LLVMPtr{Int128,1}, val::NTuple{4,Int32})
         """,
         Nothing,
         Tuple{Core.LLVMPtr{Int128,1},NTuple{4,Int32}},
-        ptr,val
+        ptr,
+        val,
     )
 
     # val = Base.llvmcall(
