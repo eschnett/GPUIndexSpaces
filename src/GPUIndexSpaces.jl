@@ -33,6 +33,7 @@ end
 function Int4x8(a1::Int32, a2::Int32, a3::Int32, a4::Int32, a5::Int32, a6::Int32, a7::Int32, a8::Int32)
     return Int4x8(bitwise_merge(0x0f0f0f0f, Int8x4(a1, a3, a5, a7).val << 0x04, Int8x4(a2, a4, a6, a8).val << 0x00))
 end
+
 Base.convert(::Type{Int4x8}, a::NTuple{2,Int8x4}) = Int4x8(bitwise_merge(0x0f0f0f0f, a[2].val << 0x04, a[1].val))
 function Base.convert(::Type{NTuple{2,Int8x4}}, a::Int4x8)
     a1 = a.val ⊻ 0x88888888            # a + 8
@@ -50,6 +51,8 @@ function Base.convert(::Type{NTuple{8,Int32}}, a::Int4x8)
     ahi32 = convert(NTuple{4,Int32}, ahi8)
     return (alo32[1], ahi32[1], alo32[2], ahi32[2], alo32[3], ahi32[3], alo32[4], ahi32[4])
 end
+
+Base.zero(::Type{Int4x8}) = Int4x8(Int32(0))
 
 Base.:&(a::Int4x8, b::Int4x8) = Int4x8(a.val * b.val)
 Base.:|(a::Int4x8, b::Int4x8) = Int4x8(a.val | b.val)
@@ -156,6 +159,8 @@ function dp4a(a::Int8x4, b::Int8x4, c::Int32)
     )::Int32
 end
 
+Base.zero(::Type{Int8x4}) = Int8x4(Int32(0))
+
 Base.:&(a::Int8x4, b::Int8x4) = Int8x4(a.val * b.val)
 Base.:|(a::Int8x4, b::Int8x4) = Int8x4(a.val | b.val)
 Base.xor(a::Int8x4, b::Int8x4) = Int8x4(a.val ⊻ b.val)
@@ -187,6 +192,8 @@ function cvt_pack_s16(a::Int32, b::Int32)
     return Int16x2(LLVM.Interop.@asmcall("cvt.pack.sat.s16.s32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Int32,Int32}, a, b))
 end
 
+Base.zero(::Type{Int16x2}) = Int16x2(Int32(0))
+
 Base.:&(a::Int16x2, b::Int16x2) = Int16x2(a.val * b.val)
 Base.:|(a::Int16x2, b::Int16x2) = Int16x2(a.val | b.val)
 Base.xor(a::Int16x2, b::Int16x2) = Int16x2(a.val ⊻ b.val)
@@ -216,6 +223,7 @@ CUDA.@device_override function Base.convert(::Type{NTuple{2,Float32}}, a::Float1
         LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10)
     )::NTuple{2,Float32}
 end
+Base.zero(::Type{Float16x2}) = Float16x2(0.0f0, 0.0f0)
 Base.:+(a::Float16x2) = a
 Base.:-(a::Float16x2) = Float16x2(LLVM.Interop.@asmcall("neg.rn.f16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
 """Negate a[1]"""
@@ -422,7 +430,7 @@ bit(i::Target) = i.bit
 
 Base.show(io::IO, i::Target) = print(io, tag(i), "(", bit(i), ")")
 
-export Ignore, SIMD, Register, Thread, Warp, Block, Loop1, Loop2, Loop3, Loop4
+export Ignore, SIMD, Register, Thread, Warp, Block, Loop1, Loop2, Loop3, Loop4, Loop5
 const Ignore = Target{:Ignore}
 const SIMD = Target{:SIMD}
 const Register = Target{:Register}
@@ -433,6 +441,7 @@ const Loop1 = Target{:Loop1}
 const Loop2 = Target{:Loop2}
 const Loop3 = Target{:Loop3}
 const Loop4 = Target{:Loop4}
+const Loop5 = Target{:Loop5}
 
 export Memory, Memory2, Memory3
 const Memory = Target{:Memory}
@@ -830,6 +839,217 @@ function assign!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs
     return nothing
 end
 
+export select!
+
+function select!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, index::Index, value::Expr)
+    return select!(steps, env, lhs, rhs, env[rhs][index], value)
+end
+function select!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, register::Register, value::Expr)
+    rhsmap = env[rhs]
+
+    @assert lhs ∉ keys(env)
+    lhsmap = copy(rhsmap)
+    register_index = inv(lhsmap)[register]
+    delete!(lhsmap, register_index)
+    env[lhs] = lhsmap
+
+    registers = [v for (k, v) in rhsmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
+
+    @assert (1 << register.bit) & register_mask ≠ 0
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            if r & (1 << register.bit) == 0
+                r0 = r
+                r1 = r | (1 << register.bit)
+                rname0 = register_mask == 0 ? "" : "_$r0"
+                rname1 = register_mask == 0 ? "" : "_$r1"
+
+                lhsr = r & ~(1 << register.bit)
+                lhsrname = register_mask & ~(1 << register.bit) == 0 ? "" : "_$lhsr"
+                push!(stmts, :($(Symbol(lhs, lhsrname)) = !$value ? $(Symbol(rhs, rname0)) : $(Symbol(rhs, rname1))))
+            end
+        end
+    end
+
+    push!(steps, Step(
+        "Select variable",
+        Variable[rhs => rhsmap],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
+end
+
+function select!(
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, indices::AbstractVector{Index}, value::Expr
+)
+    return select!(steps, env, lhs, rhs, [env[rhs][index] for index in indices], value)
+end
+function select!(
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, registers::AbstractVector{Register}, value::Expr
+)
+    rhsmap = env[rhs]
+
+    @assert lhs ∉ keys(env)
+    lhsmap = copy(rhsmap)
+    register_indices = [inv(lhsmap)[register] for register in registers]
+    for register_index in register_indices
+        delete!(lhsmap, register_index)
+    end
+    env[lhs] = lhsmap
+
+    all_registers = [v for (k, v) in rhsmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in all_registers])
+
+    @assert all((1 << register.bit) & register_mask ≠ 0 for register in registers)
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            i = sum((r & 1 << register.bit ≠ 0) << (i - 1) for (i, register) in enumerate(registers))
+            rname = register_mask == 0 ? "" : "_$r"
+            lhsr = r | sum(1 << register.bit for register in registers)
+            lhsrname = register_mask & ~sum(1 << register.bit for register in registers) == 0 ? "" : "_$lhsr"
+            push!(
+                stmts,
+                quote
+                    if $value == $i
+                        $(Symbol(lhs, lhsrname)) = $(Symbol(rhs, rname))
+                    end
+                end,
+            )
+        end
+    end
+
+    push!(steps, Step(
+        "Select variable",
+        Variable[rhs => rhsmap],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
+end
+
+export unselect!
+
+function unselect_BROKEN!(
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, index_register::Pair{<:Index,Register}, value::Expr
+)
+    rhsmap = env[rhs]
+
+    register_index, register = index_register
+    @assert register_index ∉ rhsmap
+    @assert register_index ∉ inv(rhsmap)
+
+    @assert lhs ∉ keys(env)
+    lhsmap = copy(rhsmap)
+    lhsmap[register_index] = register
+    env[lhs] = lhsmap
+
+    registers = [v for (k, v) in lhsmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
+
+    @assert (1 << register.bit) & register_mask ≠ 0
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            if r & (1 << register.bit) == 0
+                rname = register_mask & ~(1 << register.bit) == 0 ? "" : "_$r"
+
+                lhsr0 = r
+                lhsr1 = r | (1 << register.bit)
+                lhsrname0 = register_mask == 0 ? "" : "_$lhsr0"
+                lhsrname1 = register_mask == 0 ? "" : "_$lhsr1"
+                push!(
+                    stmts,
+                    quote
+                        if !$value
+                            $(Symbol(lhs, lhsrname0)) = $(Symbol(rhs, rname))
+                        else
+                            $(Symbol(lhs, lhsrname1)) = $(Symbol(rhs, rname))
+                        end
+                    end,
+                )
+            end
+        end
+    end
+
+    push!(steps, Step(
+        "Unselect variable",
+        Variable[rhs => rhsmap],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
+end
+
+function unselect!(
+    steps::Vector{AbstractStep},
+    env::Environment,
+    lhs::Symbol,
+    rhs::Symbol,
+    index_registers::AbstractArray{<:Pair{<:Index,Register}},
+    value::Expr,
+)
+    rhsmap = env[rhs]
+
+    for (register_index, register) in index_registers
+        @assert register_index ∉ rhsmap
+        @assert register_index ∉ inv(rhsmap)
+    end
+
+    @assert lhs ∉ keys(env)
+    lhsmap = copy(rhsmap)
+    for (register_index, register) in index_registers
+        lhsmap[register_index] = register
+    end
+    env[lhs] = lhsmap
+
+    all_registers = [v for (k, v) in lhsmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in all_registers])
+
+    @assert all((1 << register.bit) & register_mask ≠ 0 for (register_index, register) in index_registers)
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            i = sum((r & 1 << register.bit ≠ 0) << (i - 1) for (i, (index_register, register)) in enumerate(index_registers))
+            rname = register_mask & ~sum(1 << register.bit for (index_register, register) in index_registers) == 0 ? "" : "_$r"
+
+            lhsr = r
+            lhsrname = register_mask == 0 ? "" : "_$lhsr"
+            push!(
+                stmts,
+                quote
+                    if $value == $i
+                        $(Symbol(lhs, lhsrname)) = $(Symbol(rhs, rname))
+                    end
+                end,
+            )
+        end
+    end
+
+    push!(steps, Step(
+        "Unselect variable",
+        Variable[rhs => rhsmap],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
+end
+
 export split!
 function split!(steps::Vector{AbstractStep}, env::Environment, lhs0::Symbol, lhs1::Symbol, rhs::Symbol, index::Index)
     return split!(steps, env, lhs0, lhs1, rhs, env[rhs][index])
@@ -1135,6 +1355,8 @@ function make_indices(
     loop3_mask = sum(UInt[1 << lp.bit for lp in loops3])
     loops4 = [v for (k, v) in idxmap if v isa Loop4]
     loop4_mask = sum(UInt[1 << lp.bit for lp in loops4])
+    loops5 = [v for (k, v) in idxmap if v isa Loop5]
+    loop5_mask = sum(UInt[1 << lp.bit for lp in loops5])
     blocks = [v for (k, v) in idxmap if v isa Block]
     block_mask = sum(UInt[1 << bl.bit for bl in blocks])
     warps = [v for (k, v) in idxmap if v isa Warp]
@@ -1172,6 +1394,17 @@ function make_indices(
             expressions = Code[]
             # TODO: This assumes a memory layout in CUDA `int`s, not bytes
             # TODO: Check for aligned access
+            push!(
+                expressions,
+                movebits(
+                    :(loopIdx5 % $SizeT),
+                    [
+                        BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit) for
+                        lp in loops5 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN
+                    ],
+                    loop5_mask,
+                ),
+            )
             push!(
                 expressions,
                 movebits(
@@ -1450,6 +1683,46 @@ end
 
 ################################################################################
 
+export rename!
+function rename!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, mapping::Dict{<:Index,<:Index})
+    inv_mapping = Dict(i2 => i1 for (i1, i2) in mapping)
+    @assert all(inv_mapping[mapping[i1]] == i1 for i1 in keys(mapping))
+    @assert all(mapping[inv_mapping[i2]] == i2 for i2 in values(mapping))
+
+    rhsmap = env[rhs]
+    @assert lhs ∉ keys(env)
+    lhsmap = Layout(rhsmap.type, Dict{Index,Target}(get(mapping, ind, ind) => tgt for (ind, tgt) in rhsmap))
+    env[lhs] = lhsmap
+
+    registers = [v for (k, v) in rhsmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            rname = register_mask == 0 ? "" : "_$r"
+            push!(
+                stmts,
+                quote
+                    $(Symbol(lhs, rname)) = $(Symbol(rhs, rname))
+                end,
+            )
+        end
+    end
+
+    push!(steps, Step(
+        "Rename indices $mapping",
+        Variable[rhs => rhsmap],
+        Variable[lhs => lhsmap],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
+end
+
+################################################################################
+
 const lomask4 = 0x0f0f0f0f
 # get_lo4(r0::Code, r1::Code) = :($(bitwise_merge(lomask4, :($r1 << 0x04), r0)) % UInt32)
 # get_hi4(r0::Code, r1::Code) = :($(bitwise_merge(lomask4, r1, :($r0 >>> 0x04))) % UInt32)
@@ -1668,6 +1941,8 @@ function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbo
     )
     return nothing
 end
+
+################################################################################
 
 export addsub!
 function addsub!(
@@ -2035,7 +2310,7 @@ function narrow2!(
     @assert index1 ∈ keys(lhsmap)
     @assert index2 ∈ keys(lhsmap)
     @assert lhsmap[index1] == targetmap1[1]
-    @assert lhsmap[index1] == targetmap1[1]
+    @assert lhsmap[index2] == targetmap2[1]
     lhsmap[index1] = targetmap1[2]
     lhsmap[index2] = targetmap2[2]
     env[lhs] = lhsmap
@@ -2087,6 +2362,135 @@ function narrow2!(
         steps,
         Step(
             "narrow2 Register($(targetmap1[1])),Register($(targetmap2[1])) => SIMD($(targetmap1[2])),SIMD($(targetmap2[2]))",
+            Variable[rhs => rhsmap],
+            Variable[lhs => lhsmap],
+            quote
+                $(stmts...)
+            end,
+        ),
+    )
+    return nothing
+end
+
+export narrow3!
+function narrow3!(
+    steps::Vector{AbstractStep},
+    env::Environment,
+    lhs::Symbol,
+    rhs::Symbol,
+    indexmap1::Pair{<:Index,Register},
+    indexmap2::Pair{<:Index,Register},
+    indexmap3::Pair{<:Index,Register},
+)
+    @assert indexmap1[1] ≠ indexmap2[1] && indexmap1[1] ≠ indexmap3[1] && indexmap3[1] ≠ indexmap3[1]
+    return narrow3!(
+        steps,
+        env,
+        lhs,
+        rhs,
+        env[rhs][indexmap1[1]] => indexmap1[2],
+        env[rhs][indexmap2[1]] => indexmap2[2],
+        env[rhs][indexmap3[1]] => indexmap3[2],
+    )
+end
+
+function narrow3!(
+    steps::Vector{AbstractStep},
+    env::Environment,
+    lhs::Symbol,
+    rhs::Symbol,
+    targetmap1::Pair{Register,SIMD},
+    targetmap2::Pair{Register,SIMD},
+    targetmap3::Pair{Register,SIMD},
+)
+    rhsmap = env[rhs]
+
+    rhsreg1 = targetmap1[1]::Register
+    rhssimd1 = targetmap1[2]::SIMD
+    rhsreg2 = targetmap2[1]::Register
+    rhssimd2 = targetmap2[2]::SIMD
+    rhsreg3 = targetmap3[1]::Register
+    rhssimd3 = targetmap3[2]::SIMD
+    @assert rhsreg1 ≠ rhsreg2 && rhsreg1 ≠ rhsreg3 && rhsreg2 ≠ rhsreg3
+    @assert rhssimd1 ≠ rhssimd2 && rhssimd1 ≠ rhssimd3 && rhssimd2 ≠ rhssimd3
+
+    @assert lhs ∉ keys(env)
+    lhsmap = copy(rhsmap)
+    index1 = inv(rhsmap)[targetmap1[1]]::Index
+    index2 = inv(rhsmap)[targetmap2[1]]::Index
+    index3 = inv(rhsmap)[targetmap3[1]]::Index
+    @assert index1 ∈ keys(lhsmap)
+    @assert index2 ∈ keys(lhsmap)
+    @assert index3 ∈ keys(lhsmap)
+    @assert lhsmap[index1] == targetmap1[1]
+    @assert lhsmap[index2] == targetmap2[1]
+    @assert lhsmap[index3] == targetmap3[1]
+    lhsmap[index1] = targetmap1[2]
+    lhsmap[index2] = targetmap2[2]
+    lhsmap[index3] = targetmap3[2]
+    env[lhs] = lhsmap
+
+    registers = [v for (k, v) in rhsmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
+    simds = [v for (k, v) in rhsmap if v isa SIMD]
+    simd_mask = sum(UInt[1 << simd.bit for simd in simds])
+    simd_bits = count_ones(simd_mask)
+    @assert simd_mask == (0x01 << simd_bits - 0x01) << (5 - simd_bits)
+
+    @assert (1 << rhsreg1.bit) & register_mask ≠ 0
+    @assert (1 << rhsreg2.bit) & register_mask ≠ 0
+    @assert (1 << rhsreg3.bit) & register_mask ≠ 0
+    @assert simd_bits ≤ 2
+    @assert rhssimd1 == SIMD(5 - simd_bits - 3)
+    @assert rhssimd2 == SIMD(5 - simd_bits - 2)
+    @assert rhssimd3 == SIMD(5 - simd_bits - 1)
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            if r & (1 << rhsreg3.bit | 1 << rhsreg2.bit | 1 << rhsreg1.bit) == 0
+                rname = register_mask & ~(1 << rhsreg1.bit) & ~(1 << rhsreg2.bit) & ~(1 << rhsreg3.bit) == 0 ? "" : "_$r"
+
+                @assert r & (1 << rhsreg1.bit) == 0
+                @assert r & (1 << rhsreg2.bit) == 0
+                @assert r & (1 << rhsreg3.bit) == 0
+                rname000 = "_$r"
+                rname001 = "_$(r | 1 << rhsreg1.bit)"
+                rname010 = "_$(r | 1 << rhsreg2.bit)"
+                rname011 = "_$(r | 1 << rhsreg2.bit | 1 << rhsreg1.bit)"
+                rname100 = "_$(r | 1 << rhsreg3.bit)"
+                rname101 = "_$(r | 1 << rhsreg3.bit | 1 << rhsreg1.bit)"
+                rname110 = "_$(r | 1 << rhsreg3.bit | 1 << rhsreg2.bit)"
+                rname111 = "_$(r | 1 << rhsreg3.bit | 1 << rhsreg2.bit | 1 << rhsreg1.bit)"
+
+                if (rhssimd1, rhssimd2, rhssimd3) == (SIMD(2), SIMD(3), SIMD(4))
+                    @assert lhsmap.type ≡ Int32
+                    push!(
+                        stmts,
+                        quote
+                            $(Symbol(lhs, rname)) = Int4x8(
+                                $(Symbol(rhs, rname000)),
+                                $(Symbol(rhs, rname001)),
+                                $(Symbol(rhs, rname010)),
+                                $(Symbol(rhs, rname011)),
+                                $(Symbol(rhs, rname100)),
+                                $(Symbol(rhs, rname101)),
+                                $(Symbol(rhs, rname110)),
+                                $(Symbol(rhs, rname111)),
+                            )
+                        end,
+                    )
+                else
+                    @assert false
+                end
+            end
+        end
+    end
+
+    push!(
+        steps,
+        Step(
+            "narrow3 Register($(targetmap1[1])),Register($(targetmap2[1])),Register($(targetmap3[1])) => SIMD($(targetmap1[2])),SIMD($(targetmap2[2])),SIMD($(targetmap3[2]))",
             Variable[rhs => rhsmap],
             Variable[lhs => lhsmap],
             quote
@@ -2163,6 +2567,135 @@ function div2!(steps::Vector{AbstractStep}, env::Environment, y::Symbol, x::Symb
             $(stmts...)
         end,
     ))
+    return nothing
+end
+
+################################################################################
+
+export mma_m8n8k16
+function mma_m8n8k16(A::Int8x4, B::Int8x4, C::NTuple{2,Int32})
+    return Base.llvmcall(
+        """
+            %res = call {i32, i32} asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {\$0, \$1}, {\$2}, {\$3}, {\$4, \$5};", "=r,=r,r,r,r,r"(i32 %0, i32 %1, i32 %2, i32 %3)
+            %res0 = extractvalue {i32, i32} %res, 0
+            %res1 = extractvalue {i32, i32} %res, 1
+            %val0 = insertvalue [2 x i32] undef, i32 %res0, 0
+            %val = insertvalue [2 x i32] %val0, i32 %res1, 1
+            ret [2 x i32] %val
+        """,
+        NTuple{2,Int32},
+        NTuple{4,Int32},
+        A.val % Int32,
+        B.val % Int32,
+        C[1],
+        C[2],
+    )
+end
+
+export mma_row_col_m8n8k16_s8!
+function mma_row_col_m8n8k16_s8!(steps::Vector{AbstractStep}, env::Environment, D::Symbol, A::Symbol, B::Symbol, C::Symbol)
+    Amap = env[A]
+    Bmap = env[B]
+    Cmap = env[C]
+    @assert D ∉ keys(env)
+    Dmap = Cmap
+    env[D] = Dmap
+
+    threads_A = [v for (k, v) in Amap if v isa Thread]
+    thread_mask_A = sum(UInt[1 << thr.bit for thr in threads_A])
+    registers_A = [v for (k, v) in Amap if v isa Register]
+    register_mask_A = sum(UInt[1 << reg.bit for reg in registers_A])
+    simds_A = [v for (k, v) in Amap if v isa SIMD]
+    simd_mask_A = sum(UInt[1 << simd.bit for simd in simds_A])
+    simd_bits_A = count_ones(simd_mask_A)
+    @assert simd_mask_A == (0x01 << simd_bits_A - 0x01) << (5 - simd_bits_A)
+    @assert Amap.type ≡ Int32
+
+    threads_B = [v for (k, v) in Bmap if v isa Thread]
+    thread_mask_B = sum(UInt[1 << thr.bit for thr in threads_B])
+    registers_B = [v for (k, v) in Bmap if v isa Register]
+    register_mask_B = sum(UInt[1 << reg.bit for reg in registers_B])
+    simds_B = [v for (k, v) in Bmap if v isa SIMD]
+    simd_mask_B = sum(UInt[1 << simd.bit for simd in simds_B])
+    simd_bits_B = count_ones(simd_mask_B)
+    @assert simd_mask_B == (0x01 << simd_bits_B - 0x01) << (5 - simd_bits_B)
+    @assert Bmap.type ≡ Int32
+
+    threads_C = [v for (k, v) in Cmap if v isa Thread]
+    thread_mask_C = sum(UInt[1 << thr.bit for thr in threads_C])
+    registers_C = [v for (k, v) in Cmap if v isa Register]
+    register_mask_C = sum(UInt[1 << reg.bit for reg in registers_C])
+    simds_C = [v for (k, v) in Cmap if v isa SIMD]
+    simd_mask_C = sum(UInt[1 << simd.bit for simd in simds_C])
+    simd_bits_C = count_ones(simd_mask_C)
+    @assert simd_mask_C == (0x01 << simd_bits_C - 0x01) << (5 - simd_bits_C)
+    @assert Cmap.type ≡ Int32
+
+    # We could loop over additional register bits
+    @assert count_ones(thread_mask_A) == 5
+    @assert count_ones(register_mask_A) == 0
+    @assert simd_bits_A == 2
+    @assert thread_mask_A == 0b11111
+    @assert register_mask_A == 0b0
+    @assert simd_mask_A == 0b11000
+
+    @assert count_ones(thread_mask_B) == 5
+    @assert count_ones(register_mask_B) == 0
+    @assert simd_bits_B == 2
+    @assert thread_mask_B == 0b11111
+    @assert register_mask_B == 0b0
+    @assert simd_mask_B == 0b11000
+
+    @assert count_ones(thread_mask_C) == 5
+    @assert count_ones(register_mask_C) == 1
+    @assert simd_bits_C == 0
+    @assert thread_mask_C == 0b11111
+    @assert register_mask_C == 0b1
+    @assert simd_mask_C == 0b00000
+
+    inv_Amap = inv(Amap)
+    dual_A_col0 = inv_Amap[SIMD(3)]
+    dual_A_col1 = inv_Amap[SIMD(4)]
+    dual_A_col2 = inv_Amap[Thread(0)]
+    dual_A_col3 = inv_Amap[Thread(1)]
+    dual_A_row0 = inv_Amap[Thread(2)]
+    dual_A_row1 = inv_Amap[Thread(3)]
+    dual_A_row2 = inv_Amap[Thread(4)]
+
+    inv_Bmap = inv(Bmap)
+    dual_B_row0 = inv_Bmap[SIMD(3)]
+    dual_B_row1 = inv_Bmap[SIMD(4)]
+    dual_B_row2 = inv_Bmap[Thread(0)]
+    dual_B_row3 = inv_Bmap[Thread(1)]
+    dual_B_col0 = inv_Bmap[Thread(2)]
+    dual_B_col1 = inv_Bmap[Thread(3)]
+    dual_B_col2 = inv_Bmap[Thread(4)]
+
+    inv_Cmap = inv(Cmap)
+    dual_C_col0 = inv_Cmap[Register(0)]
+    dual_C_col1 = inv_Cmap[Thread(0)]
+    dual_C_col2 = inv_Cmap[Thread(1)]
+    dual_C_row0 = inv_Cmap[Thread(2)]
+    dual_C_row1 = inv_Cmap[Thread(3)]
+    dual_C_row2 = inv_Cmap[Thread(4)]
+
+    @assert dual_C_row0 == dual_A_row0
+    @assert dual_C_row1 == dual_A_row1
+    @assert dual_C_row2 == dual_A_row2
+
+    @assert dual_A_col0 == dual_B_row0
+    @assert dual_A_col1 == dual_B_row1
+    @assert dual_A_col2 == dual_B_row2
+
+    code = quote
+        A_frag = $(Symbol(A))::Int8x4
+        B_frag = $(Symbol(B))::Int8x4
+        C_frag = ($([Symbol(C, :_, i) for i in 0:1]...),)::NTuple{2,Int32}
+        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+        ($([Symbol(D, :_, i) for i in 0:1]...),) = D_frag
+    end
+
+    push!(steps, Step("mma 8x8x16", Variable[A => Amap, B => Bmap, C => Cmap], Variable[D => Dmap], code))
     return nothing
 end
 
@@ -2267,11 +2800,6 @@ function wmma_mma_row_col_m16n16k16_s8!(steps::Vector{AbstractStep}, env::Enviro
     @assert dual_A_col1 == dual_B_row1
     @assert dual_A_col2 == dual_B_row2
     @assert dual_A_col3 == dual_B_row3
-
-    @assert dual_C_col0 == dual_C_col0
-    @assert dual_C_col1 == dual_C_col1
-    @assert dual_C_col2 == dual_C_col2
-    @assert dual_C_col3 == dual_C_col3
 
     code = quote
         A_frag = ($([:($(Symbol(A, :_, i)).val) for i in 0:1]...),)::NTuple{2,UInt32}
