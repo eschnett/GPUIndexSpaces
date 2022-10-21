@@ -35,7 +35,7 @@ end
 
 # Int4x2
 
-Int4x2(a1::Int32, a2::Int32) = Int4x2((a1 << 0x04) & 0xf0 | (a2 << 0x00) & 0x0f)
+Int4x2(a1::Int32, a2::Int32) = Int4x2((a1 << 0x00) & 0x0f | (a2 << 0x04) & 0xf0)
 
 Base.convert(::Type{Int4x2}, a::NTuple{2,Int8}) = Int4x2(a[1], a[2])
 function Base.convert(::Type{NTuple{2,Int8}}, a::Int4x2)
@@ -48,30 +48,44 @@ function Base.convert(::Type{NTuple{2,Int8}}, a::Int4x2)
     a4_hi = a3_hi ⊻ 0x80               # a
     return (a4_lo % Int8, a4_hi % Int8)::NTuple{2,Int8}
 end
-function Base.convert(::Type{NTuple{8,Int32}}, a::Int4x2)
-    alo8, ahi8 = convert(NTuple{2,Int8x4}, a)
+function Base.convert(::Type{NTuple{2,Int32}}, a::Int4x2)
+    alo8, ahi8 = convert(NTuple{2,Int8}, a)
     alo32 = convert(Int32, alo8)
     ahi32 = convert(Int32, ahi8)
     return (alo32, ahi32)
 end
 
+Base.show(io::IO, a::Int4x2) = print(io, convert(NTuple{2,Int32}, a))
+
 Base.length(::Int4x2) = 1
 
 Base.zero(::Type{Int4x2}) = Int4x2(Int8(0))
 
-Base.:&(a::Int4x2, b::Int4x2) = Int4x2(a.val * b.val)
+Base.:~(a::Int4x2) = Int4x2(~a.val)
+Base.:&(a::Int4x2, b::Int4x2) = Int4x2(a.val & b.val)
 Base.:|(a::Int4x2, b::Int4x2) = Int4x2(a.val | b.val)
 Base.xor(a::Int4x2, b::Int4x2) = Int4x2(a.val ⊻ b.val)
 
-export unsafe_add, unsafe_sub
-unsafe_add(a::Int4x2, b::Int4x2) = Int4x2(a.val + b.val)
-unsafe_sub(a::Int4x2, b::Int4x2) = Int4x2(a.val - b.val)
+function Base.:-(a::Int4x2)
+    rlo = (-a.val) & 0x0f
+    rhi = -(a.val & 0xf0)
+    return Int4x2(rlo | rhi)
+end
+function Base.:+(a::Int4x2, b::Int4x2)
+    rlo = (a.val + b.val) & 0x0f
+    rhi = (a.val & 0xf0) + (b.val & 0xf0)
+    return Int4x2(rlo | rhi)
+end
+function Base.:-(a::Int4x2, b::Int4x2)
+    rlo = (a.val - b.val) & 0x0f
+    rhi = (a.val & 0xf0) - (b.val & 0xf0)
+    return Int4x2(rlo | rhi)
+end
 
 # Int4x8
 
-# WHY IS A1 IN THE HI NIBBLE?
 function Int4x8(a1::Int32, a2::Int32, a3::Int32, a4::Int32, a5::Int32, a6::Int32, a7::Int32, a8::Int32)
-    return Int4x8(bitwise_merge(0x0f0f0f0f, Int8x4(a1, a3, a5, a7).val << 0x04, Int8x4(a2, a4, a6, a8).val << 0x00))
+    return Int4x8(bitwise_merge(0xf0f0f0f0, Int8x4(a1, a3, a5, a7).val << 0x00, Int8x4(a2, a4, a6, a8).val << 0x04))
 end
 
 Base.convert(::Type{Int4x8}, a::NTuple{2,Int8x4}) = Int4x8(bitwise_merge(0x0f0f0f0f, a[2].val << 0x04, a[1].val))
@@ -92,15 +106,44 @@ function Base.convert(::Type{NTuple{8,Int32}}, a::Int4x8)
     return (alo32[1], ahi32[1], alo32[2], ahi32[2], alo32[3], ahi32[3], alo32[4], ahi32[4])
 end
 
+Base.show(io::IO, a::Int4x8) = print(io, convert(NTuple{8,Int32}, a))
+
 Base.zero(::Type{Int4x8}) = Int4x8(Int32(0))
 
-Base.:&(a::Int4x8, b::Int4x8) = Int4x8(a.val * b.val)
+Base.:~(a::Int4x8) = Int4x8(~a.val)
+Base.:&(a::Int4x8, b::Int4x8) = Int4x8(a.val & b.val)
 Base.:|(a::Int4x8, b::Int4x8) = Int4x8(a.val | b.val)
 Base.xor(a::Int4x8, b::Int4x8) = Int4x8(a.val ⊻ b.val)
 
-export unsafe_add, unsafe_sub
-unsafe_add(a::Int4x8, b::Int4x8) = Int4x8(a.val + b.val)
-unsafe_sub(a::Int4x8, b::Int4x8) = Int4x8(a.val - b.val)
+function Base.:-(a::Int4x8)
+    alo = a.val & 0x0f0f0f0f
+    rlo = 0x80808080 - alo
+    ahi = a.val & 0xf0f0f0f0
+    rhi = 0x08080800 - ahi
+    return Int4x8(bitwise_merge(0xf0f0f0f0, rlo, rhi))
+end
+function Base.:+(a::Int4x8, b::Int4x8)
+    a1 = a.val ⊻ 0x88888888
+    b1 = b.val ⊻ 0x88888888
+    alo = a1 & 0x0f0f0f0f
+    blo = b1 & 0x0f0f0f0f
+    rlo = alo + blo
+    ahi = a1 & 0xf0f0f0f0
+    bhi = b1 & 0xf0f0f0f0
+    rhi = ahi + bhi
+    return Int4x8(bitwise_merge(0xf0f0f0f0, rlo, rhi))
+end
+function Base.:-(a::Int4x8, b::Int4x8)
+    a1 = a.val ⊻ 0x88888888
+    b1 = b.val ⊻ 0x88888888
+    alo = (a1 & 0x0f0f0f0f) ⊻ 0x10101010
+    blo = b1 & 0x0f0f0f0f
+    rlo = alo - blo
+    ahi = (a1 & 0xf0f0f0f0) ⊻ 0x01010100
+    bhi = b1 & 0xf0f0f0f0
+    rhi = ahi - bhi
+    return Int4x8(bitwise_merge(0xf0f0f0f0, rlo, rhi))
+end
 
 # Int8x4
 
@@ -199,19 +242,49 @@ function dp4a(a::Int8x4, b::Int8x4, c::Int32)
     )::Int32
 end
 
+Base.show(io::IO, a::Int8x4) = print(io, convert(NTuple{4,Int32}, a))
+
 Base.zero(::Type{Int8x4}) = Int8x4(Int32(0))
 
-Base.:&(a::Int8x4, b::Int8x4) = Int8x4(a.val * b.val)
+Base.:~(a::Int8x4) = Int8x4(~a.val)
+Base.:&(a::Int8x4, b::Int8x4) = Int8x4(a.val & b.val)
 Base.:|(a::Int8x4, b::Int8x4) = Int8x4(a.val | b.val)
 Base.xor(a::Int8x4, b::Int8x4) = Int8x4(a.val ⊻ b.val)
 
-unsafe_add(a::Int8x4, b::Int8x4) = Int8x4(a.val + b.val)
-unsafe_sub(a::Int8x4, b::Int8x4) = Int8x4(a.val - b.val)
+function Base.:-(a::Int8x4)
+    alo = a.val & 0x00ff00ff
+    rlo = 0x80008000 - alo
+    ahi = a.val & 0xff00ff00
+    rhi = 0x00800000 - ahi
+    return Int8x4(bitwise_merge(0xff00ff00, rlo, rhi))
+end
+function Base.:+(a::Int8x4, b::Int8x4)
+    a1 = a.val ⊻ 0x80808080
+    b1 = b.val ⊻ 0x80808080
+    alo = a1 & 0x00ff00ff
+    blo = b1 & 0x00ff00ff
+    rlo = alo + blo
+    ahi = a1 & 0xff00ff00
+    bhi = b1 & 0xff00ff00
+    rhi = ahi + bhi
+    return Int8x4(bitwise_merge(0xff00ff00, rlo, rhi))
+end
+function Base.:-(a::Int8x4, b::Int8x4)
+    a1 = a.val ⊻ 0x80808080
+    b1 = b.val ⊻ 0x80808080
+    alo = (a1 & 0x00ff00ff) ⊻ 0x01000100
+    blo = b1 & 0x00ff00ff
+    rlo = alo - blo
+    ahi = (a1 & 0xff00ff00) ⊻ 0x00010000
+    bhi = b1 & 0xff00ff00
+    rhi = ahi - bhi
+    return Int8x4(bitwise_merge(0xff00ff00, rlo, rhi))
+end
 
 # Int16x2
 
 function Int16x2(a1::Int32, a2::Int32)
-    return ((a1 % UInt32) & 0xffff) + ((a2 % UInt32) & 0xffff) << 0x10
+    return Int16x2(((a1 % UInt32) & 0xffff) + ((a2 % UInt32) & 0xffff) << 0x10)
 end
 CUDA.@device_override function Int16x2(a1::Int32, a2::Int32)
     return cvt_pack_s16(a2, a1)
@@ -232,19 +305,44 @@ function cvt_pack_s16(a::Int32, b::Int32)
     return Int16x2(LLVM.Interop.@asmcall("cvt.pack.sat.s16.s32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Int32,Int32}, a, b))
 end
 
+Base.show(io::IO, a::Int16x2) = print(io, convert(NTuple{2,Int32}, a))
+
 Base.zero(::Type{Int16x2}) = Int16x2(Int32(0))
 
-Base.:&(a::Int16x2, b::Int16x2) = Int16x2(a.val * b.val)
+Base.:~(a::Int16x2) = Int16x2(~a.val)
+Base.:&(a::Int16x2, b::Int16x2) = Int16x2(a.val & b.val)
 Base.:|(a::Int16x2, b::Int16x2) = Int16x2(a.val | b.val)
 Base.xor(a::Int16x2, b::Int16x2) = Int16x2(a.val ⊻ b.val)
 
-unsafe_add(a::Int16x2, b::Int16x2) = Int16x2(a.val + b.val)
-unsafe_sub(a::Int16x2, b::Int16x2) = Int16x2(a.val - b.val)
-
-# Int32
-
-unsafe_add(a::Int32, b::Int32) = a + b
-unsafe_sub(a::Int32, b::Int32) = a - b
+function Base.:-(a::Int16x2)
+    alo = a.val
+    rlo = -alo
+    ahi = a.val & 0xffff0000
+    rhi = -ahi
+    return Int16x2(bitwise_merge(0xffff0000, rlo, rhi))
+end
+function Base.:+(a::Int16x2, b::Int16x2)
+    a1 = a.val ⊻ 0x80008000
+    b1 = b.val ⊻ 0x80008000
+    alo = a1
+    blo = b1
+    rlo = alo + blo
+    ahi = a1 & 0xffff0000
+    bhi = b1 & 0xffff0000
+    rhi = ahi + bhi
+    return Int16x2(bitwise_merge(0xffff0000, rlo, rhi))
+end
+function Base.:-(a::Int16x2, b::Int16x2)
+    a1 = a.val ⊻ 0x80008000
+    b1 = b.val ⊻ 0x80008000
+    alo = a1
+    blo = b1
+    rlo = alo - blo
+    ahi = a1 & 0xffff0000
+    bhi = b1 & 0xffff0000
+    rhi = ahi - bhi
+    return Int16x2(bitwise_merge(0xffff0000, rlo, rhi))
+end
 
 # Float16x2
 
@@ -254,6 +352,7 @@ end
 CUDA.@device_override function Float16x2(a1::Float32, a2::Float32)
     return Float16x2(LLVM.Interop.@asmcall("cvt.rn.f16x2.f32 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{Float32,Float32}, a2, a1))
 end
+
 function Base.convert(::Type{NTuple{2,Float32}}, a::Float16x2)
     return (Float32(reinterpret(Float16, (a.val >> 0x00) % UInt16)), Float32(reinterpret(Float16, (a.val >> 0x10) % UInt16)))
 end
@@ -263,26 +362,58 @@ CUDA.@device_override function Base.convert(::Type{NTuple{2,Float32}}, a::Float1
         LLVM.Interop.@asmcall("cvt.f32.f16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10)
     )::NTuple{2,Float32}
 end
+
+Base.show(io::IO, a::Float16x2) = print(io, convert(NTuple{2,Float32}, a))
+
 Base.zero(::Type{Float16x2}) = Float16x2(0.0f0, 0.0f0)
+
 Base.:+(a::Float16x2) = a
-Base.:-(a::Float16x2) = Float16x2(LLVM.Interop.@asmcall("neg.rn.f16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
+Base.:-(a::Float16x2) = Float16x2(a.val ⊻ 0x80008000)
+CUDA.@device_override function Base.:-(a::Float16x2)
+    return Float16x2(LLVM.Interop.@asmcall("neg.rn.f16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
+end
 """Negate a[1]"""
 # negate1(a::Float16x2) = Float16x2(a.val ⊻ 0x00008000)
 negate1(a::Float16x2) = a * Float16x2(-1.0f0, 1.0f0)
 """Negate a[2]"""
 # negate2(a::Float16x2) = Float16x2(a.val ⊻ 0x80000000)
 negate2(a::Float16x2) = a * Float16x2(1.0f0, -1.0f0)
-Base.abs(a::Float16x2) = Float16x2(LLVM.Interop.@asmcall("abs.rn.f16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
+Base.abs(a::Float16x2) = Float16x2(a.val & 0x7fff7fff)
+CUDA.@device_override function Base.abs(a::Float16x2)
+    return Float16x2(LLVM.Interop.@asmcall("abs.rn.f16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
+end
+
 function Base.:+(a::Float16x2, b::Float16x2)
+    alo, ahi = convert(NTuple{2,Float32}, a)
+    blo, bhi = convert(NTuple{2,Float32}, b)
+    return Float16x2(alo + blo, ahi + bhi)
+end
+CUDA.@device_override function Base.:+(a::Float16x2, b::Float16x2)
     return Float16x2(LLVM.Interop.@asmcall("add.rn.f16x2 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{UInt32,UInt32}, a.val, b.val))
 end
 function Base.:-(a::Float16x2, b::Float16x2)
+    alo, ahi = convert(NTuple{2,Float32}, a)
+    blo, bhi = convert(NTuple{2,Float32}, b)
+    return Float16x2(alo - blo, ahi - bhi)
+end
+CUDA.@device_override function Base.:-(a::Float16x2, b::Float16x2)
     return Float16x2(LLVM.Interop.@asmcall("sub.rn.f16x2 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{UInt32,UInt32}, a.val, b.val))
 end
 function Base.:*(a::Float16x2, b::Float16x2)
+    alo, ahi = convert(NTuple{2,Float32}, a)
+    blo, bhi = convert(NTuple{2,Float32}, b)
+    return Float16x2(alo * blo, ahi * bhi)
+end
+CUDA.@device_override function Base.:*(a::Float16x2, b::Float16x2)
     return Float16x2(LLVM.Interop.@asmcall("mul.rn.f16x2 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{UInt32,UInt32}, a.val, b.val))
 end
 function Base.muladd(a::Float16x2, b::Float16x2, c::Float16x2)
+    alo, ahi = convert(NTuple{2,Float32}, a)
+    blo, bhi = convert(NTuple{2,Float32}, b)
+    clo, chi = convert(NTuple{2,Float32}, c)
+    return Float16x2(muladd(alo, blo, clo), muladd(ahi, bhi, chi))
+end
+CUDA.@device_override function Base.muladd(a::Float16x2, b::Float16x2, c::Float16x2)
     return Float16x2(
         LLVM.Interop.@asmcall(
             "fma.rn.f16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32}, a.val, b.val, c.val
@@ -304,9 +435,6 @@ function Base.min(a::Float16x2, b::Float16x2)
     return Float16x2(LLVM.Interop.@asmcall("min.f16x2 \$0, \$1, \$2;", "=r,r,r", UInt32, Tuple{UInt32,UInt32}, a.val, b.val))
 end
 
-unsafe_add(a::Float16x2, b::Float16x2) = a + b
-unsafe_sub(a::Float16x2, b::Float16x2) = a - b
-
 #  BFloat16x2
 
 function BFloat16x2(a::Float32, b::Float32)
@@ -318,6 +446,8 @@ function Base.convert(::Type{NTuple{2,Float32}}, a::BFloat16x2)
         LLVM.Interop.@asmcall("cvt.f32.bf16 \$0, \$1;", "=r,r", Float32, Tuple{UInt32}, a.val >> 0x10)
     )::NTuple{2,Float32}
 end
+Base.show(io::IO, a::BFloat16x2) = print(io, convert(NTuple{2,Float32}, a))
+Base.zero(::Type{BFloat16x2}) = BFloat16x2(0.0f0, 0.0f0)
 Base.:+(a::BFloat16x2) = a
 Base.:-(a::BFloat16x2) = BFloat16x2(LLVM.Interop.@asmcall("neg.rn.bf16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
 Base.abs(a::BFloat16x2) = BFloat16x2(LLVM.Interop.@asmcall("abs.rn.bf16x2 \$0, \$1;", "=r,r", UInt32, Tuple{UInt32}, a.val))
@@ -337,14 +467,6 @@ function Base.muladd(a::BFloat16x2, b::BFloat16x2, c::BFloat16x2)
         )
     )
 end
-
-unsafe_add(a::BFloat16x2, b::BFloat16x2) = a + b
-unsafe_sub(a::BFloat16x2, b::BFloat16x2) = a - b
-
-# Float32
-
-unsafe_add(a::Float32, b::Float32) = a + b
-unsafe_sub(a::Float32, b::Float32) = a - b
 
 ################################################################################
 
@@ -2077,11 +2199,11 @@ function addsub!(
                 rname1 = register_mask == 0 ? "" : "_$r1"
 
                 # addop = :(+)
-                addop = :unsafe_add
+                addop = :+
                 # We allow changing the sign of the second operand of the subtraction
                 @assert !flipsignsub2 # currently unused
                 # subop = flipsignsub2 ? :(+) : :(-)
-                subop = flipsignsub2 ? :unsafe_add : :unsafe_sub
+                subop = flipsignsub2 ? :+ : :-
 
                 push!(
                     stmts,

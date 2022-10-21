@@ -1,105 +1,165 @@
-using CUDA
 using GPUIndexSpaces
+using Random
 using Test
 
-################################################################################
+make_int4(x::Integer) = ((x + 8) & 0xf - 8) % Int8
 
-const Dish = Index{:Dish}
+@testset "Int4x2" begin
+    # Test exhaustively
+    for xlo in (-Int32(8)):(+Int32(7)),
+        xhi in (-Int32(8)):(+Int32(7)),
+        ylo in (-Int32(8)):(+Int32(7)),
+        yhi in (-Int32(8)):(+Int32(7))
 
-mapping = Layout(
-    Dict(
-        [
-            Dish(0) => Thread(0)
-            Dish(1) => Thread(1)
-            Dish(2) => Thread(2)
-            Dish(3) => Thread(3)
-            Dish(4) => Thread(4)
-            Dish(5) => Register(0)
-            Dish(6) => Register(1)
-            Dish(7) => Warp(0)
-            Dish(8) => Warp(1)
-            Dish(9) => Warp(2)
-            Dish(10) => Warp(3)
-            Dish(11) => Warp(4)
-            Dish(12) => Block(0)
-            Dish(13) => Block(1)
-            Dish(14) => Block(2)
-            Dish(15) => Block(3)
-            Dish(16) => Block(4)
-            Dish(17) => Block(5)
-        ],
-    ),
-)
+        x = Int4x2(xlo, xhi)
+        y = Int4x2(ylo, yhi)
 
-memmap = Layout(
-    Dict(
-        [
-            Dish(0) => Memory(0)
-            Dish(1) => Memory(1)
-            Dish(2) => Memory(2)
-            Dish(3) => Memory(3)
-            Dish(4) => Memory(4)
-            Dish(5) => Memory(5)
-            Dish(6) => Memory(6)
-            Dish(7) => Memory(7)
-            Dish(8) => Memory(8)
-            Dish(9) => Memory(9)
-            Dish(10) => Memory(10)
-            Dish(11) => Memory(11)
-            Dish(12) => Memory(12)
-            Dish(13) => Memory(13)
-            Dish(14) => Memory(14)
-            Dish(15) => Memory(15)
-            Dish(16) => Memory(16)
-            Dish(17) => Memory(17)
-        ],
-    ),
-)
+        @test convert(NTuple{2,Int32}, x) == (xlo, xhi)
+        @test convert(NTuple{2,Int8}, x) == (xlo, xhi)
 
-################################################################################
+        @test string(x) == string((xlo, xhi))
 
-steps = AbstractStep[]
-env = Environment()
+        @test convert(NTuple{2,Int32}, Int4x2(x.val & 0x0f)) == (xlo, 0)
+        @test convert(NTuple{2,Int32}, Int4x2(x.val & 0xf0)) == (0, xhi)
 
-constant!(steps, env, :r, mapping, :(Int32(42)))
-assign!(steps, env, :s, :r)
-apply!(steps, env, :t, :s, expr -> :(min(Int32(127), max(Int32(-127), $expr))))
+        @test convert(NTuple{2,Int32}, zero(Int4x2)) == (0, 0)
 
-allsteps = Seq(steps)
-print(allsteps)
+        @test convert(NTuple{2,Int32}, ~x) == (~xlo, ~xhi)
+        @test convert(NTuple{2,Int32}, -x) == make_int4.((-xlo, -xhi))
 
-################################################################################
-
-steps = AbstractStep[]
-env = Environment()
-
-load!(steps, env, :r, mapping, :m, memmap)
-apply!(steps, env, :s, :r, expr -> :(min(Int32(127), max(Int32(-127), $expr))))
-permute!(steps, env, :t, :s, Register(0), Thread(0))
-store!(steps, env, :t, :m, memmap)
-
-allsteps = Seq(steps)
-print(allsteps)
-
-################################################################################
-
-@eval function runsteps(m)
-    $(code(allsteps))
-    return nothing
+        @test convert(NTuple{2,Int32}, x & y) == (xlo & ylo, xhi & yhi)
+        @test convert(NTuple{2,Int32}, x | y) == (xlo | ylo, xhi | yhi)
+        @test convert(NTuple{2,Int32}, x ⊻ y) == (xlo ⊻ ylo, xhi ⊻ yhi)
+        @test convert(NTuple{2,Int32}, x + y) == make_int4.((xlo + ylo, xhi + yhi))
+        @test convert(NTuple{2,Int32}, x - y) == make_int4.((xlo - ylo, xhi - yhi))
+    end
 end
 
-function runcuda()
-    nelts = 2^18
-    mem = CuArray(Int32[i for i in 0:(nelts - 1)])
-    @cuda blocks = 64 threads = (32, 32) runsteps(mem)
-    synchronize()
-    println(mem[1:16])
-    println(mem[(end - 15):end])
-    return nothing
+Random.seed!(0)
+@testset "Int4x8" begin
+    for iter in 1:100000
+        n = zero(Int4x8)
+        xs = tuple(rand((-Int32(8)):(+Int32(7)), 8)...)
+        ys = tuple(rand((-Int32(8)):(+Int32(7)), 8)...)
+        x = Int4x8(xs...)
+        y = Int4x8(ys...)
+
+        @test convert(NTuple{8,Int32}, x) == xs
+        @test convert(NTuple{2,Int8x4}, x) == (Int8x4(xs[1], xs[3], xs[5], xs[7]), Int8x4(xs[2], xs[4], xs[6], xs[8]))
+
+        @test string(x) == string(xs)
+
+        @test convert(NTuple{8,Int32}, Int4x8(x.val & 0x0000000f)) == (xs[1], 0, 0, 0, 0, 0, 0, 0)
+        @test convert(NTuple{8,Int32}, Int4x8(x.val & 0x000000f0)) == (0, xs[2], 0, 0, 0, 0, 0, 0)
+        @test convert(NTuple{8,Int32}, Int4x8(x.val & 0x00000f00)) == (0, 0, xs[3], 0, 0, 0, 0, 0)
+        @test convert(NTuple{8,Int32}, Int4x8(x.val & 0x0000f000)) == (0, 0, 0, xs[4], 0, 0, 0, 0)
+        @test convert(NTuple{8,Int32}, Int4x8(x.val & 0x000f0000)) == (0, 0, 0, 0, xs[5], 0, 0, 0)
+        @test convert(NTuple{8,Int32}, Int4x8(x.val & 0x00f00000)) == (0, 0, 0, 0, 0, xs[6], 0, 0)
+        @test convert(NTuple{8,Int32}, Int4x8(x.val & 0x0f000000)) == (0, 0, 0, 0, 0, 0, xs[7], 0)
+        @test convert(NTuple{8,Int32}, Int4x8(x.val & 0xf0000000)) == (0, 0, 0, 0, 0, 0, 0, xs[8])
+
+        @test convert(NTuple{8,Int32}, zero(Int4x8)) == (0, 0, 0, 0, 0, 0, 0, 0)
+
+        @test convert(NTuple{8,Int32}, ~x) == .~xs
+        @test convert(NTuple{8,Int32}, -x) == make_int4.(.-xs)
+
+        @test convert(NTuple{8,Int32}, x & y) == xs .& ys
+        @test convert(NTuple{8,Int32}, x | y) == xs .| ys
+        @test convert(NTuple{8,Int32}, x ⊻ y) == xs .⊻ ys
+        @test convert(NTuple{8,Int32}, x + y) == make_int4.(xs .+ ys)
+        @test convert(NTuple{8,Int32}, x - y) == make_int4.(xs .- ys)
+    end
 end
 
-# @device_code_warntype
-# @device_code_llvm
-# @device_code_ptx
-# @device_code_sass
-@device_code_sass runcuda()
+Random.seed!(0)
+@testset "Int8x4" begin
+    for iter in 1:100000
+        n = zero(Int8x4)
+        xs = tuple(Int32.(rand(Int8, 4))...)
+        ys = tuple(Int32.(rand(Int8, 4))...)
+        x = Int8x4(xs...)
+        y = Int8x4(ys...)
+
+        @test convert(NTuple{4,Int32}, x) == xs
+        @test convert(NTuple{2,Int16x2}, x) == (Int16x2(xs[1], xs[3]), Int16x2(xs[2], xs[4]))
+
+        @test string(x) == string(xs)
+
+        @test convert(NTuple{4,Int32}, Int8x4(x.val & 0x000000ff)) == (xs[1], 0, 0, 0)
+        @test convert(NTuple{4,Int32}, Int8x4(x.val & 0x0000ff00)) == (0, xs[2], 0, 0)
+        @test convert(NTuple{4,Int32}, Int8x4(x.val & 0x00ff0000)) == (0, 0, xs[3], 0)
+        @test convert(NTuple{4,Int32}, Int8x4(x.val & 0xff000000)) == (0, 0, 0, xs[4])
+
+        @test convert(NTuple{4,Int32}, zero(Int8x4)) == (0, 0, 0, 0)
+
+        @test convert(NTuple{4,Int32}, ~x) == .~xs
+        @test convert(NTuple{4,Int32}, -x) == .-xs .% Int8
+
+        @test convert(NTuple{4,Int32}, x & y) == xs .& ys
+        @test convert(NTuple{4,Int32}, x | y) == xs .| ys
+        @test convert(NTuple{4,Int32}, x ⊻ y) == xs .⊻ ys
+        @test convert(NTuple{4,Int32}, x + y) == (xs .+ ys) .% Int8
+        @test convert(NTuple{4,Int32}, x - y) == (xs .- ys) .% Int8
+    end
+end
+
+Random.seed!(0)
+@testset "Int16x2" begin
+    for iter in 1:100000
+        n = zero(Int16x2)
+        xs = tuple(Int32.(rand(Int16, 2))...)
+        ys = tuple(Int32.(rand(Int16, 2))...)
+        x = Int16x2(xs...)
+        y = Int16x2(ys...)
+
+        @test convert(NTuple{2,Int32}, x) == xs
+
+        @test string(x) == string(xs)
+
+        @test convert(NTuple{2,Int32}, Int16x2(x.val & 0x0000ffff)) == (xs[1], 0)
+        @test convert(NTuple{2,Int32}, Int16x2(x.val & 0xffff0000)) == (0, xs[2])
+
+        @test convert(NTuple{2,Int32}, zero(Int16x2)) == (0, 0)
+
+        @test convert(NTuple{2,Int32}, ~x) == .~xs
+        @test convert(NTuple{2,Int32}, -x) == .-xs .% Int16
+
+        @test convert(NTuple{2,Int32}, x & y) == xs .& ys
+        @test convert(NTuple{2,Int32}, x | y) == xs .| ys
+        @test convert(NTuple{2,Int32}, x ⊻ y) == xs .⊻ ys
+        @test convert(NTuple{2,Int32}, x + y) == (xs .+ ys) .% Int16
+        @test convert(NTuple{2,Int32}, x - y) == (xs .- ys) .% Int16
+    end
+end
+
+Random.seed!(0)
+@testset "Float16x2" begin
+    for iter in 1:100000
+        n = zero(Float16x2)
+        xs = tuple(Float32.(rand(Float16, 2))...)
+        ys = tuple(Float32.(rand(Float16, 2))...)
+        zs = tuple(Float32.(rand(Float16, 2))...)
+        x = Float16x2(xs...)
+        y = Float16x2(ys...)
+        z = Float16x2(zs...)
+
+        @test convert(NTuple{2,Float32}, x) == xs
+
+        @test string(x) == string(xs)
+
+        @test convert(NTuple{2,Float32}, Float16x2(x.val & 0x0000ffff)) == (xs[1], 0)
+        @test convert(NTuple{2,Float32}, Float16x2(x.val & 0xffff0000)) == (0, xs[2])
+
+        @test convert(NTuple{2,Float32}, zero(Float16x2)) == (0, 0)
+
+        @test convert(NTuple{2,Float32}, abs(x)) == abs.(xs)
+        @test convert(NTuple{2,Float32}, -x) == .-xs
+
+        @test [convert(NTuple{2,Float32}, x + y)...] ≈ [(xs .+ ys)...] atol = eps(Float16)
+        @test [convert(NTuple{2,Float32}, x - y)...] ≈ [(xs .- ys)...] atol = eps(Float16)
+        @test [convert(NTuple{2,Float32}, x * y)...] ≈ [(xs .* ys)...] atol = eps(Float16)
+        @test [convert(NTuple{2,Float32}, muladd(x, y, z))...] ≈ [muladd.(xs, ys, zs)...] atol = eps(Float16)
+    end
+end
+
+# TODO: Test BFloat16

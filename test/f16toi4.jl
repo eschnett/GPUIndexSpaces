@@ -105,7 +105,7 @@ function go(A, B, Z)
             i01234567 = Int4x8(f01.val + f23.val + f45.val + f67.val)
         end
 
-        B0 = unsafe_add(B0, i01234567)
+        B0 = B0 + i01234567
     end
 
     # Write output
