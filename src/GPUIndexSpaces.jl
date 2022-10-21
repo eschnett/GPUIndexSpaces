@@ -6,6 +6,11 @@ using OrderedCollections
 
 ################################################################################
 
+export Int4x2
+struct Int4x2
+    val::UInt8
+end
+
 export Int4x8
 struct Int4x8
     val::UInt32
@@ -28,8 +33,43 @@ struct BFloat16x2
     val::UInt32
 end
 
+# Int4x2
+
+Int4x2(a1::Int32, a2::Int32) = Int4x2((a1 << 0x04) & 0xf0 | (a2 << 0x00) & 0x0f)
+
+Base.convert(::Type{Int4x2}, a::NTuple{2,Int8}) = Int4x2(a[1], a[2])
+function Base.convert(::Type{NTuple{2,Int8}}, a::Int4x2)
+    a1 = a.val ⊻ 0x88                  # a + 8
+    a2_lo = a1 & 0x0f                  # extract low part
+    a3_lo = a2_lo + 0x78               # a + 128
+    a4_lo = a3_lo ⊻ 0x80               # a
+    a2_hi = (a1 >>> 0x04) & 0x0f       # extract high part
+    a3_hi = a2_hi + 0x78               # a + 128
+    a4_hi = a3_hi ⊻ 0x80               # a
+    return (a4_lo % Int8, a4_hi % Int8)::NTuple{2,Int8}
+end
+function Base.convert(::Type{NTuple{8,Int32}}, a::Int4x2)
+    alo8, ahi8 = convert(NTuple{2,Int8x4}, a)
+    alo32 = convert(Int32, alo8)
+    ahi32 = convert(Int32, ahi8)
+    return (alo32, ahi32)
+end
+
+Base.length(::Int4x2) = 1
+
+Base.zero(::Type{Int4x2}) = Int4x2(Int8(0))
+
+Base.:&(a::Int4x2, b::Int4x2) = Int4x2(a.val * b.val)
+Base.:|(a::Int4x2, b::Int4x2) = Int4x2(a.val | b.val)
+Base.xor(a::Int4x2, b::Int4x2) = Int4x2(a.val ⊻ b.val)
+
+export unsafe_add, unsafe_sub
+unsafe_add(a::Int4x2, b::Int4x2) = Int4x2(a.val + b.val)
+unsafe_sub(a::Int4x2, b::Int4x2) = Int4x2(a.val - b.val)
+
 # Int4x8
 
+# WHY IS A1 IN THE HI NIBBLE?
 function Int4x8(a1::Int32, a2::Int32, a3::Int32, a4::Int32, a5::Int32, a6::Int32, a7::Int32, a8::Int32)
     return Int4x8(bitwise_merge(0x0f0f0f0f, Int8x4(a1, a3, a5, a7).val << 0x04, Int8x4(a2, a4, a6, a8).val << 0x00))
 end
@@ -329,8 +369,8 @@ function cuda_prmt(x::UInt32, y::UInt32, op::UInt32)
     LLVM.Interop.@asmcall("prmt.b32 \$0, \$1, \$2, \$3;", "=r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32}, x, y, op)
 end
 
-function cuda_prmt(x::Int_UInt_8_16_32, y::Int_UInt_8_16_32, op::Int_UInt_8_16_32)
-    return cuda_prmt(x % UInt32, y % UInt32, op % UInt32)::UInt32
+function cuda_prmt(x::T, y::T, op::Int_UInt_8_16_32) where {T<:Int_UInt_8_16_32}
+    return T(cuda_prmt(x % UInt32, y % UInt32, op % UInt32)::UInt32)
 end
 
 function cuda_prmt(x::Code, y::Code, op::Int_UInt_8_16_32)
@@ -560,12 +600,13 @@ function clean_code(expr::Expr)
 end
 export clean_code
 
-export AbstractStep, invars, outvars, code
+export AbstractStep, invars, outvars, declarations, code
 abstract type AbstractStep end
 description(::AbstractStep) = error("undefined")
 invars(::AbstractStep) = error("undefined")
 outvars(::AbstractStep) = error("undefined")
 unusedsymbols(::AbstractStep) = error("undefined")
+declarations(::AbstractStep) = error("undefined")
 code(::AbstractStep) = error("undefined")
 
 function Base.show(io::IO, step::AbstractStep)
@@ -586,6 +627,7 @@ function Base.show(io::IO, step::AbstractStep)
     end
     println(io, "#     Unused: [$(join(sort!(collect(unusedsymbols(step))), ", "))]")
     # println(io, code(step))
+    println(io, clean_code(declarations(step)))
     println(io, clean_code(code(step)))
     return nothing
 end
@@ -595,12 +637,24 @@ struct Step <: AbstractStep
     description::String
     invars::Vector{Variable}
     outvars::Vector{Variable}
+    declarations::Code
     code::Code
+end
+# For backward compatibility
+function Step(description::String, invars::Vector{Variable}, outvars::Vector{Variable}, code::Code)
+    return Step(
+        description,
+        invars,
+        outvars,
+        quote end,
+        code,
+    )
 end
 description(step::Step) = step.description
 invars(step::Step) = step.invars
 outvars(step::Step) = step.outvars
 unusedsymbols(step::Step) = Set(v[1] for v in step.outvars)
+declarations(step::Step) = step.declarations
 code(step::Step) = step.code
 
 export Seq
@@ -666,12 +720,19 @@ struct Seq <: AbstractStep
         return new(description′, invars′, outvars′, unusedsymbols′, steps)
     end
 end
-description(step::Seq) = step.description
-invars(step::Seq) = step.invars
-outvars(step::Seq) = step.outvars
-unusedsymbols(step::Seq) = step.unusedsymbols
-code(step::Seq) = quote
-    $(code.(step.steps)...)
+description(seq::Seq) = seq.description
+invars(seq::Seq) = seq.invars
+outvars(seq::Seq) = seq.outvars
+unusedsymbols(seq::Seq) = seq.unusedsymbols
+function declarations(seq::Seq)
+    quote
+        $(declarations.(seq.steps)...)
+    end
+end
+function code(seq::Seq)
+    quote
+        $(code.(seq.steps)...)
+    end
 end
 
 Base.:|>(step1::AbstractStep, step2::AbstractStep) = Seq([step1, step2])
@@ -682,14 +743,34 @@ struct Nested <: AbstractStep
     var::Symbol
     range::Expr
     body::AbstractStep
+    unroll::Bool
+    function Nested(description::String, var::Symbol, range::Expr, body::AbstractStep; unroll::Bool=false)
+        return new(description, var, range, body, unroll)
+    end
 end
 description(nested::Nested) = nested.description
 invars(nested::Nested) = invars(nested.body)
 outvars(nested::Nested) = outvars(nested.body)
 unusedsymbols(nested::Nested) = unusedsymbols(nested.body)
-code(nested::Nested) = quote
-    for $(nested.var) in $(nested.range)
-        $(code(nested.body))
+declarations(nested::Nested) = declarations(nested.body)
+function code(nested::Nested)
+    if nested.unroll
+        range = eval(nested.range)
+        stmts = [
+            quote
+                $(nested.var) = $value
+                $(code(nested.body))
+            end for value in range
+        ]
+        quote
+            $(stmts...)
+        end
+    else
+        quote
+            for $(nested.var) in $(nested.range)
+                $(code(nested.body))
+            end
+        end
     end
 end
 
@@ -702,6 +783,16 @@ function loop!(
     loop_steps = AbstractStep[]
     makebody(loop_steps, env)
     push!(steps, Nested("loop", loopVar, loopRange, Seq(loop_steps)))
+    return nothing
+end
+
+export unrolled_loop!
+function unrolled_loop!(
+    makebody, steps::Vector{AbstractStep}, env::Environment, loopVar::Symbol, loopRange::Code, loopIndices::AbstractArray{<:Index}
+)
+    loop_steps = AbstractStep[]
+    makebody(loop_steps, env)
+    push!(steps, Nested("unrolled loop", loopVar, loopRange, Seq(loop_steps); unroll=true))
     return nothing
 end
 
@@ -913,7 +1004,7 @@ function select!(
         if r & ~register_mask == 0
             i = sum((r & 1 << register.bit ≠ 0) << (i - 1) for (i, register) in enumerate(registers))
             rname = register_mask == 0 ? "" : "_$r"
-            lhsr = r | sum(1 << register.bit for register in registers)
+            lhsr = r & ~sum(1 << register.bit for register in registers)
             lhsrname = register_mask & ~sum(1 << register.bit for register in registers) == 0 ? "" : "_$lhsr"
             push!(
                 stmts,
@@ -1020,6 +1111,7 @@ function unselect!(
 
     @assert all((1 << register.bit) & register_mask ≠ 0 for (register_index, register) in index_registers)
 
+    decls = Code[]
     stmts = Code[]
     for r in 0:register_mask
         if r & ~register_mask == 0
@@ -1028,6 +1120,13 @@ function unselect!(
 
             lhsr = r
             lhsrname = register_mask == 0 ? "" : "_$lhsr"
+            lhstype = get_type(lhsmap)
+            push!(
+                decls,
+                quote
+                    $(Symbol(lhs, lhsrname)) = zero($lhstype)
+                end,
+            )
             push!(
                 stmts,
                 quote
@@ -1043,6 +1142,9 @@ function unselect!(
         "Unselect variable",
         Variable[rhs => rhsmap],
         Variable[lhs => lhsmap],
+        quote
+            $(decls...)
+        end,
         quote
             $(stmts...)
         end,
@@ -1499,6 +1601,7 @@ function make_indices(
             end
             @assert !isempty(expressions)
             filter!(≠(0), expressions)
+            expressions = map(x -> x isa Integer ? :($x % Int32) : x, expressions)
             if isempty(expressions)
                 expression = make_uint(0)
             elseif length(expressions) == 1
