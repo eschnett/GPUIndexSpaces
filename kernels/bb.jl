@@ -11,7 +11,7 @@ using Random
 # Kernel parameters
 
 #UNDO const T = 32768                # number of times
-const T = 128                  # number of times
+const T = 128                   # number of times
 const T1 = 128                  # outer time cadence
 @assert T % T1 == 0
 #UNDO const B = 96                    # number of beams
@@ -126,11 +126,14 @@ const map_Ecopy_registers = let
             Time(3) => Warp(3),
             # TODO: With 24 warps, this will not work
             Time(4) => Warp(4),
+            Time(5) => LoopT1(0),
+            Time(6) => LoopT1(1),
             Polr(0) => Block(b += 1),
             [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
         ),
     )
 end
+@warn "insert Time(5:6) into other layouts as well ???"
 
 @assert Wd == 4
 @assert D ÷ Wd % 16 == 0
@@ -244,6 +247,7 @@ const map_s_global = let
             Beam(4) => Memory(m += 1),
             Beam(5) => Memory(m += 1),
             Beam(6) => Memory(m += 1),
+            Polr(0) => Memory(m += 1),
             Freq(0) => Memory(m += 1),
             Freq(1) => Memory(m += 1),
             Freq(2) => Memory(m += 1),
@@ -252,7 +256,6 @@ const map_s_global = let
             Freq(5) => Memory(m += 1),
             Freq(6) => Memory(m += 1),
             Freq(7) => Memory(m += 1),
-            Polr(0) => Memory(m += 1),
         ),
     )
 end
@@ -283,8 +286,8 @@ const map_Ju_shared = let
             Cplx(0) => SIMD(4),
             [Beam(b) => Memory(m += 1) for b in 0:(Int(log(2, B)) - 1)]...,
             [Time(t) => Memory2(m2 += 1) for t in 0:Int(log(2, T2) - 1)]...,
-            Dish(7) => Memory3(m3 += 1),
-            Dish(8) => Memory3(m3 += 1),
+            Dish′(7) => Memory3(m3 += 1),
+            Dish′(8) => Memory3(m3 += 1),
             Polr(0) => Ignore(i += 1),
             [Freq(f) => Ignore(i += 1) for f in 0:(Int(log(2, F)) - 1)]...,
         ),
@@ -423,8 +426,8 @@ function multiply!(steps::Vector{AbstractStep}, env::Environment)
                     Layout(
                         Int32,
                         Dict(
-                            Dish(7) => Warp(0),
-                            Dish(8) => Warp(1),
+                            Dish′(7) => Warp(0),
+                            Dish′(8) => Warp(1),
                             Time(0) => Register(0),
                             Time(1) => Thread(0),
                             Time(2) => Thread(1),
@@ -474,8 +477,8 @@ function multiply!(steps::Vector{AbstractStep}, env::Environment)
                             Time(3) => LoopT2(0),
                             Time(4) => LoopT2(1),
                             Beam(3) => LoopB(0),
-                            Dish(7) => Warp(0),
-                            Dish(8) => Warp(1),
+                            Dish′(7) => Warp(0),
+                            Dish′(8) => Warp(1),
                             Beam(4) => Warp(2),     # since Wb = 6
                             Beam(5) => Warp(3),     # since Wb = 6
                             Beam(6) => Warp(4),     # since Wb = 6
@@ -518,8 +521,8 @@ function reduce!(steps::Vector{AbstractStep}, env::Environment)
                 Time(2) => Thread(2),
                 Time(3) => Register(3),
                 Time(4) => Register(4),
-                Dish(7) => Register(0),
-                Dish(8) => Register(1),
+                Dish′(7) => Register(0),
+                Dish′(8) => Register(1),
                 Polr(0) => Block(b += 1),
                 [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
             ),
@@ -747,8 +750,8 @@ const shmem_bytes = sizeof(Int32) * shmem_length
 end
 
 function runcuda()
-    println("Baseband beamformer v2")
-    println("J[b,f,p,t] = Σ[d] A[p,b,d] E[d,p,f,t]")
+    println("CHORD 8-bit baseband beamformer")
+    println("J[t,p,f,b] = Σ[d] A[d,b,p,f] E[d,p,f,t]")
     println("Setting up inputs...")
 
     # Cplx, Dish, Beam, Polr
@@ -774,10 +777,13 @@ function runcuda()
     #     A_input[2, d, ibeam, ipolr] = 1
     # end
     # vvvvv
+    ## for d in 29:29 # 29:32
+    ##     A_input[1, d, ibeam, ipolr] = 1
+    ## end
     # ^^^^^
-    for d in 1:D
-        A_input[1, d, ibeam, ipolr] = 1
-    end
+    # for d in 1:D
+    #     A_input[1, d, ibeam, ipolr] = 1
+    # end
     # for d in 1:D, c in 1:2
     #     A_input[c, d, ibeam, ipolr] = 1
     # end
@@ -798,7 +804,7 @@ function runcuda()
     # end
     # vvvvv
     # ^^^^^
-    for d in 1:D
+    for d in 1:32 # D
         E_input[d, ipolr, ifreq, itime] = Int4x2(Int32(1), Int32(0))
     end
     # for p in 1:2, d in 1:D
@@ -857,12 +863,13 @@ function runcuda()
         nzcount = 0
         for b in 1:B, f in 1:F, p in 1:2, t in 1:T
             if J_output[t, p, f, b] ≠ zero(Int4x2)
-                println("J[$t,$p,$f,$b] = $(convert(NTuple{2,Int8}, J_output[t,p,f,b]))")
                 nzcount += 1
+                if nzcount ≤ 100
+                    println("J[$t,$p,$f,$b] = $(convert(NTuple{2,Int8}, J_output[t,p,f,b]))")
+                end
             end
-            nzcount == 100 && break
         end
-        @assert nzcount == 0
+        println("There are $nzcount non-zero elements")
     end
 
     println("Done.")
