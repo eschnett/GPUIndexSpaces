@@ -133,6 +133,19 @@ Random.seed!(0)
 end
 
 Random.seed!(0)
+@testset "Int32" begin
+    for iter in 1:100000
+        n = zero(Int32)
+        x = rand(Int32)
+        y = rand(Int32)
+
+        @test add_sat(x, y) == Int64(x) + Int64(y) ||
+            Int64(x) + Int64(y) < typemin(Int32) && add_sat(x, y) == typemin(Int32) ||
+            Int64(x) + Int64(y) > typemax(Int32) && add_sat(x, y) == typemax(Int32)
+    end
+end
+
+Random.seed!(0)
 @testset "Float16x2" begin
     for iter in 1:100000
         n = zero(Float16x2)

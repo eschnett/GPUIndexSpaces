@@ -75,10 +75,13 @@ void bb_simple(const int8_t *__restrict__ const A,
 
 int main(int argc, char **argv) {
   std::cout << "CHORD 8-bit baseband beamformer\n";
+
+  const int niters = 1;
+
   using std::abs;
   std::random_device rd;
   std::default_random_engine re(rd());
-  for (int iter = 0; iter < 100; ++iter) {
+  for (int iter = 0; iter < niters; ++iter) {
     std::cout << "Initializing inputs...\n";
     std::vector<int8_t> A(F * 2 * B * D * 2, 0);
     std::vector<int4x2_t> E(T * F * 2 * D, 0);

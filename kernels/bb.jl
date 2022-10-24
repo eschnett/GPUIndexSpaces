@@ -133,7 +133,6 @@ const map_Ecopy_registers = let
         ),
     )
 end
-@warn "insert Time(5:6) into other layouts as well ???"
 
 @assert Wd == 4
 @assert D ÷ Wd % 16 == 0
@@ -342,86 +341,109 @@ function copy_E!(steps::Vector{AbstractStep}, env::Environment)
 end
 
 # Step 2: matrix multiplication
-function multiply!(steps::Vector{AbstractStep}, env::Environment)
+function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
     @assert T2 % 8 == 0
     @assert T2 ÷ 8 == 4
     loop!(steps, env, loopIdxT2, :(Int32(0):Int32($T2 ÷ 8 - 1)), [Time(3), Time(4)]) do steps, env
-        @assert D ÷ Wd % 16 == 0
-        @assert D ÷ Wd ÷ 16 == 8
-        loop!(steps, env, loopIdxD, :(Int32(0):Int32($D ÷ $Wd ÷ 16 - 1)), [Dish(2), Dish(3), Dish(4)]) do steps, env
-            map_E0_registers = let
+        @assert B ÷ Wb % 8 == 0
+        @assert B ÷ Wb ÷ 8 == 2
+        unrolled_loop!(steps, env, loopIdxB, :(Int32(0):Int32($B ÷ $Wb ÷ 8 - 1)), [Beam(6)]) do steps, env
+            select!(steps, env, :A10, :A, [Register(4)], :($loopIdxB))
+
+            map_Ju_registers = let
                 b = -1
                 Layout(
                     Int32,
                     Dict(
-                        Cplx(0) => SIMD(2),
-                        Dish(0) => SIMD(3),
-                        Dish(1) => SIMD(4),
-                        Dish(2) => LoopD(0), # since Wd = 4
-                        Dish(3) => LoopD(1), # since Wd = 4
-                        Dish(4) => LoopD(2), # since Wd = 4
-                        Dish(5) => Thread(0),
-                        Dish(6) => Thread(1),
-                        Dish(7) => Warp(0), # since Wd = 4
-                        Dish(8) => Warp(1), # since Wd = 4
-                        Time(0) => Thread(2),
-                        Time(1) => Thread(3),
-                        Time(2) => Thread(4),
+                        Cplx(0) => Register(1),
+                        Dish′(7) => Warp(0),
+                        Dish′(8) => Warp(1),
+                        Time(0) => Register(0),
+                        Time(1) => Thread(0),
+                        Time(2) => Thread(1),
                         Time(3) => LoopT2(0),
                         Time(4) => LoopT2(1),
+                        Beam(0) => Thread(2),
+                        Beam(1) => Thread(3),
+                        Beam(2) => Thread(4),
+                        Beam(3) => LoopB(0),    # since Wb = 6
+                        Beam(4) => Warp(2),     # since Wb = 6
+                        Beam(5) => Warp(3),     # since Wb = 6
+                        Beam(6) => Warp(4),     # since Wb = 6
                         Polr(0) => Block(b += 1),
                         [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
                     ),
                 )
             end
-            load!(steps, env, :E0, map_E0_registers, :E_shared, map_E_shared)
-            rename!(steps, env, :E1, :E0, Dict(Dish(d) => Dish′(dish2dish′[d]) for d in 0:8))
-            @assert env[:E1] == map_E_registers
+            constant!(steps, env, :Ju, map_Ju_registers, :(Int32(0)))
 
-            # Section 4, eqn (16)
-            map_E2_registers = let
-                b = -1
-                Layout(
-                    Int32,
-                    Dict(
-                        Cplx(0) => Register(0),
-                        Dish′(0) => SIMD(3),
-                        Dish′(1) => SIMD(4),
-                        Dish′(2) => Thread(0),
-                        Dish′(3) => Thread(1),
-                        Dish′(4) => LoopD(0), # since Wd = 4
-                        Dish′(5) => LoopD(1), # since Wd = 4
-                        Dish′(6) => LoopD(2), # since Wd = 4
-                        Dish′(7) => Warp(0),  # since Wd = 4
-                        Dish′(8) => Warp(1),  # since Wd = 4
-                        Time(0) => Thread(2),
-                        Time(1) => Thread(3),
-                        Time(2) => Thread(4),
-                        Time(3) => LoopT2(0),
-                        Time(4) => LoopT2(1),
-                        Polr(0) => Block(b += 1),
-                        [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
-                    ),
-                )
-            end
-            widen!(steps, env, :E2, :E1, SIMD(2) => Register(0))
-            @assert env[:E2] == map_E2_registers
+            @assert D ÷ Wd % 16 == 0
+            @assert D ÷ Wd ÷ 16 == 8
+            unrolled_loop!(steps, env, loopIdxD, :(Int32(0):Int32($D ÷ $Wd ÷ 16 - 1)), [Dish(2), Dish(3), Dish(4)]) do steps, env
+                select!(steps, env, :A11, :A10, [Register(1), Register(2), Register(3)], :($loopIdxD))
+                split!(steps, env, :Are, :Aim, :A11, Cplx(0))
 
-            # select!(steps, env, :A3, :A, Register(1), :($loopIdxD & 0b1 ≠ 0))
-            # select!(steps, env, :A4, :A3, Register(2), :($loopIdxD & 0b10 ≠ 0))
-            # select!(steps, env, :A5, :A4, Register(3), :($loopIdxD & 0b100 ≠ 0))
-            select!(steps, env, :A5, :A, [Register(1), Register(2), Register(3)], :($loopIdxD & 0b111))
+                map_E0_registers = let
+                    b = -1
+                    Layout(
+                        Int32,
+                        Dict(
+                            Cplx(0) => SIMD(2),
+                            Dish(0) => SIMD(3),
+                            Dish(1) => SIMD(4),
+                            Dish(2) => LoopD(0), # since Wd = 4
+                            Dish(3) => LoopD(1), # since Wd = 4
+                            Dish(4) => LoopD(2), # since Wd = 4
+                            Dish(5) => Thread(0),
+                            Dish(6) => Thread(1),
+                            Dish(7) => Warp(0), # since Wd = 4
+                            Dish(8) => Warp(1), # since Wd = 4
+                            Time(0) => Thread(2),
+                            Time(1) => Thread(3),
+                            Time(2) => Thread(4),
+                            Time(3) => LoopT2(0),
+                            Time(4) => LoopT2(1),
+                            Polr(0) => Block(b += 1),
+                            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                        ),
+                    )
+                end
+                load!(steps, env, :E0, map_E0_registers, :E_shared, map_E_shared)
+                rename!(steps, env, :E1, :E0, Dict(Dish(d) => Dish′(dish2dish′[d]) for d in 0:8))
+                @assert env[:E1] == map_E_registers
 
-            @assert B ÷ Wb % 8 == 0
-            @assert B ÷ Wb ÷ 8 == 2
-            unrolled_loop!(steps, env, loopIdxB, :(Int32(0):Int32($B ÷ $Wb ÷ 8 - 1)), [Beam(6)]) do steps, env
-                # select!(steps, env, :A6, :A5, Register(4), :($loopIdxB & 0b1 ≠ 0))
-                select!(steps, env, :A6, :A5, [Register(4)], :($loopIdxB & 0b1))
-                split!(steps, env, :Are, :Aim, :A6, Cplx(0))
+                # Section 4, eqn (16)
+                map_E2_registers = let
+                    b = -1
+                    Layout(
+                        Int32,
+                        Dict(
+                            Cplx(0) => Register(0),
+                            Dish′(0) => SIMD(3),
+                            Dish′(1) => SIMD(4),
+                            Dish′(2) => Thread(0),
+                            Dish′(3) => Thread(1),
+                            Dish′(4) => LoopD(0), # since Wd = 4
+                            Dish′(5) => LoopD(1), # since Wd = 4
+                            Dish′(6) => LoopD(2), # since Wd = 4
+                            Dish′(7) => Warp(0),  # since Wd = 4
+                            Dish′(8) => Warp(1),  # since Wd = 4
+                            Time(0) => Thread(2),
+                            Time(1) => Thread(3),
+                            Time(2) => Thread(4),
+                            Time(3) => LoopT2(0),
+                            Time(4) => LoopT2(1),
+                            Polr(0) => Block(b += 1),
+                            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                        ),
+                    )
+                end
+                widen!(steps, env, :E2, :E1, SIMD(2) => Register(0))
+                @assert env[:E2] == map_E2_registers
 
                 split!(steps, env, :E2re, :E2im, :E2, Cplx(0))
 
-                map_Ju_registers = let
+                map_Ju0_registers = let
                     b = -1
                     Layout(
                         Int32,
@@ -445,65 +467,68 @@ function multiply!(steps::Vector{AbstractStep}, env::Environment)
                         ),
                     )
                 end
-                constant!(steps, env, :Ju0, map_Ju_registers, :(Int32(0)))
+                constant!(steps, env, :Ju0, map_Ju0_registers, :(Int32(0)))
                 mma_row_col_m8n8k16_s8!(steps, env, :Jure1, :Aim, :E2im, :Ju0)
+                # TODO: Add a separate reduction variable instead of negating here?
                 apply!(steps, env, :Jure2, :Jure1, Jure1 -> :(-$Jure1))
                 mma_row_col_m8n8k16_s8!(steps, env, :Jure, :Are, :E2re, :Jure2)
                 mma_row_col_m8n8k16_s8!(steps, env, :Juim1, :Are, :E2im, :Ju0)
                 mma_row_col_m8n8k16_s8!(steps, env, :Juim, :Aim, :E2re, :Juim1)
 
-                # TODO: Break ties to even?
-                # TODO: clamp
-                #UNDO apply!(steps, env, :Jure3, :Jure, Jure -> :(($Jure + (Int32(1) << $σ) >> 1) >> $σ))
-                #UNDO apply!(steps, env, :Juim3, :Juim, Juim -> :(($Juim + (Int32(1) << $σ) >> 1) >> $σ))
-                apply!(steps, env, :Jure3, :Jure, Jure -> :($Jure))
-                apply!(steps, env, :Juim3, :Juim, Juim -> :($Juim))
-
-                merge!(steps, env, :Ju1, :Jure3, :Juim3, Cplx(0) => Register(1))
-                apply!(steps, env, :Ju1′, :Ju1, J -> :(clamp($J, (-Int32(2^15 - 1)):(+Int32(2^15 - 1)))))
-                narrow!(steps, env, :Ju2, :Ju1′, Register(1) => SIMD(4))
-                @assert env[:Ju2] == let
-                    b = -1
-                    Layout(
-                        Int32,
-                        Dict(
-                            Cplx(0) => SIMD(4),
-                            Time(0) => Register(0),
-                            Time(1) => Thread(0),
-                            Time(2) => Thread(1),
-                            Beam(0) => Thread(2),
-                            Beam(1) => Thread(3),
-                            Beam(2) => Thread(4),
-                            Time(3) => LoopT2(0),
-                            Time(4) => LoopT2(1),
-                            Beam(3) => LoopB(0),
-                            Dish′(7) => Warp(0),
-                            Dish′(8) => Warp(1),
-                            Beam(4) => Warp(2),     # since Wb = 6
-                            Beam(5) => Warp(3),     # since Wb = 6
-                            Beam(6) => Warp(4),     # since Wb = 6
-                            Polr(0) => Block(b += 1),
-                            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
-                        ),
-                    )
-                end
-                store!(steps, env, :Ju2, :Ju_shared, map_Ju_shared)
+                merge!(steps, env, :Ju1, :Jure, :Juim, Cplx(0) => Register(1))
+                reduce!(steps, env, :Ju, :Ju1, (Ju, Ju1) -> :($Ju += $Ju1))
 
                 nothing
+            end                     # LoopD
+
+            # TODO: Break ties to even?
+            #UNDO apply!(steps, env, :Ju2, :Ju, Ju -> :(($Ju + (Int32(1) << $σ) >> 1) >> $σ))
+            apply!(steps, env, :Ju2, :Ju, Ju -> :($Ju))
+
+            apply!(steps, env, :Ju3, :Ju2, J -> :(clamp($J, (-Int32(2^15 - 1)):(+Int32(2^15 - 1)))))
+            narrow!(steps, env, :Ju4, :Ju3, Register(1) => SIMD(4))
+            @assert env[:Ju4] == let
+                b = -1
+                Layout(
+                    Int32,
+                    Dict(
+                        Cplx(0) => SIMD(4),
+                        Time(0) => Register(0),
+                        Time(1) => Thread(0),
+                        Time(2) => Thread(1),
+                        Beam(0) => Thread(2),
+                        Beam(1) => Thread(3),
+                        Beam(2) => Thread(4),
+                        Time(3) => LoopT2(0),
+                        Time(4) => LoopT2(1),
+                        Beam(3) => LoopB(0),
+                        Dish′(7) => Warp(0),
+                        Dish′(8) => Warp(1),
+                        Beam(4) => Warp(2),     # since Wb = 6
+                        Beam(5) => Warp(3),     # since Wb = 6
+                        Beam(6) => Warp(4),     # since Wb = 6
+                        Polr(0) => Block(b += 1),
+                        [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                    ),
+                )
             end
+
+            store!(steps, env, :Ju4, :Ju_shared, map_Ju_shared)
+
             nothing
-        end
+        end                     # LoopB
+
         nothing
-    end
+    end                         # LoopT2
     sync_threads!(steps, env)
 
     return nothing
 end
 
 # Step 3: reduce and quantize
-function reduce!(steps::Vector{AbstractStep}, env::Environment)
+function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
     # Section 5, eqn (22)
-    map_Ju3_registers = let
+    map_Ju10_registers = let
         b = -1
         Layout(
             Int32,
@@ -528,15 +553,17 @@ function reduce!(steps::Vector{AbstractStep}, env::Environment)
             ),
         )
     end
-    load!(steps, env, :Ju3, map_Ju3_registers, :Ju_shared, map_Ju_shared)
+    load!(steps, env, :Ju10, map_Ju10_registers, :Ju_shared, map_Ju_shared)
     # TODO: Use a saturating add-and-halve instead?
-    widen!(steps, env, :Ju4, :Ju3, SIMD(4) => Register(2))
-    split!(steps, env, :Ju4a, :Ju4b, :Ju4, Register(0))
-    #TODO apply!(steps, env, :Ju5, :Ju4a, :Ju4b, (Ju4a, Ju4b) -> :($Ju4a + $Ju4b))
-    apply!(steps, env, :Ju5, :Ju4a, :Ju4b, (Ju4a, Ju4b) -> :(clamp($Ju4a + $Ju4b, (-Int32(2^31 - 1)):(+Int32(2^31 - 1)))))
-    split!(steps, env, :Ju5a, :Ju5b, :Ju5, Register(1))
-    #TODO apply!(steps, env, :J, :Ju5a, :Ju5b, (Ju5a, Ju5b) -> :($Ju5a + $Ju5b))
-    apply!(steps, env, :J, :Ju5a, :Ju5b, (Ju5a, Ju5b) -> :(clamp($Ju5a + $Ju5b, (-Int32(2^31 - 1)):(+Int32(2^31 - 1)))))
+    widen!(steps, env, :Ju11, :Ju10, SIMD(4) => Register(2))
+    split!(steps, env, :Ju11a, :Ju11b, :Ju11, Register(0))
+    #TODO apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :($Ju11a + $Ju11b))
+    #TODO apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :(clamp($Ju11a + $Ju11b, (-Int32(2^31 - 1)):(+Int32(2^31 - 1)))))
+    apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :(add_sat($Ju11a, $Ju11b)))
+    split!(steps, env, :Ju12a, :Ju12b, :Ju12, Register(1))
+    #TODO apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :($Ju12a + $Ju12b))
+    #TODO apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :(clamp($Ju12a + $Ju12b, (-Int32(2^31 - 1)):(+Int32(2^31 - 1)))))
+    apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :(add_sat($Ju12a, $Ju12b)))
     # Section 5, eqn. (24)
     map_J_registers = let
         b = -1
@@ -596,7 +623,7 @@ function reduce!(steps::Vector{AbstractStep}, env::Environment)
     end
     @assert env[:J3] == map_J3_registers
 
-    unselect!(steps, env, :Jper, :J3, [Time(5) => Register(0), Time(6) => Register(1)], :($loopIdxT1 & 0b11))
+    unselect!(steps, env, :Jper, :J3, [Time(5) => Register(0), Time(6) => Register(1)], :($loopIdxT1))
     # Section 5, eqn. (27), but Time(5:6) replaced by Time(3:4)
     map_Jper_registers = let
         b = -1
@@ -713,8 +740,8 @@ function bb!(steps::Vector{AbstractStep}, env::Environment)
         @assert T1 ÷ T2 == 4
         loop!(steps, env, loopIdxT1, :(Int32(0):Int32($T1 ÷ $T2 - 1)), [Time(5), Time(6)]) do steps, env
             copy_E!(steps, env)
-            multiply!(steps, env)
-            reduce!(steps, env)
+            multiply_A_E!(steps, env)
+            reduce_Ju!(steps, env)
             return nothing
         end
         write_J!(steps, env)
@@ -770,55 +797,8 @@ function runcuda()
     itime = 1
 
     A_input[1, idish, ibeam, ipolr] = 1
-    # for d in 1:D
-    #     A_input[1, d, ibeam, ipolr] = 1
-    # end
-    # for d in 1:D
-    #     A_input[2, d, ibeam, ipolr] = 1
-    # end
-    # vvvvv
-    ## for d in 29:29 # 29:32
-    ##     A_input[1, d, ibeam, ipolr] = 1
-    ## end
-    # ^^^^^
-    # for d in 1:D
-    #     A_input[1, d, ibeam, ipolr] = 1
-    # end
-    # for d in 1:D, c in 1:2
-    #     A_input[c, d, ibeam, ipolr] = 1
-    # end
-    # for b in 1:B, d in 1:D, c in 1:2
-    #     A_input[c, d, b, ipolr] = 1
-    # end
-    # for p in 1:2, b in 1:B, d in 1:D, c in 1:2
-    #     A_input[c, d, b, p] = 1
-    # end
-    # A_input .= 1
 
-    # E_input[idish, ipolr, ifreq, itime] = Int4x2(Int32(1), Int32(1))
-    # for d in 1:D
-    #     E_input[d, ipolr, ifreq, itime] = Int4x2(Int32(1), Int32(0))
-    # end
-    # for d in 1:D
-    #     E_input[d, ipolr, ifreq, itime] = Int4x2(Int32(0), Int32(1))
-    # end
-    # vvvvv
-    # ^^^^^
-    for d in 1:32 # D
-        E_input[d, ipolr, ifreq, itime] = Int4x2(Int32(1), Int32(0))
-    end
-    # for p in 1:2, d in 1:D
-    #     E_input[d, p, ifreq, itime] = Int4x2(Int32(1), Int32(1))
-    # end
-    # for f in 1:F, p in 1:2, d in 1:D
-    #     E_input[d, p, f, itime] = Int4x2(Int32(1), Int32(1))
-    # end
-    # for t in 1:T, f in 1:F, p in 1:2, d in 1:D
-    #     E_input[d, p, f, t] = Int4x2(Int32(1), Int32(1))
-    # end
-    # for i in eachindex(E_input)
-    #     E_input[i] = Int4x2(Int32(1), Int32(1))
-    # end
+    E_input[idish, ipolr, ifreq, itime] = Int4x2(Int32(1), Int32(0))
 
     A_mem = reinterpret(Int8x4, reshape(A_input, :))
     E_mem = reinterpret(Int4x8, reshape(E_input, :))
@@ -883,7 +863,7 @@ if CUDA.functional()
     # @device_code_warntype runcuda()
     # @device_code_llvm runcuda()
     # @device_code_ptx runcuda()
-    # @device_code_sass runcuda()
+    @device_code_sass runcuda()
     # @device_code runcuda()
-    runcuda()
+    # runcuda()
 end

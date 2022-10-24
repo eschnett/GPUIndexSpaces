@@ -344,6 +344,13 @@ function Base.:-(a::Int16x2, b::Int16x2)
     return Int16x2(bitwise_merge(0xffff0000, rlo, rhi))
 end
 
+# Int32
+export add_sat
+add_sat(x::Int32, y::Int32) = clamp(Int64(x) + y, Int32)
+CUDA.@device_override function add_sat(x::Int32, y::Int32)
+    LLVM.Interop.@asmcall("add.sat.s32 \$0, \$1, \$2;", "=r,r,r", Int32, Tuple{Int32,Int32}, x, y)
+end
+
 # Float16x2
 
 function Float16x2(a1::Float32, a2::Float32)
@@ -1054,10 +1061,10 @@ end
 
 export select!
 
-function select!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, index::Index, value::Expr)
+function select!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, index::Index, value::Code)
     return select!(steps, env, lhs, rhs, env[rhs][index], value)
 end
-function select!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, register::Register, value::Expr)
+function select!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, register::Register, value::Code)
     rhsmap = env[rhs]
 
     @assert lhs ∉ keys(env)
@@ -1099,12 +1106,12 @@ function select!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs
 end
 
 function select!(
-    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, indices::AbstractVector{Index}, value::Expr
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, indices::AbstractVector{Index}, value::Code
 )
     return select!(steps, env, lhs, rhs, [env[rhs][index] for index in indices], value)
 end
 function select!(
-    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, registers::AbstractVector{Register}, value::Expr
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, registers::AbstractVector{Register}, value::Code
 )
     rhsmap = env[rhs]
 
@@ -1153,7 +1160,7 @@ end
 export unselect!
 
 function unselect_BROKEN!(
-    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, index_register::Pair{<:Index,Register}, value::Expr
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, index_register::Pair{<:Index,Register}, value::Code
 )
     rhsmap = env[rhs]
 
@@ -1212,7 +1219,7 @@ function unselect!(
     lhs::Symbol,
     rhs::Symbol,
     index_registers::AbstractArray{<:Pair{<:Index,Register}},
-    value::Expr,
+    value::Code,
 )
     rhsmap = env[rhs]
 
@@ -1359,9 +1366,47 @@ function Base.merge!(
     return nothing
 end
 
+export reduce!
+function reduce!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, fun::Function)
+    rhsmap = env[rhs]
+    @assert lhs ∈ keys(env)
+    lhsmap = rhsmap
+
+    registers = [v for (k, v) in rhsmap if v isa Register]
+    register_mask = sum(UInt[1 << reg.bit for reg in registers])
+    simds = [v for (k, v) in rhsmap if v isa SIMD]
+    # @assert isempty(simds)
+
+    stmts = Code[]
+    for r in 0:register_mask
+        if r & ~register_mask == 0
+            rname = register_mask == 0 ? "" : "_$r"
+            lhsname = Symbol(lhs, rname)
+            rhsname = Symbol(rhs, rname)
+            push!(stmts, fun(lhsname, rhsname)::Code)
+        end
+    end
+
+    push!(steps, Step(
+        "Apply function",
+        Variable[lhs => lhsmap, rhs => rhsmap],
+        Variable[],
+        quote
+            $(stmts...)
+        end,
+    ))
+    return nothing
+end
+
 export apply!
 function apply!(
-    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, fun::Function; newtype::Union{Nothing,Type}=nothing
+    steps::Vector{AbstractStep},
+    env::Environment,
+    lhs::Symbol,
+    rhs::Symbol,
+    fun::Function;
+    newtype::Union{Nothing,Type}=nothing,
+    operator::Symbol=:(=),
 )
     rhsmap = env[rhs]
     @assert lhs ∉ keys(env)
@@ -1379,7 +1424,13 @@ function apply!(
         if r & ~register_mask == 0
             rname = register_mask == 0 ? "" : "_$r"
             lhsname = Symbol(lhs, rname)
-            push!(stmts, :($lhsname = $(fun(Symbol(rhs, rname))::Code)::$type))
+            if operator === :(=)
+                push!(stmts, :($lhsname = $(fun(Symbol(rhs, rname))::Code)::$type))
+            elseif operator === :(+=)
+                push!(stmts, :($lhsname += $(fun(Symbol(rhs, rname))::Code)::$type))
+            else
+                @assert false
+            end
         end
     end
 
