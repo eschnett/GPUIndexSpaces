@@ -485,8 +485,9 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
             #UNDO apply!(steps, env, :Ju2, :Ju, Ju -> :(($Ju + (Int32(1) << $σ) >> 1) >> $σ))
             apply!(steps, env, :Ju2, :Ju, Ju -> :($Ju))
 
-            apply!(steps, env, :Ju3, :Ju2, J -> :(clamp($J, (-Int32(2^15 - 1)):(+Int32(2^15 - 1)))))
-            narrow!(steps, env, :Ju4, :Ju3, Register(1) => SIMD(4))
+            # Note: `cvs_pack_s16` saturates, so we don't need to clamp
+            # apply!(steps, env, :Ju3, :Ju2, J -> :(clamp($J, (-Int32(0x7fff)):(+Int32(0x7fff)))))
+            narrow!(steps, env, :Ju4, :Ju2, Register(1) => SIMD(4))
             @assert env[:Ju4] == let
                 b = -1
                 Layout(
@@ -554,15 +555,10 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
         )
     end
     load!(steps, env, :Ju10, map_Ju10_registers, :Ju_shared, map_Ju_shared)
-    # TODO: Use a saturating add-and-halve instead?
     widen!(steps, env, :Ju11, :Ju10, SIMD(4) => Register(2))
     split!(steps, env, :Ju11a, :Ju11b, :Ju11, Register(0))
-    #TODO apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :($Ju11a + $Ju11b))
-    #TODO apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :(clamp($Ju11a + $Ju11b, (-Int32(2^31 - 1)):(+Int32(2^31 - 1)))))
     apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :(add_sat($Ju11a, $Ju11b)))
     split!(steps, env, :Ju12a, :Ju12b, :Ju12, Register(1))
-    #TODO apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :($Ju12a + $Ju12b))
-    #TODO apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :(clamp($Ju12a + $Ju12b, (-Int32(2^31 - 1)):(+Int32(2^31 - 1)))))
     apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :(add_sat($Ju12a, $Ju12b)))
     # Section 5, eqn. (24)
     map_J_registers = let
@@ -591,11 +587,11 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
     @assert env[:J] == map_J_registers
 
     # TODO: Use s_β
-    # TODO: clamp
     #UNDO apply!(steps, env, :J2, :J, J -> :(($J + (Int32(1) << (16 - 1 - $σ))) >> (16 - $σ)))
     apply!(steps, env, :J2, :J, J -> :($J))
 
-    apply!(steps, env, :J2′, :J2, J -> :(clamp($J, (-Int32(2^3 - 1)):(+Int32(2^3 - 1)))))
+    # TODO: Try this: Shift values left by 4, rely on saturation when converting, then shift right and mask
+    apply!(steps, env, :J2′, :J2, J -> :(clamp($J, (-Int32(0x7)):(+Int32(0x7)))))
     narrow3!(steps, env, :J3, :J2′, Register(2) => SIMD(2), Register(3) => SIMD(3), Register(4) => SIMD(4))
     # Section 5, eqn. (26)
     map_J3_registers = let
@@ -856,7 +852,7 @@ function runcuda()
     return nothing
 end
 
-println(bb_allsteps)
+# println(bb_allsteps)
 if CUDA.functional()
     # @device_code_lowered runcuda()
     # @device_code_typed runcuda()

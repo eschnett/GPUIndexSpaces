@@ -162,7 +162,7 @@ function Base.convert(::Type{Int8x4}, a::NTuple{2,Int16x2})
     )
 end
 CUDA.@device_override function Base.convert(::Type{Int8x4}, a::NTuple{2,Int16x2})
-    return Int8x4(cuda_prmt(a[1].val, a[2].val, 0x6240))
+    return Int8x4(cuda_prmt(a[1].val, a[2].val, 0x6240) % UInt32)
 end
 
 function Base.convert(::Type{NTuple{2,Int16x2}}, a::Int8x4)
