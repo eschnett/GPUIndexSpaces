@@ -10,15 +10,15 @@ using Random
 
 # Kernel parameters
 
-#UNDO const T = 32768                # number of times
-const T = 128                   # number of times
+const T = 32768                # number of times
 const T1 = 128                  # outer time cadence
 @assert T % T1 == 0
 #UNDO const B = 96                    # number of beams
 const B = 128                   # number of beams
 const D = 512                   # number of dishes
 #UNDO const F = 16                    # frequency channels per GPU
-const F = 1                     # frequency channels per GPU
+const F = 84 ÷ 2                # frequency channels per GPU
+# const F = 1                     # frequency channels per GPU
 #UNDO const Wb = 6                    # A matrix tiling
 const Wb = 8                    # A matrix tiling
 const Wd = 4                    # A matrix tiling
@@ -73,10 +73,10 @@ const map_E_global = let
             Cplx(0) => SIMD(2),
             Dish(0) => SIMD(3),
             Dish(1) => SIMD(4),
-            [Dish(d) => Memory(m += 1) for d in 2:(Int(log(2, D)) - 1)]...,
+            [Dish(d) => Memory(m += 1) for d in 2:(ceil(Int, log(2, D)) - 1)]...,
             Polr(0) => Memory(m += 1),
-            [Freq(f) => Memory(m += 1) for f in 0:(Int(log(2, F)) - 1)]...,
-            [Time(t) => Memory(m += 1) for t in 0:(Int(log(2, T)) - 1)]...,
+            [Freq(f) => Memory(m += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
+            [Time(t) => Memory(m += 1) for t in 0:(ceil(Int, log(2, T)) - 1)]...,
         ),
     )
 end
@@ -85,19 +85,19 @@ end
 const map_E_shared = let
     m = m2 = -1
     b = -1
-    i = -1
     Layout(
         Int32,
         Dict(
             Cplx(0) => SIMD(2),
             Dish(0) => SIMD(3),
             Dish(1) => SIMD(4),
-            [Dish(d) => Memory(m += 1) for d in 2:(Int(log(2, D)) - 1)]...,
+            [Dish(d) => Memory(m += 1) for d in 2:(ceil(Int, log(2, D)) - 1)]...,
             Polr(0) => Block(b += 1),
-            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
             # TODO: Make padding a compile-time constant, not a run-time choice
             [Time(t) => Memory2(m2 += 1) for t in 0:4]...,
-            [Time(t) => Ignore(i += 1) for t in 5:(Int(log(2, T)) - 1)]...,
+            [Time(t) => LoopT1(t - 5) for t in 5:(ceil(Int, log(2, T1)) - 1)]...,
+            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
         ),
     )
 end
@@ -128,8 +128,9 @@ const map_Ecopy_registers = let
             Time(4) => Warp(4),
             Time(5) => LoopT1(0),
             Time(6) => LoopT1(1),
+            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
             Polr(0) => Block(b += 1),
-            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
         ),
     )
 end
@@ -159,8 +160,11 @@ const map_E_registers = let
             Time(2) => Thread(4),
             Time(3) => LoopT2(0),
             Time(4) => LoopT2(1),
+            Time(5) => LoopT1(0),
+            Time(6) => LoopT1(1),
+            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
             Polr(0) => Block(b += 1),
-            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
         ),
     )
 end
@@ -175,10 +179,10 @@ const map_A_global = let
             # The natural layout
             Cplx(0) => SIMD(3),
             Dish(0) => SIMD(4),
-            [Dish(d) => Memory(m += 1) for d in 1:(Int(log(2, D)) - 1)]...,
-            [Beam(b) => Memory(m += 1) for b in 0:(Int(log(2, B)) - 1)]...,
+            [Dish(d) => Memory(m += 1) for d in 1:(ceil(Int, log(2, D)) - 1)]...,
+            [Beam(b) => Memory(m += 1) for b in 0:(ceil(Int, log(2, B)) - 1)]...,
             Polr(0) => Memory(m += 1),
-            [Freq(f) => Ignore(i += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+            [Freq(f) => Ignore(i += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
             # The internal layout
             # Cplx(0) => Memory(0 + 0),
             # Dish′(0) => SIMD(3),
@@ -227,7 +231,7 @@ const map_A_registers = let
             Beam(5) => Warp(3),     # since Wb = 6
             Beam(6) => Warp(4),     # since Wb = 6
             Polr(0) => Block(b += 1),
-            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
         ),
     )
 end
@@ -272,7 +276,7 @@ const map_s_registers = let
             Beam(5) => Warp(3),
             Beam(6) => Warp(4),
             Polr(0) => Block(b += 1),
-            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
         ),
     )
 end
@@ -286,10 +290,10 @@ const map_J_global = let
             Cplx(0) => SIMD(2),
             Time(0) => SIMD(3),
             Time(1) => SIMD(4),
-            [Time(t) => Memory(m += 1) for t in 2:(Int(log(2, T)) - 1)]...,
+            [Time(t) => Memory(m += 1) for t in 2:(ceil(Int, log(2, T)) - 1)]...,
             Polr(0) => Memory(m += 1),
-            [Freq(f) => Memory(m += 1) for f in 0:(Int(log(2, F)) - 1)]...,
-            [Beam(b) => Memory(m += 1) for b in 0:(Int(log(2, B)) - 1)]...,
+            [Freq(f) => Memory(m += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
+            [Beam(b) => Memory(m += 1) for b in 0:(ceil(Int, log(2, B)) - 1)]...,
         ),
     )
 end
@@ -301,12 +305,14 @@ const map_Ju_shared = let
         Int32,
         Dict(
             Cplx(0) => SIMD(4),
-            [Beam(b) => Memory(m += 1) for b in 0:(Int(log(2, B)) - 1)]...,
-            [Time(t) => Memory2(m2 += 1) for t in 0:Int(log(2, T2) - 1)]...,
+            [Beam(b) => Memory(m += 1) for b in 0:(ceil(Int, log(2, B)) - 1)]...,
+            [Time(t) => Memory2(m2 += 1) for t in 0:ceil(Int, log(2, T2) - 1)]...,
+            [Time(t) => LoopT1(t - 5) for t in 5:(ceil(Int, log(2, T1)) - 1)]...,
+            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
             Dish′(7) => Memory3(m3 += 1),
             Dish′(8) => Memory3(m3 += 1),
             Polr(0) => Ignore(i += 1),
-            [Freq(f) => Ignore(i += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+            [Freq(f) => Ignore(i += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
         ),
     )
 end
@@ -338,7 +344,7 @@ function read_A!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(5) => Warp(3),
                 Beam(6) => Warp(4),
                 Polr(0) => Block(b += 1),
-                [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
             ),
         )
     end
@@ -381,6 +387,9 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                         Time(2) => Thread(1),
                         Time(3) => LoopT2(0),
                         Time(4) => LoopT2(1),
+                        Time(5) => LoopT1(0),
+                        Time(6) => LoopT1(1),
+                        [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                         Beam(0) => Thread(2),
                         Beam(1) => Thread(3),
                         Beam(2) => Thread(4),
@@ -389,7 +398,7 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                         Beam(5) => Warp(3),     # since Wb = 6
                         Beam(6) => Warp(4),     # since Wb = 6
                         Polr(0) => Block(b += 1),
-                        [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                        [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
                     ),
                 )
             end
@@ -421,8 +430,11 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                             Time(2) => Thread(4),
                             Time(3) => LoopT2(0),
                             Time(4) => LoopT2(1),
+                            Time(5) => LoopT1(0),
+                            Time(6) => LoopT1(1),
+                            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                             Polr(0) => Block(b += 1),
-                            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
                         ),
                     )
                 end
@@ -451,8 +463,11 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                             Time(2) => Thread(4),
                             Time(3) => LoopT2(0),
                             Time(4) => LoopT2(1),
+                            Time(5) => LoopT1(0),
+                            Time(6) => LoopT1(1),
+                            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                             Polr(0) => Block(b += 1),
-                            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
                         ),
                     )
                 end
@@ -473,6 +488,9 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                             Time(2) => Thread(1),
                             Time(3) => LoopT2(0),
                             Time(4) => LoopT2(1),
+                            Time(5) => LoopT1(0),
+                            Time(6) => LoopT1(1),
+                            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                             Beam(0) => Thread(2),
                             Beam(1) => Thread(3),
                             Beam(2) => Thread(4),
@@ -481,7 +499,7 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                             Beam(5) => Warp(3),     # since Wb = 6
                             Beam(6) => Warp(4),     # since Wb = 6
                             Polr(0) => Block(b += 1),
-                            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
                         ),
                     )
                 end
@@ -527,8 +545,11 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                         Beam(4) => Warp(2),     # since Wb = 6
                         Beam(5) => Warp(3),     # since Wb = 6
                         Beam(6) => Warp(4),     # since Wb = 6
+                        Time(5) => LoopT1(0),
+                        Time(6) => LoopT1(1),
+                        [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                         Polr(0) => Block(b += 1),
-                        [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                        [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
                     ),
                 )
             end
@@ -566,10 +587,13 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
                 Time(2) => Thread(2),
                 Time(3) => Register(3),
                 Time(4) => Register(4),
+                Time(5) => LoopT1(0),
+                Time(6) => LoopT1(1),
+                [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                 Dish′(7) => Register(0),
                 Dish′(8) => Register(1),
                 Polr(0) => Block(b += 1),
-                [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
             ),
         )
     end
@@ -582,6 +606,8 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
     # Section 5, eqn. (24)
     map_J_registers = let
         b = -1
+        @assert T1 == 128
+        @assert T2 == 32
         Layout(
             Int32,
             Dict(
@@ -591,6 +617,9 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
                 Time(2) => Thread(2),
                 Time(3) => Register(3),
                 Time(4) => Register(4),
+                Time(5) => LoopT1(0),
+                Time(6) => LoopT1(1),
+                [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                 Beam(0) => Thread(3),
                 Beam(1) => Thread(4),
                 Beam(2) => Warp(0),
@@ -599,14 +628,14 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(5) => Warp(3),
                 Beam(6) => Warp(4),
                 Polr(0) => Block(b += 1),
-                [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
             ),
         )
     end
     @assert env[:J] == map_J_registers
 
+    # TODO: Load in the beginning, save in a register?
     load!(steps, env, :s, map_s_registers, :s_mem, map_s_global)
-    # TODO: Use s_β
     apply!(steps, env, :J2, :J, :s, (J, s) -> :(($J + (Int32(1) << ($s % UInt32 - UInt32(1)))) >> (s % UInt32)))
     # apply!(steps, env, :J2, :J, J -> :($J))
 
@@ -625,6 +654,9 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
                 Time(2) => Thread(2),
                 Time(3) => SIMD(3),
                 Time(4) => SIMD(4),
+                Time(5) => LoopT1(0),
+                Time(6) => LoopT1(1),
+                [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                 Beam(0) => Thread(3),
                 Beam(1) => Thread(4),
                 Beam(2) => Warp(0),
@@ -633,7 +665,7 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(5) => Warp(3),
                 Beam(6) => Warp(4),
                 Polr(0) => Block(b += 1),
-                [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
             ),
         )
     end
@@ -658,6 +690,7 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
                 Time(4) => SIMD(4),
                 Time(5) => Register(0),
                 Time(6) => Register(1),
+                [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                 Beam(0) => Thread(3),
                 Beam(1) => Thread(4),
                 Beam(2) => Warp(0),
@@ -666,7 +699,7 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(5) => Warp(3),
                 Beam(6) => Warp(4),
                 Polr(0) => Block(b += 1),
-                [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
             ),
         )
     end
@@ -693,6 +726,7 @@ function write_J!(steps::Vector{AbstractStep}, env::Environment)
                 Time(4) => SIMD(4),
                 Time(5) => Register(0),
                 Time(6) => Register(1),
+                [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                 Beam(0) => Thread(3),
                 Beam(1) => Thread(4),
                 Beam(2) => Warp(0),
@@ -701,7 +735,7 @@ function write_J!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(5) => Warp(3),
                 Beam(6) => Warp(4),
                 Polr(0) => Block(b += 1),
-                [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
             ),
         )
     end
@@ -728,6 +762,7 @@ function write_J!(steps::Vector{AbstractStep}, env::Environment)
                 Time(4) => Thread(0),
                 Time(5) => Thread(2),
                 Time(6) => Thread(1),
+                [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
                 Beam(0) => Thread(3),
                 Beam(1) => Thread(4),
                 Beam(2) => Warp(0),
@@ -736,7 +771,7 @@ function write_J!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(5) => Warp(3),
                 Beam(6) => Warp(4),
                 Polr(0) => Block(b += 1),
-                [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+                [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
             ),
         )
     end
@@ -797,7 +832,8 @@ function runcuda()
     println("J[t,p,f,b] = s[b,p,f] Σ[d] A[d,b,p,f] E[d,p,f,t]")
 
     Random.seed!(0)
-    niters = 1000
+    niters = 1
+    nruns = 3
     for iter in 1:niters
         println("Iteration $iter:")
         println("    Setting up inputs...")
@@ -829,20 +865,25 @@ function runcuda()
 
         aval = 0 + im * 0
         eval = 0 + im * 0
+        sval = 0
         jval = 0 + im * 0
         while true
             aval = rand(-127:+127) + im * rand(-127:+127)
             eval = rand(-7:+7) + im * rand(-7:+7)
+            sval = rand(σ:(σ + 2)) - σ
             jval = aval * eval
             jval = Complex((real(jval) + (1 << (σ - 1))) >> σ, (imag(jval) + (1 << (σ - 1))) >> σ)
+            jval = Complex((real(jval) + (1 << (sval - 1))) >> sval, (imag(jval) + (1 << (sval - 1))) >> sval)
             abs(real(jval)) ≤ 7 && abs(imag(jval)) ≤ 7 && break
         end
-        println("        Using aval=$aval eval=$eval jval=$jval...")
+        println("        Using a=$aval e=$eval s=$sval j=$jval...")
 
         A_input[1, idish, ibeam, ipolr] = real(aval)
         A_input[2, idish, ibeam, ipolr] = imag(aval)
 
         E_input[idish, ipolr, ifreq, itime] = Int4x2(Int32(real(eval)), Int32(imag(eval)))
+
+        s_input[ibeam, ipolr, ifreq] = sval
 
         A_mem = reinterpret(Int8x4, reshape(A_input, :))
         E_mem = reinterpret(Int4x8, reshape(E_input, :))
@@ -874,8 +915,15 @@ function runcuda()
 
         println("    Running kernel...")
         attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem_bytes
-        kernel(A_mem, E_mem, s_mem, J_mem, E_shared, Ju_shared; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
-        synchronize()
+        for run in 1:nruns
+            stats = @timed begin
+                kernel(
+                    A_mem, E_mem, s_mem, J_mem, E_shared, Ju_shared; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes
+                )
+                synchronize()
+            end
+            println("        run time: $(stats.time * 1.0e+6) μsec")
+        end
 
         println("    Copying outputs from device...")
         E_shared = Array(E_shared)
@@ -899,6 +947,7 @@ function runcuda()
                 end
             end
             println("        There are $errcount errors")
+            @assert errcount == 0
         end
     end
 
