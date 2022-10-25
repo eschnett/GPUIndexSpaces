@@ -259,6 +259,24 @@ const map_s_global = let
     )
 end
 
+const map_s_registers = let
+    b = -1
+    Layout(
+        Int32,
+        Dict(
+            Beam(0) => Thread(3),
+            Beam(1) => Thread(4),
+            Beam(2) => Warp(0),
+            Beam(3) => Warp(1),
+            Beam(4) => Warp(2),
+            Beam(5) => Warp(3),
+            Beam(6) => Warp(4),
+            Polr(0) => Block(b += 1),
+            [Freq(f) => Block(b += 1) for f in 0:(Int(log(2, F)) - 1)]...,
+        ),
+    )
+end
+
 # Beamformed electric field
 const map_J_global = let
     m = -1
@@ -587,9 +605,10 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
     end
     @assert env[:J] == map_J_registers
 
+    load!(steps, env, :s, map_s_registers, :s_mem, map_s_global)
     # TODO: Use s_β
-    #UNDO apply!(steps, env, :J2, :J, J -> :(($J + (Int32(1) << (16 - 1 - $σ))) >> (16 - $σ)))
-    apply!(steps, env, :J2, :J, J -> :($J))
+    apply!(steps, env, :J2, :J, :s, (J, s) -> :(($J + (Int32(1) << ($s % UInt32 - UInt32(1)))) >> (s % UInt32)))
+    # apply!(steps, env, :J2, :J, J -> :($J))
 
     # TODO: Try this: Shift values left by 4, rely on saturation when converting, then shift right and mask
     apply!(steps, env, :J2′, :J2, J -> :(clamp($J, (-Int32(0x7)):(+Int32(0x7)))))
@@ -765,7 +784,7 @@ const Ju_shared_offset = E_shared_length
 const shmem_length = E_shared_length + Ju_shared_length
 const shmem_bytes = sizeof(Int32) * shmem_length
 
-@eval function runsteps(A_mem, E_mem, J_mem, E_shared, Ju_shared)
+@eval function runsteps(A_mem, E_mem, s_mem, J_mem, E_shared, Ju_shared)
     E_shared = @cuDynamicSharedMem(Int4x8, $E_shared_size, $(sizeof(Int32) * E_shared_offset))
     Ju_shared = @cuDynamicSharedMem(Int16x2, $Ju_shared_size, $(sizeof(Int32) * Ju_shared_offset))
     $(declarations(bb_allsteps))
@@ -775,18 +794,22 @@ end
 
 function runcuda()
     println("CHORD 8-bit baseband beamformer")
-    println("J[t,p,f,b] = Σ[d] A[d,b,p,f] E[d,p,f,t]")
+    println("J[t,p,f,b] = s[b,p,f] Σ[d] A[d,b,p,f] E[d,p,f,t]")
 
     Random.seed!(0)
     niters = 1000
     for iter in 1:niters
-        println("Setting up inputs...")
+        println("Iteration $iter:")
+        println("    Setting up inputs...")
 
         # Cplx, Dish, Beam, Polr
         A_input = zeros(Int8, 2, nextpow(2, D), nextpow(2, B), 2)
 
         # Dish, Polr, Freq, Time
         E_input = zeros(Int4x2, nextpow(2, D), 2, nextpow(2, F), nextpow(2, T))
+
+        # Beam, Polr, Freq
+        s_input = zeros(Int32, nextpow(2, B), 2, nextpow(2, F))
 
         # Time, Polr, Freq, Beam
         J_input = zeros(Int4x2, nextpow(2, T), 2, nextpow(2, F), nextpow(2, B))
@@ -802,7 +825,7 @@ function runcuda()
         ifreq = rand(1:F)
         ipolr = rand(1:2)
         itime = rand(1:T)
-        println("Choosing b=$ibeam d=$idish f=$ifreq p=$ipolr t=$itime...")
+        println("    Choosing b=$ibeam d=$idish f=$ifreq p=$ipolr t=$itime...")
 
         aval = 0 + im * 0
         eval = 0 + im * 0
@@ -814,7 +837,7 @@ function runcuda()
             jval = Complex((real(jval) + (1 << (σ - 1))) >> σ, (imag(jval) + (1 << (σ - 1))) >> σ)
             abs(real(jval)) ≤ 7 && abs(imag(jval)) ≤ 7 && break
         end
-        println("    Using aval=$aval eval=$eval jval=$jval...")
+        println("        Using aval=$aval eval=$eval jval=$jval...")
 
         A_input[1, idish, ibeam, ipolr] = real(aval)
         A_input[2, idish, ibeam, ipolr] = imag(aval)
@@ -823,19 +846,21 @@ function runcuda()
 
         A_mem = reinterpret(Int8x4, reshape(A_input, :))
         E_mem = reinterpret(Int4x8, reshape(E_input, :))
+        s_mem = reinterpret(Int32, reshape(s_input, :))
         J_mem = reinterpret(Int4x8, reshape(J_input, :))
 
         E_shared = zeros(Int4x8, E_shared_size)
         Ju_shared = zeros(Int16x2, Ju_shared_size)
 
-        println("Copying inputs to device...")
+        println("    Copying inputs to device...")
         A_mem = CuArray(A_mem)
         E_mem = CuArray(E_mem)
+        s_mem = CuArray(s_mem)
         J_mem = CuArray(J_mem)
         E_shared = CuArray(E_shared)
         Ju_shared = CuArray(Ju_shared)
 
-        println("Compiling kernel...")
+        println("    Compiling kernel...")
         nthreads = 32
         nwarps = Wb * Wd
         nblocks = 2 * F                 # Polr, Freq
@@ -844,21 +869,21 @@ function runcuda()
         blocks_per_sm = 1
         # maxregs = 65536 ÷ (nthreads * nwarps * blocks_per_sm)
         kernel = @cuda launch = false minthreads = nthreads * nwarps blocks_per_sm = blocks_per_sm runsteps(
-            A_mem, E_mem, J_mem, E_shared, Ju_shared
+            A_mem, E_mem, s_mem, J_mem, E_shared, Ju_shared
         )
 
-        println("Running kernel...")
+        println("    Running kernel...")
         attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem_bytes
-        kernel(A_mem, E_mem, J_mem, E_shared, Ju_shared; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
+        kernel(A_mem, E_mem, s_mem, J_mem, E_shared, Ju_shared; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
         synchronize()
 
-        println("Copying outputs from device...")
+        println("    Copying outputs from device...")
         E_shared = Array(E_shared)
         Ju_shared = Array(Ju_shared)
 
         J_mem = Array(J_mem)
 
-        println("Checking outputs...")
+        println("    Checking outputs...")
         J_output = reshape(reinterpret(Int4x2, J_mem), nextpow(2, T), 2, nextpow(2, F), nextpow(2, B))
         let
             errcount = 0
@@ -869,11 +894,11 @@ function runcuda()
                 if have_jval ≠ want_jval
                     errcount += 1
                     if errcount ≤ 100
-                        println("J[$t,$p,$f,$b] = $have_jval   (want $want_jval)")
+                        println("            J[$t,$p,$f,$b] = $have_jval   (want $want_jval)")
                     end
                 end
             end
-            println("There are $errcount errors")
+            println("        There are $errcount errors")
         end
     end
 

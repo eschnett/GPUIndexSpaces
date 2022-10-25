@@ -1,6 +1,6 @@
 # { Load from memory; Rename indices Dict{Index{:Dish}, Index{:Dish′}}(Dish(4) => Dish′(6), Dish(2) => Dish′(4), Dish(5) => Dish′(2), Dish(6) => Dish′(3), Dish(1) => Dish′(1), Dish(3) => Dish′(5), Dish(0) => Dish′(0), Dish(7) => Dish′(7), Dish(8) => Dish′(8)); Permute Register(0) and SIMD(4); Permute Register(0) and SIMD(3); loop }
 #     Inputs: []
-#     Outputs: [A, A0, A1, A10, A11, A2, Aim, Are, E0, E1, E2, E2im, E2re, Ecopy, J, J2, J2′, J3, Jper, Jper2, Jper3, Jper4, Jper5, Jper6, Jper7, Jstore, Ju, Ju0, Ju1, Ju10, Ju11, Ju11a, Ju11b, Ju12, Ju12a, Ju12b, Ju2, Ju4, Juim, Juim1, Jure, Jure1, Jure2]
+#     Outputs: [A, A0, A1, A10, A11, A2, Aim, Are, E0, E1, E2, E2im, E2re, Ecopy, J, J2, J2′, J3, Jper, Jper2, Jper3, Jper4, Jper5, Jper6, Jper7, Jstore, Ju, Ju0, Ju1, Ju10, Ju11, Ju11a, Ju11b, Ju12, Ju12a, Ju12b, Ju2, Ju4, Juim, Juim1, Jure, Jure1, Jure2, s]
 #         A::Int32
 #             Beam(0) => Thread(2)
 #             Beam(1) => Thread(3)
@@ -712,6 +712,15 @@
 #             Time(2) => Thread(1)
 #             Time(3) => Loop3(0)
 #             Time(4) => Loop3(1)
+#         s::Int32
+#             Beam(0) => Thread(3)
+#             Beam(1) => Thread(4)
+#             Beam(2) => Warp(0)
+#             Beam(3) => Warp(1)
+#             Beam(4) => Warp(2)
+#             Beam(5) => Warp(3)
+#             Beam(6) => Warp(4)
+#             Polr(0) => Block(0)
 #     Unused: []
 begin
     begin end
@@ -746,6 +755,7 @@ begin
                 begin end
                 begin end
             end
+            begin end
             begin end
             begin end
             begin end
@@ -3458,15 +3468,18 @@ begin
                 J_24 = add_sat(Ju12a_24, Ju12b_24)::Int32
                 J_28 = add_sat(Ju12a_28, Ju12b_28)::Int32
             end
+            s = @inbounds(
+                s_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03)]::Int32
+            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
             begin
-                J2_0 = J_0::Int32
-                J2_4 = J_4::Int32
-                J2_8 = J_8::Int32
-                J2_12 = J_12::Int32
-                J2_16 = J_16::Int32
-                J2_20 = J_20::Int32
-                J2_24 = J_24::Int32
-                J2_28 = J_28::Int32
+                J2_0 = ((J_0 + Int32(1) << (s % UInt32 - UInt32(1))) >> (s % UInt32))::Int32
+                J2_4 = ((J_4 + Int32(1) << (s % UInt32 - UInt32(1))) >> (s % UInt32))::Int32
+                J2_8 = ((J_8 + Int32(1) << (s % UInt32 - UInt32(1))) >> (s % UInt32))::Int32
+                J2_12 = ((J_12 + Int32(1) << (s % UInt32 - UInt32(1))) >> (s % UInt32))::Int32
+                J2_16 = ((J_16 + Int32(1) << (s % UInt32 - UInt32(1))) >> (s % UInt32))::Int32
+                J2_20 = ((J_20 + Int32(1) << (s % UInt32 - UInt32(1))) >> (s % UInt32))::Int32
+                J2_24 = ((J_24 + Int32(1) << (s % UInt32 - UInt32(1))) >> (s % UInt32))::Int32
+                J2_28 = ((J_28 + Int32(1) << (s % UInt32 - UInt32(1))) >> (s % UInt32))::Int32
             end
             begin
                 J2′_0 = clamp(J2_0, (-(Int32(0x07))):+(Int32(0x07)))::Int32
