@@ -30,7 +30,7 @@ const T2 = 32                   # chunk size (inner time cadence)
 @assert T1 % T2 == 0
 @assert T2 % 4 == 0
 
-const σ = 3 + round(Int, log2(Wd))
+const σ = 5 - round(Int, log2(Wd))
 
 ################################################################################
 
@@ -482,8 +482,9 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
             end                     # LoopD
 
             # TODO: Break ties to even?
-            #UNDO apply!(steps, env, :Ju2, :Ju, Ju -> :(($Ju + (Int32(1) << $σ) >> 1) >> $σ))
-            apply!(steps, env, :Ju2, :Ju, Ju -> :($Ju))
+            @assert σ ≥ 1
+            apply!(steps, env, :Ju2, :Ju, Ju -> :(($Ju + Int32($(1 << (σ - 1)))) >> $σ))
+            # apply!(steps, env, :Ju2, :Ju, Ju -> :($Ju))
 
             # Note: `cvs_pack_s16` saturates, so we don't need to clamp
             # apply!(steps, env, :Ju3, :Ju2, J -> :(clamp($J, (-Int32(0x7fff)):(+Int32(0x7fff)))))
@@ -777,7 +778,8 @@ function runcuda()
     println("J[t,p,f,b] = Σ[d] A[d,b,p,f] E[d,p,f,t]")
 
     Random.seed!(0)
-    for iter in 1:100
+    niters = 1000
+    for iter in 1:niters
         println("Setting up inputs...")
 
         # Cplx, Dish, Beam, Polr
@@ -809,8 +811,10 @@ function runcuda()
             aval = rand(-127:+127) + im * rand(-127:+127)
             eval = rand(-7:+7) + im * rand(-7:+7)
             jval = aval * eval
+            jval = Complex((real(jval) + (1 << (σ - 1))) >> σ, (imag(jval) + (1 << (σ - 1))) >> σ)
             abs(real(jval)) ≤ 7 && abs(imag(jval)) ≤ 7 && break
         end
+        println("    Using aval=$aval eval=$eval jval=$jval...")
 
         A_input[1, idish, ibeam, ipolr] = real(aval)
         A_input[2, idish, ibeam, ipolr] = imag(aval)
