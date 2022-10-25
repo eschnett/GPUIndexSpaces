@@ -775,77 +775,102 @@ end
 function runcuda()
     println("CHORD 8-bit baseband beamformer")
     println("J[t,p,f,b] = Σ[d] A[d,b,p,f] E[d,p,f,t]")
-    println("Setting up inputs...")
 
-    # Cplx, Dish, Beam, Polr
-    A_input = zeros(Int8, 2, nextpow(2, D), nextpow(2, B), 2)
+    Random.seed!(0)
+    for iter in 1:100
+        println("Setting up inputs...")
 
-    # Dish, Polr, Freq, Time
-    E_input = zeros(Int4x2, nextpow(2, D), 2, nextpow(2, F), nextpow(2, T))
+        # Cplx, Dish, Beam, Polr
+        A_input = zeros(Int8, 2, nextpow(2, D), nextpow(2, B), 2)
 
-    # Time, Polr, Freq, Beam
-    J_input = zeros(Int4x2, nextpow(2, T), 2, nextpow(2, F), nextpow(2, B))
+        # Dish, Polr, Freq, Time
+        E_input = zeros(Int4x2, nextpow(2, D), 2, nextpow(2, F), nextpow(2, T))
 
-    ibeam = 1
-    idish = 1
-    ifreq = 1
-    ipolr = 1
-    itime = 1
+        # Time, Polr, Freq, Beam
+        J_input = zeros(Int4x2, nextpow(2, T), 2, nextpow(2, F), nextpow(2, B))
 
-    A_input[1, idish, ibeam, ipolr] = 1
+        # ibeam = 1
+        # idish = 1
+        # ifreq = 1
+        # ipolr = 1
+        # itime = 1
 
-    E_input[idish, ipolr, ifreq, itime] = Int4x2(Int32(1), Int32(0))
+        ibeam = rand(1:B)
+        idish = rand(1:D)
+        ifreq = rand(1:F)
+        ipolr = rand(1:2)
+        itime = rand(1:T)
+        println("Choosing b=$ibeam d=$idish f=$ifreq p=$ipolr t=$itime...")
 
-    A_mem = reinterpret(Int8x4, reshape(A_input, :))
-    E_mem = reinterpret(Int4x8, reshape(E_input, :))
-    J_mem = reinterpret(Int4x8, reshape(J_input, :))
+        aval = 0 + im * 0
+        eval = 0 + im * 0
+        jval = 0 + im * 0
+        while true
+            aval = rand(-127:+127) + im * rand(-127:+127)
+            eval = rand(-7:+7) + im * rand(-7:+7)
+            jval = aval * eval
+            abs(real(jval)) ≤ 7 && abs(imag(jval)) ≤ 7 && break
+        end
 
-    E_shared = zeros(Int4x8, E_shared_size)
-    Ju_shared = zeros(Int16x2, Ju_shared_size)
+        A_input[1, idish, ibeam, ipolr] = real(aval)
+        A_input[2, idish, ibeam, ipolr] = imag(aval)
 
-    println("Copying inputs to device...")
-    A_mem = CuArray(A_mem)
-    E_mem = CuArray(E_mem)
-    J_mem = CuArray(J_mem)
-    E_shared = CuArray(E_shared)
-    Ju_shared = CuArray(Ju_shared)
+        E_input[idish, ipolr, ifreq, itime] = Int4x2(Int32(real(eval)), Int32(imag(eval)))
 
-    println("Compiling kernel...")
-    nthreads = 32
-    nwarps = Wb * Wd
-    nblocks = 2 * F                 # Polr, Freq
-    @assert shmem_bytes ≤ 99 * 1024 # NVIDIA A10 has 99 kB shared memory
+        A_mem = reinterpret(Int8x4, reshape(A_input, :))
+        E_mem = reinterpret(Int4x8, reshape(E_input, :))
+        J_mem = reinterpret(Int4x8, reshape(J_input, :))
 
-    blocks_per_sm = 1
-    # maxregs = 65536 ÷ (nthreads * nwarps * blocks_per_sm)
-    kernel = @cuda launch = false minthreads = nthreads * nwarps blocks_per_sm = blocks_per_sm runsteps(
-        A_mem, E_mem, J_mem, E_shared, Ju_shared
-    )
+        E_shared = zeros(Int4x8, E_shared_size)
+        Ju_shared = zeros(Int16x2, Ju_shared_size)
 
-    println("Running kernel...")
-    attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem_bytes
-    kernel(A_mem, E_mem, J_mem, E_shared, Ju_shared; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
-    synchronize()
+        println("Copying inputs to device...")
+        A_mem = CuArray(A_mem)
+        E_mem = CuArray(E_mem)
+        J_mem = CuArray(J_mem)
+        E_shared = CuArray(E_shared)
+        Ju_shared = CuArray(Ju_shared)
 
-    println("Copying outputs from device...")
-    E_shared = Array(E_shared)
-    Ju_shared = Array(Ju_shared)
+        println("Compiling kernel...")
+        nthreads = 32
+        nwarps = Wb * Wd
+        nblocks = 2 * F                 # Polr, Freq
+        @assert shmem_bytes ≤ 99 * 1024 # NVIDIA A10 has 99 kB shared memory
 
-    J_mem = Array(J_mem)
+        blocks_per_sm = 1
+        # maxregs = 65536 ÷ (nthreads * nwarps * blocks_per_sm)
+        kernel = @cuda launch = false minthreads = nthreads * nwarps blocks_per_sm = blocks_per_sm runsteps(
+            A_mem, E_mem, J_mem, E_shared, Ju_shared
+        )
 
-    println("Checking outputs...")
-    J_output = reshape(reinterpret(Int4x2, J_mem), nextpow(2, T), 2, nextpow(2, F), nextpow(2, B))
-    let
-        nzcount = 0
-        for b in 1:B, f in 1:F, p in 1:2, t in 1:T
-            if J_output[t, p, f, b] ≠ zero(Int4x2)
-                nzcount += 1
-                if nzcount ≤ 100
-                    println("J[$t,$p,$f,$b] = $(convert(NTuple{2,Int8}, J_output[t,p,f,b]))")
+        println("Running kernel...")
+        attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem_bytes
+        kernel(A_mem, E_mem, J_mem, E_shared, Ju_shared; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
+        synchronize()
+
+        println("Copying outputs from device...")
+        E_shared = Array(E_shared)
+        Ju_shared = Array(Ju_shared)
+
+        J_mem = Array(J_mem)
+
+        println("Checking outputs...")
+        J_output = reshape(reinterpret(Int4x2, J_mem), nextpow(2, T), 2, nextpow(2, F), nextpow(2, B))
+        let
+            errcount = 0
+            for b in 1:B, f in 1:F, p in 1:2, t in 1:T
+                want_jval = (b == ibeam && f == ifreq && p == ipolr && t == itime) ? jval : 0
+                have_jval′ = convert(NTuple{2,Int32}, J_output[t, p, f, b])
+                have_jval = have_jval′[1] + im * have_jval′[2]
+                if have_jval ≠ want_jval
+                    errcount += 1
+                    if errcount ≤ 100
+                        println("J[$t,$p,$f,$b] = $have_jval   (want $want_jval)")
+                    end
                 end
             end
+            println("There are $errcount errors")
         end
-        println("There are $nzcount non-zero elements")
     end
 
     println("Done.")
@@ -859,7 +884,7 @@ if CUDA.functional()
     # @device_code_warntype runcuda()
     # @device_code_llvm runcuda()
     # @device_code_ptx runcuda()
-    @device_code_sass runcuda()
+    # @device_code_sass runcuda()
     # @device_code runcuda()
-    # runcuda()
+    runcuda()
 end
