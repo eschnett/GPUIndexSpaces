@@ -819,7 +819,7 @@ const Ju_shared_offset = E_shared_length
 const shmem_length = E_shared_length + Ju_shared_length
 const shmem_bytes = sizeof(Int32) * shmem_length
 
-@eval function runsteps(A_mem, E_mem, s_mem, J_mem, E_shared, Ju_shared)
+@eval function runsteps(A_mem, E_mem, s_mem, J_mem)
     E_shared = @cuDynamicSharedMem(Int4x8, $E_shared_size, $(sizeof(Int32) * E_shared_offset))
     Ju_shared = @cuDynamicSharedMem(Int16x2, $Ju_shared_size, $(sizeof(Int32) * Ju_shared_offset))
     $(declarations(bb_allsteps))
@@ -833,7 +833,7 @@ function runcuda()
 
     Random.seed!(0)
     niters = 1
-    nruns = 3
+    nruns = 0
     for iter in 1:niters
         println("Iteration $iter:")
         println("    Setting up inputs...")
@@ -890,16 +890,11 @@ function runcuda()
         s_mem = reinterpret(Int32, reshape(s_input, :))
         J_mem = reinterpret(Int4x8, reshape(J_input, :))
 
-        E_shared = zeros(Int4x8, E_shared_size)
-        Ju_shared = zeros(Int16x2, Ju_shared_size)
-
         println("    Copying inputs to device...")
         A_mem = CuArray(A_mem)
         E_mem = CuArray(E_mem)
         s_mem = CuArray(s_mem)
         J_mem = CuArray(J_mem)
-        E_shared = CuArray(E_shared)
-        Ju_shared = CuArray(Ju_shared)
 
         println("    Compiling kernel...")
         nthreads = 32
@@ -910,25 +905,24 @@ function runcuda()
         blocks_per_sm = 1
         # maxregs = 65536 ÷ (nthreads * nwarps * blocks_per_sm)
         kernel = @cuda launch = false minthreads = nthreads * nwarps blocks_per_sm = blocks_per_sm runsteps(
-            A_mem, E_mem, s_mem, J_mem, E_shared, Ju_shared
+            A_mem, E_mem, s_mem, J_mem
         )
 
         println("    Running kernel...")
         attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem_bytes
-        for run in 1:nruns
-            stats = @timed begin
-                kernel(
-                    A_mem, E_mem, s_mem, J_mem, E_shared, Ju_shared; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes
-                )
-                synchronize()
-            end
-            println("        run time: $(stats.time * 1.0e+6) μsec")
-        end
+        kernel(A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
+        synchronize()
+        #TODO for run in 1:nruns
+        #TODO     stats = @timed begin
+        #TODO         kernel(
+        #TODO             A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes
+        #TODO         )
+        #TODO         synchronize()
+        #TODO     end
+        #TODO     println("        run time: $(stats.time * 1.0e+6) μsec")
+        #TODO end
 
         println("    Copying outputs from device...")
-        E_shared = Array(E_shared)
-        Ju_shared = Array(Ju_shared)
-
         J_mem = Array(J_mem)
 
         println("    Checking outputs...")

@@ -6,6 +6,24 @@ Copy source code to Sky:
 ```sh
 rsync -Paz --exclude .git --exclude *.toml ~/src/jl/GPUIndexSpaces.jl sky.lwlab:src/jl
 ```
+Run normally:
+```sh
+julia --project=@. kernel/bb.jl
+```
+
+Run with profiling:
+```sh
+ncu -o profile --set full --target-processes all env LD_LIBRARY_PATH="/home/eschnett/julia-1.8/lib/julia:$LD_LIBRARY_PATH" ~/julia-1.8/bin/julia --project=@. kernels/bb.jl
+```
+The juliaup-installed Julia does not work.
+One cannot extract PTX or SASS while profiling.
+
+## How to run on Sky (old)
+
+Copy source code to Sky:
+```sh
+rsync -Paz --exclude .git --exclude *.toml ~/src/jl/GPUIndexSpaces.jl sky.lwlab:src/jl
+```
 
 Run normally:
 ```sh

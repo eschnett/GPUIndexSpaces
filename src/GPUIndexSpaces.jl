@@ -1,5 +1,6 @@
 module GPUIndexSpaces
 
+using BFloat16s
 using CUDA
 using LLVM
 using OrderedCollections
