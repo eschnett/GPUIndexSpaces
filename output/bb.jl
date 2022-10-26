@@ -1,4 +1,4 @@
-# { Load from memory; Rename indices Dict{Index{:Dish}, Index{:Dish′}}(Dish(2) => Dish′(4), Dish(6) => Dish′(3), Dish(7) => Dish′(7), Dish(8) => Dish′(8), Dish(5) => Dish′(2), Dish(1) => Dish′(1), Dish(3) => Dish′(5), Dish(0) => Dish′(0), Dish(4) => Dish′(6)); Permute Register(0) and SIMD(4); Permute Register(0) and SIMD(3); loop }
+# { Load from memory; Rename indices Dict{Index{:Dish}, Index{:Dish′}}(Dish(5) => Dish′(2), Dish(7) => Dish′(7), Dish(4) => Dish′(6), Dish(8) => Dish′(8), Dish(0) => Dish′(0), Dish(6) => Dish′(3), Dish(1) => Dish′(1), Dish(2) => Dish′(4), Dish(3) => Dish′(5)); Permute Register(0) and SIMD(4); Permute Register(0) and SIMD(3); loop }
 #     Inputs: []
 #     Outputs: [A, A0, A1, A10, A11, A2, Aim, Are, E0, E1, E2, E2im, E2re, Ecopy, J, J2, J2′, J3, Jper, Jper2, Jper3, Jper4, Jper5, Jper6, Jper7, Jstore, Ju, Ju0, Ju1, Ju10, Ju11, Ju11a, Ju11b, Ju12, Ju12a, Ju12b, Ju2, Ju4, Juim, Juim1, Jure, Jure1, Jure2, s]
 #         A::Int32
@@ -1381,102 +1381,77 @@ begin
 end
 begin
     begin
-        A0_0 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_1 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 1 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_2 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 2 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_3 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 3 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_4 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 4 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_5 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 5 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_6 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 6 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_7 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 7 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_8 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 8 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_9 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 9 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_10 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 10 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_11 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 11 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_12 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 12 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_13 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 13 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_14 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 14 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_15 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 15 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_16 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + 2048 % Int32)]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_17 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (1 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_18 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (2 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_19 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (3 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_20 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (4 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_21 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (5 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_22 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (6 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_23 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (7 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_24 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (8 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_25 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (9 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_26 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (10 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_27 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (11 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_28 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (12 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_29 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (13 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_30 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (14 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-        A0_31 = @inbounds(
-            A_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) + (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) + (15 + 2048))]::Int8x4
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
+        (A0_0, A0_1, A0_2, A0_3) = unsafe_load4_global(
+            A_mem,
+            1 + (
+                ((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f +
+                (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) +
+                (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06)
+            ),
+        )::NTuple{4,Int8x4}
+        (A0_4, A0_5, A0_6, A0_7) = unsafe_load4_global(
+            A_mem,
+            1 + (
+                ((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f +
+                (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) +
+                (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) +
+                4 % Int32
+            ),
+        )::NTuple{4,Int8x4}
+        (A0_8, A0_9, A0_10, A0_11) = unsafe_load4_global(
+            A_mem,
+            1 + (
+                ((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f +
+                (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) +
+                (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) +
+                8 % Int32
+            ),
+        )::NTuple{4,Int8x4}
+        (A0_12, A0_13, A0_14, A0_15) = unsafe_load4_global(
+            A_mem,
+            1 + (
+                ((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f +
+                (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) +
+                (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) +
+                12 % Int32
+            ),
+        )::NTuple{4,Int8x4}
+        (A0_16, A0_17, A0_18, A0_19) = unsafe_load4_global(
+            A_mem,
+            1 + (
+                ((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f +
+                (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) +
+                (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) +
+                2048 % Int32
+            ),
+        )::NTuple{4,Int8x4}
+        (A0_20, A0_21, A0_22, A0_23) = unsafe_load4_global(
+            A_mem,
+            1 + (
+                ((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f +
+                (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) +
+                (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) +
+                (4 + 2048)
+            ),
+        )::NTuple{4,Int8x4}
+        (A0_24, A0_25, A0_26, A0_27) = unsafe_load4_global(
+            A_mem,
+            1 + (
+                ((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f +
+                (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) +
+                (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) +
+                (8 + 2048)
+            ),
+        )::NTuple{4,Int8x4}
+        (A0_28, A0_29, A0_30, A0_31) = unsafe_load4_global(
+            A_mem,
+            1 + (
+                ((((blockIdx()).x - 1) % Int32) & 0x01) << 0x0f +
+                (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x06 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0a) +
+                (((((threadIdx()).x - 1) % Int32) & 0x03) << 0x04 + ((((threadIdx()).x - 1) % Int32) & 0x1c) << 0x06) +
+                (12 + 2048)
+            ),
+        )::NTuple{4,Int8x4}
     end
     begin
         A1_0 = A0_0
@@ -1646,37 +1621,33 @@ begin
     end
     for loopIdx1 in Int32(0):Int32(32768 ÷ 128 - 1)
         for loopIdx2 in Int32(0):Int32(128 ÷ 32 - 1)
-            begin
-                Ecopy_0 = @inbounds(
-                    E_mem[1 + (((loopIdx2 % Int32) & 0x03) << 0x13 + ((loopIdx1 % Int32) & 0xff) << 0x15 + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x07 + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0e) + (((((threadIdx()).x - 1) % Int32) & 0x07) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) << 0x0b))]::Int4x8
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-                Ecopy_1 = @inbounds(
-                    E_mem[1 + (((loopIdx2 % Int32) & 0x03) << 0x13 + ((loopIdx1 % Int32) & 0xff) << 0x15 + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x07 + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0e) + (((((threadIdx()).x - 1) % Int32) & 0x07) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) << 0x0b) + 1 % Int32)]::Int4x8
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-                Ecopy_2 = @inbounds(
-                    E_mem[1 + (((loopIdx2 % Int32) & 0x03) << 0x13 + ((loopIdx1 % Int32) & 0xff) << 0x15 + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x07 + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0e) + (((((threadIdx()).x - 1) % Int32) & 0x07) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) << 0x0b) + 2 % Int32)]::Int4x8
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-                Ecopy_3 = @inbounds(
-                    E_mem[1 + (((loopIdx2 % Int32) & 0x03) << 0x13 + ((loopIdx1 % Int32) & 0xff) << 0x15 + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x07 + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0e) + (((((threadIdx()).x - 1) % Int32) & 0x07) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) << 0x0b) + 3 % Int32)]::Int4x8
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
-            end
+            (Ecopy_0, Ecopy_1, Ecopy_2, Ecopy_3) = unsafe_load4_global(
+                E_mem,
+                1 + (
+                    ((loopIdx2 % Int32) & 0x03) << 0x13 +
+                    ((loopIdx1 % Int32) & 0xff) << 0x15 +
+                    ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x07 +
+                    (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x0e) +
+                    (((((threadIdx()).x - 1) % Int32) & 0x07) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) << 0x0b)
+                ),
+            )::NTuple{4,Int4x8}
             begin
                 @inbounds E_shared[
                     1 + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x07) << 0x02) + 0,
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
-                ] = Ecopy_0                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1876 =#
+                ] = Ecopy_0                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1949 =#
                 @inbounds E_shared[
                     1 + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x07) << 0x02 + 1 % Int32) + 0,
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
-                ] = Ecopy_1                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1876 =#
+                ] = Ecopy_1                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1949 =#
                 @inbounds E_shared[
                     1 + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x07) << 0x02 + 2 % Int32) + 0,
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
-                ] = Ecopy_2                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1876 =#
+                ] = Ecopy_2                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1949 =#
                 @inbounds E_shared[
                     1 + (((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x07) << 0x02 + 3 % Int32) + 0,
                     1 + ((((threadIdx()).y - 1) % Int32) & 0x1c + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
-                ] = Ecopy_3                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1876 =#
+                ] = Ecopy_3                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1949 =#
             end
             sync_threads()
             for loopIdx3 in Int32(0):Int32(32 ÷ 8 - 1)
@@ -1850,7 +1821,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -1969,7 +1940,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -2088,7 +2059,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -2207,7 +2178,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -2326,7 +2297,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -2445,7 +2416,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -2564,7 +2535,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -2683,7 +2654,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -2756,12 +2727,12 @@ begin
                                 1 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02) + 0,
                                 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x01),
                                 1 + (((threadIdx()).y - 1) % Int32) & 0x03,
-                            ] = Ju4_0                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1874 =#
+                            ] = Ju4_0                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1947 =#
                             @inbounds Ju_shared[
                                 1 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02) + 0,
                                 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x01 + 1 % Int32),
                                 1 + (((threadIdx()).y - 1) % Int32) & 0x03,
-                            ] = Ju4_1                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1874 =#
+                            ] = Ju4_1                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1947 =#
                         end
                     end
                 end
@@ -2935,7 +2906,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -3054,7 +3025,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -3173,7 +3144,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -3292,7 +3263,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -3411,7 +3382,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -3530,7 +3501,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -3649,7 +3620,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -3768,7 +3739,7 @@ begin
                                             1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x03),
                                             1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02),
                                         ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1820 =#
+                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1892 =#
                                     E1 = E0
                                     (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
@@ -3841,12 +3812,12 @@ begin
                                 1 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02) + 0,
                                 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x01),
                                 1 + (((threadIdx()).y - 1) % Int32) & 0x03,
-                            ] = Ju4_0                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1874 =#
+                            ] = Ju4_0                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1947 =#
                             @inbounds Ju_shared[
                                 1 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - 1) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x1c) >>> 0x02) + 0,
                                 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x03) << 0x01 + 1 % Int32),
                                 1 + (((threadIdx()).y - 1) % Int32) & 0x03,
-                            ] = Ju4_1                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1874 =#
+                            ] = Ju4_1                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1947 =#
                         end
                     end
                 end
@@ -3859,112 +3830,112 @@ begin
                         1 + (((threadIdx()).x - 1) % Int32) & 0x07,
                         1 + 0x00,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_1 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + (((threadIdx()).x - 1) % Int32) & 0x07,
                         1 + 1 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_2 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + (((threadIdx()).x - 1) % Int32) & 0x07,
                         1 + 2 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_3 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + (((threadIdx()).x - 1) % Int32) & 0x07,
                         1 + 3 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_8 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 8 % Int32),
                         1 + 0x00,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_9 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 8 % Int32),
                         1 + 1 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_10 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 8 % Int32),
                         1 + 2 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_11 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 8 % Int32),
                         1 + 3 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_16 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 16 % Int32),
                         1 + 0x00,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_17 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 16 % Int32),
                         1 + 1 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_18 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 16 % Int32),
                         1 + 2 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_19 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 16 % Int32),
                         1 + 3 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_24 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 24 % Int32),
                         1 + 0x00,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_25 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 24 % Int32),
                         1 + 1 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_26 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 24 % Int32),
                         1 + 2 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
                 Ju10_27 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - 1) % Int32) & 0x07 + 24 % Int32),
                         1 + 3 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1818 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1890 =#
             end
             begin
                 (Ju11_0, Ju11_4) = convert(NTuple{2,Int32}, Ju10_0)
@@ -4066,7 +4037,7 @@ begin
             end
             s = @inbounds(
                 s_mem[1 + (((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x07 + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x18) >>> 0x03)]::Int32
-            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1822 =#
+            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1894 =#
             begin
                 J2_0 = ((J_0 + Int32(1) << (s % UInt32 - UInt32(1))) >> (s % UInt32))::Int32
                 J2_4 = ((J_4 + Int32(1) << (s % UInt32 - UInt32(1))) >> (s % UInt32))::Int32
@@ -4295,13 +4266,13 @@ begin
         end
         begin
             @inbounds J_mem[1 + (((loopIdx1 % Int32) & 0xff) << 0x05 + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x0d + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x16 + (((((threadIdx()).x - 1) % Int32) & 0x04) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x18) << 0x11)) + 0] =
-                Jstore_0            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1878 =#
+                Jstore_0            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1951 =#
             @inbounds J_mem[1 + (((loopIdx1 % Int32) & 0xff) << 0x05 + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x0d + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x16 + (((((threadIdx()).x - 1) % Int32) & 0x04) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x18) << 0x11) + 1 % Int32) + 0] =
-                Jstore_1            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1878 =#
+                Jstore_1            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1951 =#
             @inbounds J_mem[1 + (((loopIdx1 % Int32) & 0xff) << 0x05 + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x0d + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x16 + (((((threadIdx()).x - 1) % Int32) & 0x04) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x18) << 0x11) + 2 % Int32) + 0] =
-                Jstore_2            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1878 =#
+                Jstore_2            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1951 =#
             @inbounds J_mem[1 + (((loopIdx1 % Int32) & 0xff) << 0x05 + ((((blockIdx()).x - 1) % Int32) & 0x7f) << 0x0d + ((((threadIdx()).y - 1) % Int32) & 0x1f) << 0x16 + (((((threadIdx()).x - 1) % Int32) & 0x04) << 0x01 + ((((threadIdx()).x - 1) % Int32) & 0x01) << 0x02 + ((((threadIdx()).x - 1) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - 1) % Int32) & 0x18) << 0x11) + 3 % Int32) + 0] =
-                Jstore_3            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1878 =#
+                Jstore_3            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1951 =#
         end
     end
 end

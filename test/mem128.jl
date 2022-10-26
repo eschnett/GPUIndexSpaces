@@ -53,6 +53,20 @@ function load_global(ptr::Core.LLVMPtr{Int128,1})
 end
 load_global(arr::CuDeviceVector{Int128}, idx::Integer) = load_global(pointer(arr, idx))
 
+function load_global(ptr::Core.LLVMPtr{Int32,1})
+    return Base.llvmcall(
+        """
+           %ptr = bitcast i8 addrspace(1)* %0 to [4 x i32] addrspace(1)*
+           %val = load [4 x i32], [4 x i32] addrspace(1)* %ptr, align 16
+           ret [4 x i32] %val
+        """,
+        NTuple{4,Int32},
+        Tuple{Core.LLVMPtr{Int32,1}},
+        ptr,
+    )
+end
+load_global(arr::CuDeviceVector{Int32}, idx::Integer) = load_global(pointer(arr, idx))
+
 function store_global!(ptr::Core.LLVMPtr{Int128,1}, val::NTuple{4,Int32})
     # st.global.v4.u32        [%rd6], {%r2, %r3, %r4, %r5};
 
@@ -85,6 +99,21 @@ function store_global!(ptr::Core.LLVMPtr{Int128,1}, val::NTuple{4,Int32})
 end
 store_global!(arr::CuDeviceVector{Int128}, idx::Integer, val) = store_global!(pointer(arr, idx), val)
 
+function store_global!(ptr::Core.LLVMPtr{Int32,1}, val::NTuple{4,Int32})
+    return Base.llvmcall(
+        """
+           %ptr = bitcast i8 addrspace(1)* %0 to [4 x i32] addrspace(1)*
+           store [4 x i32] %1, [4 x i32] addrspace(1)* %ptr, align 16
+           ret void
+        """,
+        Nothing,
+        Tuple{Core.LLVMPtr{Int32,1},NTuple{4,Int32}},
+        ptr,
+        val,
+    )
+end
+store_global!(arr::CuDeviceVector{Int32}, idx::Integer, val) = store_global!(pointer(arr, idx), val)
+
 function copy(A, B)
     @inbounds A[threadIdx().x] = B[threadIdx().x]
     return nothing
@@ -101,11 +130,18 @@ function runcuda()
     # B = CuArray(zeros(Int128, 32))
     # @cuda threads = (1, 1) blocks = 1 copy(A, B)
 
-    B = CuArray(-ones(Int128, 32))
+    # B = CuArray(-ones(Int128, 32))
+    # @show B
+    # A = CuArray(zeros(Int128, 32))
+    # @cuda threads = (32, 1) blocks = 1 copy4(A, B)
+    # # @cuda launch = false copy4(A, B)
+
+    B = CuArray(-ones(Int32, 4 * 32))
     @show B
-    A = CuArray(zeros(Int128, 32))
+    A = CuArray(zeros(Int32, 4 * 32))
     @cuda threads = (32, 1) blocks = 1 copy4(A, B)
     # @cuda launch = false copy4(A, B)
+
     synchronize()
     @show A
 end

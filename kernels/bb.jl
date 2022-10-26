@@ -348,7 +348,7 @@ function read_A!(steps::Vector{AbstractStep}, env::Environment)
             ),
         )
     end
-    load!(steps, env, :A0, map_A0_registers, :A_mem, map_A_global)
+    load!(steps, env, :A0, map_A0_registers, :A_mem, map_A_global; align=16)
     rename!(steps, env, :A1, :A0, Dict(Dish(d) => Dish′(dish2dish′[d]) for d in 0:8))
     permute!(steps, env, :A2, :A1, Register(0), SIMD(4))
     permute!(steps, env, :A, :A2, Register(0), SIMD(3))
@@ -358,8 +358,8 @@ end
 
 # Step 1: transferring global memory to shared memory
 function copy_E!(steps::Vector{AbstractStep}, env::Environment)
-    load!(steps, env, :Ecopy, map_Ecopy_registers, :E_mem, map_E_global)
-    store!(steps, env, :Ecopy, :E_shared, map_E_shared)
+    load!(steps, env, :Ecopy, map_Ecopy_registers, :E_mem, map_E_global; align=16)
+    store!(steps, env, :Ecopy, :E_shared, map_E_shared; align=4)
     sync_threads!(steps, env)
     return nothing
 end
@@ -438,7 +438,7 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                         ),
                     )
                 end
-                load!(steps, env, :E0, map_E0_registers, :E_shared, map_E_shared)
+                load!(steps, env, :E0, map_E0_registers, :E_shared, map_E_shared; align=4)
                 rename!(steps, env, :E1, :E0, Dict(Dish(d) => Dish′(dish2dish′[d]) for d in 0:8))
                 @assert env[:E1] == map_E_registers
 
@@ -554,7 +554,7 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                 )
             end
 
-            store!(steps, env, :Ju4, :Ju_shared, map_Ju_shared)
+            store!(steps, env, :Ju4, :Ju_shared, map_Ju_shared; align=4)
 
             nothing
         end                     # LoopB
@@ -597,12 +597,14 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
             ),
         )
     end
-    load!(steps, env, :Ju10, map_Ju10_registers, :Ju_shared, map_Ju_shared)
+    load!(steps, env, :Ju10, map_Ju10_registers, :Ju_shared, map_Ju_shared; align=4)
     widen!(steps, env, :Ju11, :Ju10, SIMD(4) => Register(2))
     split!(steps, env, :Ju11a, :Ju11b, :Ju11, Register(0))
-    apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :(add_sat($Ju11a, $Ju11b)))
+    #TODO apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :(add_sat($Ju11a, $Ju11b)))
+    apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :($Ju11a + $Ju11b))
     split!(steps, env, :Ju12a, :Ju12b, :Ju12, Register(1))
-    apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :(add_sat($Ju12a, $Ju12b)))
+    #TODO apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :(add_sat($Ju12a, $Ju12b)))
+    apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :($Ju12a + $Ju12b))
     # Section 5, eqn. (24)
     map_J_registers = let
         b = -1
@@ -635,7 +637,6 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
     @assert env[:J] == map_J_registers
 
     # TODO: Load in the beginning, save in a register?
-    load!(steps, env, :s, map_s_registers, :s_mem, map_s_global)
     apply!(steps, env, :J2, :J, :s, (J, s) -> :(($J + (Int32(1) << ($s % UInt32 - UInt32(1)))) >> (s % UInt32)))
     # apply!(steps, env, :J2, :J, J -> :($J))
 
@@ -777,13 +778,14 @@ function write_J!(steps::Vector{AbstractStep}, env::Environment)
     end
     @assert env[:Jstore] == map_Jstore_registers
 
-    # TODO: Use 16-byte stores
-    store!(steps, env, :Jstore, :J_mem, map_J_global)
+    store!(steps, env, :Jstore, :J_mem, map_J_global; align=16)
 
     return nothing
 end
 
 function bb!(steps::Vector{AbstractStep}, env::Environment)
+    #UNDO load!(steps, env, :s, map_s_registers, :s_mem, map_s_global)
+    constant!(steps, env, :s, map_s_registers, :(Int32(0)))
     read_A!(steps, env)
     @assert T % T1 == 0
     loop!(steps, env, loopIdxT, :(Int32(0):Int32($T ÷ $T1 - 1)), [Time(t) for t in 7:14]) do steps, env
@@ -814,14 +816,16 @@ const E_shared_length = prod(E_shared_size)
 const Ju_shared_length = prod(Ju_shared_size)
 
 const E_shared_offset = 0
-const Ju_shared_offset = E_shared_length
+const Ju_shared_offset = (E_shared_offset + E_shared_length + 31) & ~31
 
-const shmem_length = E_shared_length + Ju_shared_length
+const shmem_length = (Ju_shared_offset + Ju_shared_length + 31) & ~31
 const shmem_bytes = sizeof(Int32) * shmem_length
 
 @eval function runsteps(A_mem, E_mem, s_mem, J_mem)
     E_shared = @cuDynamicSharedMem(Int4x8, $E_shared_size, $(sizeof(Int32) * E_shared_offset))
+    @assert UInt(pointer(E_shared)) & 127 == 0
     Ju_shared = @cuDynamicSharedMem(Int16x2, $Ju_shared_size, $(sizeof(Int32) * Ju_shared_offset))
+    @assert UInt(pointer(Ju_shared)) & 127 == 0
     $(declarations(bb_allsteps))
     $(code(bb_allsteps))
     return nothing

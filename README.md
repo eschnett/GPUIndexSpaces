@@ -8,12 +8,12 @@ rsync -Paz --exclude .git --exclude *.toml ~/src/jl/GPUIndexSpaces.jl sky.lwlab:
 ```
 Run normally:
 ```sh
-julia --project=@. kernel/bb.jl
+julia --project=@. --optimize=3 kernel/bb.jl
 ```
 
 Run with profiling:
 ```sh
-ncu -o profile --set full --target-processes all env LD_LIBRARY_PATH="/home/eschnett/julia-1.8/lib/julia:$LD_LIBRARY_PATH" ~/julia-1.8/bin/julia --project=@. kernels/bb.jl
+ncu -f -o profile --set full --target-processes all env LD_LIBRARY_PATH="/home/eschnett/julia-1.8/lib/julia:$LD_LIBRARY_PATH" ~/julia-1.8/bin/julia --project=@. --optimize=3 kernels/bb.jl
 ```
 The juliaup-installed Julia does not work.
 One cannot extract PTX or SASS while profiling.

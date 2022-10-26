@@ -40,6 +40,7 @@ Int4x2(a1::Int32, a2::Int32) = Int4x2((a1 << 0x00) & 0x0f | (a2 << 0x04) & 0xf0)
 
 Base.convert(::Type{Int4x2}, a::NTuple{2,Int8}) = Int4x2(a[1], a[2])
 function Base.convert(::Type{NTuple{2,Int8}}, a::Int4x2)
+    # TODO: Merge the `⊻ 0x88` and the `& 0x0f` into a single LOP3
     a1 = a.val ⊻ 0x88                  # a + 8
     a2_lo = a1 & 0x0f                  # extract low part
     a3_lo = a2_lo + 0x78               # a + 128
@@ -347,7 +348,7 @@ end
 
 # Int32
 export add_sat
-add_sat(x::Int32, y::Int32) = clamp(Int64(x) + y, Int32)
+add_sat(x::Int32, y::Int32) = clamp(Int64(x) + Int64(y), Int32)
 CUDA.@device_override function add_sat(x::Int32, y::Int32)
     LLVM.Interop.@asmcall("add.sat.s32 \$0, \$1, \$2;", "=r,r,r", Int32, Tuple{Int32,Int32}, x, y)
 end
@@ -562,6 +563,77 @@ CUDA.@device_override bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32)
 export bitwise_merge
 
 bitwise_merge(mask::Code, iffalse::Code, iftrue::Code) = :(cuda_lop3($iftrue, $iffalse, $mask, 0xe4)::UInt32)
+
+export unsafe_load4_global
+# Address space 1 is global, 3 is shared
+function unsafe_load4_global(ptr::Core.LLVMPtr{Int32,1})
+    return Base.llvmcall(
+        """
+           %ptr = bitcast i8 addrspace(1)* %0 to [4 x i32] addrspace(1)*
+           %val = load [4 x i32], [4 x i32] addrspace(1)* %ptr, align 16
+           ret [4 x i32] %val
+        """,
+        NTuple{4,Int32},
+        Tuple{Core.LLVMPtr{Int32,1}},
+        ptr,
+    )
+end
+function unsafe_load4_global(ptr::Core.LLVMPtr{Int32,3})
+    return Base.llvmcall(
+        """
+           %ptr = bitcast i8 addrspace(3)* %0 to [4 x i32] addrspace(3)*
+           %val = load [4 x i32], [4 x i32] addrspace(3)* %ptr, align 16
+           ret [4 x i32] %val
+        """,
+        NTuple{4,Int32},
+        Tuple{Core.LLVMPtr{Int32,3}},
+        ptr,
+    )
+end
+unsafe_load4_global(arr::CuDeviceArray{Int32}, idx::Integer) = unsafe_load4_global(pointer(arr, idx))
+function unsafe_load4_global(arr::CuDeviceArray{T}, idx::Integer) where {T}
+    @assert sizeof(T) == sizeof(Int32)
+    res = unsafe_load4_global(reinterpret(Int32, arr), idx)::NTuple{4,Int32}
+    # return ntuple(n -> reinterpret(T, res[n]), 4)::NTuple{4,T}
+    return ntuple(n -> T(res[n] % UInt32), 4)::NTuple{4,T}
+end
+
+export unsafe_store4_global!
+# Address space 1 is global, 3 is shared
+function unsafe_store4_global!(ptr::Core.LLVMPtr{Int32,1}, val::NTuple{4,Int32})
+    return Base.llvmcall(
+        """
+           %ptr = bitcast i8 addrspace(1)* %0 to [4 x i32] addrspace(1)*
+           store [4 x i32] %1, [4 x i32] addrspace(1)* %ptr, align 16
+           ret void
+        """,
+        Nothing,
+        Tuple{Core.LLVMPtr{Int32,1},NTuple{4,Int32}},
+        ptr,
+        val,
+    )
+end
+function unsafe_store4_global!(ptr::Core.LLVMPtr{Int32,3}, val::NTuple{4,Int32})
+    return Base.llvmcall(
+        """
+           %ptr = bitcast i8 addrspace(3)* %0 to [4 x i32] addrspace(3)*
+           store [4 x i32] %1, [4 x i32] addrspace(3)* %ptr, align 16
+           ret void
+        """,
+        Nothing,
+        Tuple{Core.LLVMPtr{Int32,3},NTuple{4,Int32}},
+        ptr,
+        val,
+    )
+end
+function unsafe_store4_global!(arr::CuDeviceArray{Int32}, idx::Integer, val::NTuple{4,Int32})
+    return unsafe_store4_global!(pointer(arr, idx), val)
+end
+function unsafe_store4_global!(arr::CuDeviceArray{T}, idx::Integer, val::NTuple{4,T}) where {T}
+    @assert sizeof(T) == sizeof(Int32)
+    val′ = ntuple(n -> val[n].val % Int32, 4)::NTuple{4,Int32}
+    return unsafe_store4_global!(reinterpret(Int32, arr), idx, val′)
+end
 
 ################################################################################
 
@@ -1728,7 +1800,7 @@ function make_indices(
             push!(
                 expressions,
                 movebits(
-                    :((blockIdx().x - 1) % $SizeT),
+                    :((blockIdx().x - Int32(1)) % $SizeT),
                     [
                         BitMap(bl.bit, (memmap[inv_idxmap[bl]]::MemoryN).bit) for
                         bl in blocks if inv_idxmap[bl] ∉ ignore && memmap[inv_idxmap[bl]] isa MemoryN
@@ -1739,7 +1811,7 @@ function make_indices(
             push!(
                 expressions,
                 movebits(
-                    :((threadIdx().y - 1) % $SizeT),
+                    :((threadIdx().y - Int32(1)) % $SizeT),
                     [
                         BitMap(wr.bit, (memmap[inv_idxmap[wr]]::MemoryN).bit) for
                         wr in warps if inv_idxmap[wr] ∉ ignore && memmap[inv_idxmap[wr]] isa MemoryN
@@ -1751,7 +1823,7 @@ function make_indices(
                 expressions,
                 flag_if_bank_conflict(
                     movebits(
-                        :((threadIdx().x - 1) % $SizeT),
+                        :((threadIdx().x - Int32(1)) % $SizeT),
                         [
                             BitMap(thr.bit, (memmap[inv_idxmap[thr]]::MemoryN).bit) for
                             thr in threads if inv_idxmap[thr] ∉ ignore && memmap[inv_idxmap[thr]] isa MemoryN
@@ -1790,13 +1862,29 @@ function make_indices(
 end
 
 export load!
-function load!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsmap::Layout, mem::Symbol, memmap::Layout)
+function load!(
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsmap::Layout, mem::Symbol, memmap::Layout; align::Int=4
+)
+    @assert ispow2(align)
     @assert lhs ∉ keys(env)
     type = get_type(lhsmap)
     env[lhs] = lhsmap
 
     registers = [v for (k, v) in lhsmap if v isa Register]
     register_mask = sum(UInt[1 << reg.bit for reg in registers])
+
+    use_load2 = false
+    if align ≥ 8 && Memory(0) ∈ values(memmap)
+        membit0 = inv(memmap)[Memory(0)]
+        load2_reg = lhsmap[membit0]
+        use_load2 = load2_reg isa Register
+    end
+    use_load4 = false
+    if use_load2 && align ≥ 16 && Memory(1) ∈ values(memmap)
+        membit1 = inv(memmap)[Memory(1)]
+        load4_reg = lhsmap[membit1]
+        use_load4 = load4_reg isa Register
+    end
 
     indices = make_indices(lhsmap, memmap)
     have_memory2 = any(v -> v isa Memory2, values(memmap))
@@ -1815,12 +1903,41 @@ function load!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsma
             # It is important to write `1 + $expression` instead of
             # `$expression + 1`, so that the added `1` can be combined
             # with the subtracted `1` in the `getindex` function.
-            if have_memory3
-                push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2, 1 + $index3]::$type))
-            elseif have_memory2
-                push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2]::$type))
+            if use_load4
+                load2_regmask = 1 << load2_reg.bit
+                load4_regmask = 1 << load4_reg.bit
+                if r & (load4_regmask | load2_regmask) == 0
+                    @assert register_mask ≠ 0
+                    lhsname0 = Symbol(lhs, "_$r")
+                    lhsname1 = Symbol(lhs, "_$(r | load2_regmask)")
+                    lhsname2 = Symbol(lhs, "_$(r | load4_regmask)")
+                    lhsname3 = Symbol(lhs, "_$(r | load4_regmask | load2_regmask)")
+                    if have_memory3
+                        @assert false
+                    elseif have_memory2
+                        @assert false
+                    else
+                        push!(
+                            stmts,
+                            :(
+                                # ($lhsname0, $lhsname1, $lhsname2, $lhsname3) =
+                                #     ($mem[1 + $index], $mem[2 + $index], $mem[3 + $index], $mem[4 + $index])::NTuple{4,$type}
+                                ($lhsname0, $lhsname1, $lhsname2, $lhsname3) =
+                                    unsafe_load4_global($mem, 1 + $index)::NTuple{4,$type}
+                            ),
+                        )
+                    end
+                end
+            elseif use_load2
+                @assert false
             else
-                push!(stmts, :($lhsname = @inbounds $mem[1 + $index]::$type))
+                if have_memory3
+                    push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2, 1 + $index3]::$type))
+                elseif have_memory2
+                    push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2]::$type))
+                else
+                    push!(stmts, :($lhsname = @inbounds $mem[1 + $index]::$type))
+                end
             end
         end
     end
@@ -1846,11 +1963,26 @@ function store!(
     operator::Symbol=:(=),
     ignore::Set{<:Index}=Set{Index}(),
     offset::Code=Int32(0),
+    align::Int=4,
 )
+    @assert ispow2(align)
     rhsmap = env[rhs]
 
     registers = [v for (k, v) in rhsmap if v isa Register]
     register_mask = sum(UInt[1 << reg.bit for reg in registers])
+
+    use_store2 = false
+    if align ≥ 8 && Memory(0) ∈ values(memmap)
+        membit0 = inv(memmap)[Memory(0)]
+        store2_reg = rhsmap[membit0]
+        use_store2 = store2_reg isa Register
+    end
+    use_store4 = false
+    if use_store2 && align ≥ 16 && Memory(1) ∈ values(memmap)
+        membit1 = inv(memmap)[Memory(1)]
+        store4_reg = rhsmap[membit1]
+        use_store4 = store4_reg isa Register
+    end
 
     indices = make_indices(rhsmap, memmap; ignore)
     have_memory2 = any(v -> v isa Memory2, values(memmap))
@@ -1870,19 +2002,54 @@ function store!(
             # It is important to write `1 + $expression` instead of
             # `$expression + 1`, so that the added `1` can be combined
             # with the subtracted `1` in the `getindex` function.
-            if operator === :(=)
-                if have_memory3
-                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2, 1 + $index3] = $rhsname))
-                elseif have_memory2
-                    push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2] = $rhsname))
-                else
-                    push!(stmts, :(@inbounds $mem[1 + $index + $offset] = $rhsname))
+            if use_store4
+                store2_regmask = 1 << store2_reg.bit
+                store4_regmask = 1 << store4_reg.bit
+                if r & (store4_regmask | store2_regmask) == 0
+                    @assert register_mask ≠ 0
+                    rhsname0 = Symbol(rhs, "_$r")
+                    rhsname1 = Symbol(rhs, "_$(r | store2_regmask)")
+                    rhsname2 = Symbol(rhs, "_$(r | store4_regmask)")
+                    rhsname3 = Symbol(rhs, "_$(r | store4_regmask | store2_regmask)")
+                    if operator === :(=)
+                        if have_memory3
+                            @assert false
+                        elseif have_memory2
+                            push!(
+                                stmts,
+                                :(unsafe_store4_global!(
+                                    $mem,
+                                    1 + $offset + size($mem, 1) * $index2 + $index,
+                                    ($rhsname0, $rhsname1, $rhsname2, $rhsname3),
+                                )),
+                            )
+                        else
+                            push!(
+                                stmts,
+                                :(unsafe_store4_global!($mem, 1 + $index + $offset, ($rhsname0, $rhsname1, $rhsname2, $rhsname3))),
+                            )
+                        end
+                    else
+                        @assert false
+                    end
                 end
-            elseif operator === :(+=)
-                @assert !have_memory2 && !have_memory3
-                push!(stmts, :(@inbounds $mem[1 + $index] += $rhsname))
-            else
+            elseif use_store2
                 @assert false
+            else
+                if operator === :(=)
+                    if have_memory3
+                        push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2, 1 + $index3] = $rhsname))
+                    elseif have_memory2
+                        push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2] = $rhsname))
+                    else
+                        push!(stmts, :(@inbounds $mem[1 + $index + $offset] = $rhsname))
+                    end
+                elseif operator === :(+=)
+                    @assert !have_memory2 && !have_memory3
+                    push!(stmts, :(@inbounds $mem[1 + $index] += $rhsname))
+                else
+                    @assert false
+                end
             end
         end
     end
@@ -2175,7 +2342,7 @@ function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbo
             mask = $(UInt32(1 << thread.bit))
             # Thread 0: exchange register 1
             # Thread 1: exchange register 0
-            isthread1 = ((threadIdx().x - 1) % Int32) & mask ≠ 0
+            isthread1 = ((threadIdx().x - Int32(1)) % Int32) & mask ≠ 0
         end,
     )
     for r in 0:register_mask
