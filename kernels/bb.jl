@@ -326,20 +326,20 @@ function read_A!(steps::Vector{AbstractStep}, env::Environment)
         Layout(
             Int32,
             Dict(
-                Cplx(0) => SIMD(3),
-                Dish(0) => SIMD(4),
-                Dish(1) => Register(0),
-                Dish(2) => Register(1),
-                Dish(3) => Register(2),
-                Dish(4) => Register(3),
-                Dish(5) => Thread(0),
-                Dish(6) => Thread(1),
-                Dish(7) => Warp(0),
-                Dish(8) => Warp(1),
-                Beam(0) => Thread(2),
-                Beam(1) => Thread(3),
-                Beam(2) => Thread(4),
-                Beam(3) => Register(4),
+                Cplx(0) => SIMD(3),     # want Register(0)
+                Dish(0) => SIMD(4),     # want SIMD(3)
+                Dish(1) => Register(0), # want SIMD(4)
+                Dish(2) => Register(1), # final
+                Dish(3) => Thread(1),   # want Register(2)
+                Dish(4) => Thread(2),   # want Register(3)
+                Dish(5) => Thread(0),   # final
+                Dish(6) => Register(2), # want Thread(1)
+                Dish(7) => Warp(0),     # final
+                Dish(8) => Warp(1),     # final
+                Beam(0) => Register(3), # want Thread(2)
+                Beam(1) => Thread(3),   # final
+                Beam(2) => Thread(4),   # final
+                Beam(3) => Register(4), # final
                 Beam(4) => Warp(2),
                 Beam(5) => Warp(3),
                 Beam(6) => Warp(4),
@@ -350,8 +350,14 @@ function read_A!(steps::Vector{AbstractStep}, env::Environment)
     end
     load!(steps, env, :A0, map_A0_registers, :A_mem, map_A_global; align=16)
     rename!(steps, env, :A1, :A0, Dict(Dish(d) => Dish′(dish2dish′[d]) for d in 0:8))
+    # Make Dish(1) correct
     permute!(steps, env, :A2, :A1, Register(0), SIMD(4))
-    permute!(steps, env, :A, :A2, Register(0), SIMD(3))
+    # Make Cplx(0) and Dish(0) correct
+    permute!(steps, env, :A3, :A2, Register(0), SIMD(3))
+    # Make Dish(3), Dish(6) correct
+    permute!(steps, env, :A4, :A3, Register(2), Thread(1))
+    # Make Dish(4), Beam(0) correct
+    permute!(steps, env, :A, :A4, Register(3), Thread(2))
     @assert env[:A] == map_A_registers
     return nothing
 end
@@ -784,8 +790,7 @@ function write_J!(steps::Vector{AbstractStep}, env::Environment)
 end
 
 function bb!(steps::Vector{AbstractStep}, env::Environment)
-    #UNDO load!(steps, env, :s, map_s_registers, :s_mem, map_s_global)
-    constant!(steps, env, :s, map_s_registers, :(Int32(0)))
+    load!(steps, env, :s, map_s_registers, :s_mem, map_s_global)
     read_A!(steps, env)
     @assert T % T1 == 0
     loop!(steps, env, loopIdxT, :(Int32(0):Int32($T ÷ $T1 - 1)), [Time(t) for t in 7:14]) do steps, env
@@ -916,15 +921,15 @@ function runcuda()
         attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem_bytes
         kernel(A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
         synchronize()
-        #TODO for run in 1:nruns
-        #TODO     stats = @timed begin
-        #TODO         kernel(
-        #TODO             A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes
-        #TODO         )
-        #TODO         synchronize()
-        #TODO     end
-        #TODO     println("        run time: $(stats.time * 1.0e+6) μsec")
-        #TODO end
+        for run in 1:nruns
+            stats = @timed begin
+                kernel(
+                    A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes
+                )
+                synchronize()
+            end
+            println("        run time: $(stats.time * 1.0e+6) μsec")
+        end
 
         println("    Copying outputs from device...")
         J_mem = Array(J_mem)
