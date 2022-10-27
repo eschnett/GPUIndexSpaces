@@ -92,6 +92,7 @@ end
 
 Base.convert(::Type{Int4x8}, a::NTuple{2,Int8x4}) = Int4x8(bitwise_merge(0x0f0f0f0f, a[2].val << 0x04, a[1].val))
 function Base.convert(::Type{NTuple{2,Int8x4}}, a::Int4x8)
+    # TODO: Merge the `⊻ 0x88` and the `& 0x0f` into a single LOP3
     a1 = a.val ⊻ 0x88888888            # a + 8
     a2_lo = a1 & 0x0f0f0f0f            # extract low part
     a3_lo = a2_lo + 0x78787878         # a + 128
@@ -125,6 +126,7 @@ function Base.:-(a::Int4x8)
     return Int4x8(bitwise_merge(0xf0f0f0f0, rlo, rhi))
 end
 function Base.:+(a::Int4x8, b::Int4x8)
+    # TODO: Combine these via LOP3
     a1 = a.val ⊻ 0x88888888
     b1 = b.val ⊻ 0x88888888
     alo = a1 & 0x0f0f0f0f
@@ -136,6 +138,7 @@ function Base.:+(a::Int4x8, b::Int4x8)
     return Int4x8(bitwise_merge(0xf0f0f0f0, rlo, rhi))
 end
 function Base.:-(a::Int4x8, b::Int4x8)
+    # TODO: Combine these via LOP3
     a1 = a.val ⊻ 0x88888888
     b1 = b.val ⊻ 0x88888888
     alo = (a1 & 0x0f0f0f0f) ⊻ 0x10101010
@@ -261,6 +264,7 @@ function Base.:-(a::Int8x4)
     return Int8x4(bitwise_merge(0xff00ff00, rlo, rhi))
 end
 function Base.:+(a::Int8x4, b::Int8x4)
+    # TODO: Combine these via LOP3
     a1 = a.val ⊻ 0x80808080
     b1 = b.val ⊻ 0x80808080
     alo = a1 & 0x00ff00ff
@@ -272,6 +276,7 @@ function Base.:+(a::Int8x4, b::Int8x4)
     return Int8x4(bitwise_merge(0xff00ff00, rlo, rhi))
 end
 function Base.:-(a::Int8x4, b::Int8x4)
+    # TODO: Combine these via LOP3
     a1 = a.val ⊻ 0x80808080
     b1 = b.val ⊻ 0x80808080
     alo = (a1 & 0x00ff00ff) ⊻ 0x01000100
@@ -510,28 +515,48 @@ function cuda_prmt(x::Code, y::Code, op::Int_UInt_8_16_32)
     ))
 end
 
-export cuda_lop3
-function cuda_lop3(x::UInt32, y::UInt32, z::UInt32, op::UInt32)
+export lop3
+function lop3(a::UInt32, b::UInt32, c::UInt32, op::UInt32)
+    z = UInt32(0)
+    return (ifelse(op & 0x01 ≠ 0, ~z, z) & ~a & ~b & ~c) |
+           (ifelse(op & 0x02 ≠ 0, ~z, z) & ~a & ~b & c) |
+           (ifelse(op & 0x04 ≠ 0, ~z, z) & ~a & b & ~c) |
+           (ifelse(op & 0x08 ≠ 0, ~z, z) & ~a & b & c) |
+           (ifelse(op & 0x10 ≠ 0, ~z, z) & a & ~b & ~c) |
+           (ifelse(op & 0x20 ≠ 0, ~z, z) & a & ~b & c) |
+           (ifelse(op & 0x40 ≠ 0, ~z, z) & a & b & ~c) |
+           (ifelse(op & 0x80 ≠ 0, ~z, z) & a & b & c)
+end
+CUDA.@device_override function lop3(x::UInt32, y::UInt32, z::UInt32, op::UInt32)
     LLVM.Interop.@asmcall(
         "lop3.b32 \$0, \$1, \$2, \$3, \$4;", "=r,r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32,UInt32}, x, y, z, op
     )
 end
-
-function cuda_lop3(x::Int_UInt_8_16_32, y::Int_UInt_8_16_32, z::Int_UInt_8_16_32, op::Int_UInt_8_16_32)
-    return cuda_lop3(x % UInt32, y % UInt32, z % UInt32, op % UInt32)::UInt32
+function lop3(x::Int_UInt_8_16_32, y::Int_UInt_8_16_32, z::Int_UInt_8_16_32, op::Int_UInt_8_16_32)
+    return lop3(x % UInt32, y % UInt32, z % UInt32, op % UInt32)::UInt32
 end
 
-function cuda_lop3(x::Code, y::Code, z::Code, op::Int_UInt_8_16_32)
-    return :(LLVM.Interop.@asmcall(
-        "lop3.b32 \$0, \$1, \$2, \$3, \$4;",
-        "=r,r,r,r,i",
-        UInt32,
-        Tuple{UInt32,UInt32,UInt32,UInt32},
-        $x % UInt32,
-        $y % UInt32,
-        $z % UInt32,
-        $(op % UInt32)
-    ))
+# lop3(x::Code, y::Code, z::Code, op::Int_UInt_8_16_32) = :(lop3($x, $y, $z, $op))
+# function lop3(x::Code, y::Code, z::Code, op::Int_UInt_8_16_32)
+#     return :(LLVM.Interop.@asmcall(
+#         "lop3.b32 \$0, \$1, \$2, \$3, \$4;",
+#         "=r,r,r,r,i",
+#         UInt32,
+#         Tuple{UInt32,UInt32,UInt32,UInt32},
+#         $x % UInt32,
+#         $y % UInt32,
+#         $z % UInt32,
+#         $(op % UInt32)
+#     ))
+# end
+
+export make_lop3_lut
+function make_lop3_lut(f)
+    ta = 0xf0
+    tb = 0xcc
+    tc = 0xaa
+    lut = f(ta, tb, tc)::UInt8
+    return lut
 end
 
 """
@@ -558,11 +583,11 @@ See <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#logic-and
 function bitwise_merge end
 bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = (~mask & iffalse) | (mask & iftrue)
 bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = bitwise_merge(mask, iffalse % UInt32, iftrue % UInt32) % Int32
-CUDA.@device_override bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = cuda_lop3(iftrue, iffalse, mask, 0xe4)::UInt32
-CUDA.@device_override bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = cuda_lop3(iftrue, iffalse, mask, 0xe4) % Int32
+CUDA.@device_override bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = lop3(iftrue, iffalse, mask, 0xe4)::UInt32
+CUDA.@device_override bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = lop3(iftrue, iffalse, mask, 0xe4) % Int32
 export bitwise_merge
 
-bitwise_merge(mask::Code, iffalse::Code, iftrue::Code) = :(cuda_lop3($iftrue, $iffalse, $mask, 0xe4)::UInt32)
+bitwise_merge(mask::Code, iffalse::Code, iftrue::Code) = :(lop3($iftrue, $iffalse, $mask, 0xe4)::UInt32)
 
 export unsafe_load4_global
 # Address space 1 is global, 3 is shared
@@ -2026,7 +2051,7 @@ function store!(
                         else
                             push!(
                                 stmts,
-                                :(unsafe_store4_global!($mem, 1 + $index + $offset, ($rhsname0, $rhsname1, $rhsname2, $rhsname3))),
+                                :(unsafe_store4_global!($mem, 1 + $offset + $index, ($rhsname0, $rhsname1, $rhsname2, $rhsname3))),
                             )
                         end
                     else
@@ -2038,11 +2063,11 @@ function store!(
             else
                 if operator === :(=)
                     if have_memory3
-                        push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2, 1 + $index3] = $rhsname))
+                        push!(stmts, :(@inbounds $mem[1 + $offset + $index, 1 + $index2, 1 + $index3] = $rhsname))
                     elseif have_memory2
-                        push!(stmts, :(@inbounds $mem[1 + $index + $offset, 1 + $index2] = $rhsname))
+                        push!(stmts, :(@inbounds $mem[1 + $offset + $index, 1 + $index2] = $rhsname))
                     else
-                        push!(stmts, :(@inbounds $mem[1 + $index + $offset] = $rhsname))
+                        push!(stmts, :(@inbounds $mem[1 + $offset + $index] = $rhsname))
                     end
                 elseif operator === :(+=)
                     @assert !have_memory2 && !have_memory3

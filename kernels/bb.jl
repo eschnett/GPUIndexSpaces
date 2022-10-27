@@ -380,12 +380,11 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
         unrolled_loop!(steps, env, loopIdxB, :(Int32(0):Int32($B ÷ $Wb ÷ 8 - 1)), [Beam(6)]) do steps, env
             select!(steps, env, :A10, :A, [Register(4)], :($loopIdxB))
 
-            map_Ju_registers = let
+            map_Jureim_registers = let
                 b = -1
                 Layout(
                     Int32,
                     Dict(
-                        Cplx(0) => Register(1),
                         Dish′(7) => Warp(0),
                         Dish′(8) => Warp(1),
                         Time(0) => Register(0),
@@ -408,7 +407,9 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                     ),
                 )
             end
-            constant!(steps, env, :Ju, map_Ju_registers, :(Int32(0)))
+            constant!(steps, env, :Jurepos, map_Jureim_registers, :(Int32(0)))
+            constant!(steps, env, :Jureneg, map_Jureim_registers, :(Int32(0)))
+            constant!(steps, env, :Juim, map_Jureim_registers, :(Int32(0)))
 
             @assert D ÷ Wd % 16 == 0
             @assert D ÷ Wd ÷ 16 == 8
@@ -482,46 +483,20 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
 
                 split!(steps, env, :E2re, :E2im, :E2, Cplx(0))
 
-                map_Ju0_registers = let
-                    b = -1
-                    Layout(
-                        Int32,
-                        Dict(
-                            Dish′(7) => Warp(0),
-                            Dish′(8) => Warp(1),
-                            Time(0) => Register(0),
-                            Time(1) => Thread(0),
-                            Time(2) => Thread(1),
-                            Time(3) => LoopT2(0),
-                            Time(4) => LoopT2(1),
-                            Time(5) => LoopT1(0),
-                            Time(6) => LoopT1(1),
-                            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log(2, T)) - 1)]...,
-                            Beam(0) => Thread(2),
-                            Beam(1) => Thread(3),
-                            Beam(2) => Thread(4),
-                            Beam(3) => LoopB(0),    # since Wb = 6
-                            Beam(4) => Warp(2),     # since Wb = 6
-                            Beam(5) => Warp(3),     # since Wb = 6
-                            Beam(6) => Warp(4),     # since Wb = 6
-                            Polr(0) => Block(b += 1),
-                            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log(2, F)) - 1)]...,
-                        ),
-                    )
-                end
-                constant!(steps, env, :Ju0, map_Ju0_registers, :(Int32(0)))
-                mma_row_col_m8n8k16_s8!(steps, env, :Jure1, :Aim, :E2im, :Ju0)
-                # TODO: Add a separate reduction variable instead of negating here?
-                apply!(steps, env, :Jure2, :Jure1, Jure1 -> :(-$Jure1))
-                mma_row_col_m8n8k16_s8!(steps, env, :Jure, :Are, :E2re, :Jure2)
-                mma_row_col_m8n8k16_s8!(steps, env, :Juim1, :Are, :E2im, :Ju0)
-                mma_row_col_m8n8k16_s8!(steps, env, :Juim, :Aim, :E2re, :Juim1)
+                mma_row_col_m8n8k16_s8!(steps, env, :Jurepos1, :Are, :E2re, :Jurepos)
+                mma_row_col_m8n8k16_s8!(steps, env, :Jureneg1, :Aim, :E2im, :Jureneg)
+                mma_row_col_m8n8k16_s8!(steps, env, :Juim1, :Are, :E2im, :Juim)
+                mma_row_col_m8n8k16_s8!(steps, env, :Juim2, :Aim, :E2re, :Juim1)
 
-                merge!(steps, env, :Ju1, :Jure, :Juim, Cplx(0) => Register(1))
-                reduce!(steps, env, :Ju, :Ju1, (Ju, Ju1) -> :($Ju += $Ju1))
+                reduce!(steps, env, :Jurepos, :Jurepos1, (Ju, Ju1) -> :($Ju = $Ju1))
+                reduce!(steps, env, :Jureneg, :Jureneg1, (Ju, Ju1) -> :($Ju = $Ju1))
+                reduce!(steps, env, :Juim, :Juim2, (Ju, Ju1) -> :($Ju = $Ju1))
 
                 nothing
             end                     # LoopD
+
+            apply!(steps, env, :Jure, :Jurepos, :Jureneg, (Jurepos, Jureneg) -> :($Jurepos - $Jureneg))
+            merge!(steps, env, :Ju, :Jure, :Juim, Cplx(0) => Register(1))
 
             # TODO: Break ties to even?
             @assert σ ≥ 1
@@ -923,9 +898,7 @@ function runcuda()
         synchronize()
         for run in 1:nruns
             stats = @timed begin
-                kernel(
-                    A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes
-                )
+                kernel(A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
                 synchronize()
             end
             println("        run time: $(stats.time * 1.0e+6) μsec")
