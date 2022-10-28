@@ -374,7 +374,7 @@ end
 function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
     @assert T2 % 8 == 0
     @assert T2 ÷ 8 == 4
-    loop!(steps, env, loopIdxT2, :(Int32(0):Int32($T2 ÷ 8 - 1)), [Time(3), Time(4)]) do steps, env
+    unrolled_loop!(steps, env, loopIdxT2, :(Int32(0):Int32($T2 ÷ 8 - 1)), [Time(3), Time(4)]) do steps, env
         @assert B ÷ Wb % 8 == 0
         @assert B ÷ Wb ÷ 8 == 2
         unrolled_loop!(steps, env, loopIdxB, :(Int32(0):Int32($B ÷ $Wb ÷ 8 - 1)), [Beam(6)]) do steps, env
@@ -478,6 +478,7 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                         ),
                     )
                 end
+                # TODO: Don't undo offset encoding, don't shift right; fold this into a fixup after multiplying by A
                 widen!(steps, env, :E2, :E1, SIMD(2) => Register(0))
                 @assert env[:E2] == map_E2_registers
 
@@ -621,7 +622,8 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
     apply!(steps, env, :J2, :J, :s, (J, s) -> :(($J + (Int32(1) << ($s % UInt32 - UInt32(1)))) >> (s % UInt32)))
     # apply!(steps, env, :J2, :J, J -> :($J))
 
-    # TODO: Try this: Shift values left by 4, rely on saturation when converting, then shift right and mask
+    # TODO: Try this: Shift values left by 4, rely on saturation when converting, then shift right and mask (doesn't work)
+    # TODO: Try this: Pack to Int16, the clamp, then pack to Int8 (doesn't work, no efficient 16-bit clamp)
     apply!(steps, env, :J2′, :J2, J -> :(clamp($J, (-Int32(0x7)):(+Int32(0x7)))))
     narrow3!(steps, env, :J3, :J2′, Register(2) => SIMD(2), Register(3) => SIMD(3), Register(4) => SIMD(4))
     # Section 5, eqn. (26)
@@ -771,7 +773,7 @@ function bb!(steps::Vector{AbstractStep}, env::Environment)
     loop!(steps, env, loopIdxT, :(Int32(0):Int32($T ÷ $T1 - 1)), [Time(t) for t in 7:14]) do steps, env
         @assert T1 % T2 == 0
         @assert T1 ÷ T2 == 4
-        loop!(steps, env, loopIdxT1, :(Int32(0):Int32($T1 ÷ $T2 - 1)), [Time(5), Time(6)]) do steps, env
+        unrolled_loop!(steps, env, loopIdxT1, :(Int32(0):Int32($T1 ÷ $T2 - 1)), [Time(5), Time(6)]) do steps, env
             copy_E!(steps, env)
             multiply_A_E!(steps, env)
             reduce_Ju!(steps, env)

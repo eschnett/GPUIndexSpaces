@@ -32,6 +32,8 @@ make_int4(x::Integer) = ((x + 8) & 0xf - 8) % Int8
         @test convert(NTuple{2,Int32}, x ⊻ y) == (xlo ⊻ ylo, xhi ⊻ yhi)
         @test convert(NTuple{2,Int32}, x + y) == make_int4.((xlo + ylo, xhi + yhi))
         @test convert(NTuple{2,Int32}, x - y) == make_int4.((xlo - ylo, xhi - yhi))
+        @test convert(NTuple{2,Int32}, min(x, y)) == make_int4.((min(xlo, ylo), min(xhi, yhi)))
+        @test convert(NTuple{2,Int32}, max(x, y)) == make_int4.((max(xlo, ylo), max(xhi, yhi)))
     end
 end
 
@@ -68,6 +70,8 @@ Random.seed!(0)
         @test convert(NTuple{8,Int32}, x ⊻ y) == xs .⊻ ys
         @test convert(NTuple{8,Int32}, x + y) == make_int4.(xs .+ ys)
         @test convert(NTuple{8,Int32}, x - y) == make_int4.(xs .- ys)
+        @test convert(NTuple{8,Int32}, min(x, y)) == make_int4.(min.(xs, ys))
+        @test convert(NTuple{8,Int32}, max(x, y)) == make_int4.(max.(xs, ys))
     end
 end
 
@@ -100,6 +104,8 @@ Random.seed!(0)
         @test convert(NTuple{4,Int32}, x ⊻ y) == xs .⊻ ys
         @test convert(NTuple{4,Int32}, x + y) == (xs .+ ys) .% Int8
         @test convert(NTuple{4,Int32}, x - y) == (xs .- ys) .% Int8
+        @test convert(NTuple{4,Int32}, min(x, y)) == min.(xs, ys) .% Int8
+        @test convert(NTuple{4,Int32}, max(x, y)) == max.(xs, ys) .% Int8
     end
 end
 
@@ -129,6 +135,8 @@ Random.seed!(0)
         @test convert(NTuple{2,Int32}, x ⊻ y) == xs .⊻ ys
         @test convert(NTuple{2,Int32}, x + y) == (xs .+ ys) .% Int16
         @test convert(NTuple{2,Int32}, x - y) == (xs .- ys) .% Int16
+        @test convert(NTuple{2,Int32}, min(x, y)) == min.(xs, ys) .% Int16
+        @test convert(NTuple{2,Int32}, max(x, y)) == max.(xs, ys) .% Int16
     end
 end
 

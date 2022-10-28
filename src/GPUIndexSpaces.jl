@@ -254,6 +254,18 @@ function Base.:-(a::Int4x2, b::Int4x2)
     rhi = (a.val & 0xf0) - (b.val & 0xf0)
     return Int4x2(rlo | rhi)
 end
+function Base.min(a::Int4x2, b::Int4x2)
+    as = convert(NTuple{2,Int32}, a)
+    bs = convert(NTuple{2,Int32}, b)
+    rs = min.(as, bs)
+    return Int4x2(rs...)
+end
+function Base.max(a::Int4x2, b::Int4x2)
+    as = convert(NTuple{2,Int32}, a)
+    bs = convert(NTuple{2,Int32}, b)
+    rs = max.(as, bs)
+    return Int4x2(rs...)
+end
 
 # Int4x8
 
@@ -320,6 +332,18 @@ function Base.:-(a::Int4x8, b::Int4x8)
     bhi = b1 & 0xf0f0f0f0
     rhi = ahi - bhi
     return Int4x8(bitwise_merge(0xf0f0f0f0, rlo, rhi))
+end
+function Base.min(a::Int4x8, b::Int4x8)
+    as = convert(NTuple{8,Int32}, a)
+    bs = convert(NTuple{8,Int32}, b)
+    rs = min.(as, bs)
+    return Int4x8(rs...)
+end
+function Base.max(a::Int4x8, b::Int4x8)
+    as = convert(NTuple{8,Int32}, a)
+    bs = convert(NTuple{8,Int32}, b)
+    rs = max.(as, bs)
+    return Int4x8(rs...)
 end
 
 # Int8x4
@@ -459,6 +483,18 @@ function Base.:-(a::Int8x4, b::Int8x4)
     rhi = ahi - bhi
     return Int8x4(bitwise_merge(0xff00ff00, rlo, rhi))
 end
+function Base.min(a::Int8x4, b::Int8x4)
+    as = convert(NTuple{4,Int32}, a)
+    bs = convert(NTuple{4,Int32}, b)
+    rs = min.(as, bs)
+    return Int8x4(rs...)
+end
+function Base.max(a::Int8x4, b::Int8x4)
+    as = convert(NTuple{4,Int32}, a)
+    bs = convert(NTuple{4,Int32}, b)
+    rs = max.(as, bs)
+    return Int8x4(rs...)
+end
 
 # Int16x2
 
@@ -521,6 +557,18 @@ function Base.:-(a::Int16x2, b::Int16x2)
     bhi = b1 & 0xffff0000
     rhi = ahi - bhi
     return Int16x2(bitwise_merge(0xffff0000, rlo, rhi))
+end
+function Base.min(a::Int16x2, b::Int16x2)
+    as = convert(NTuple{2,Int32}, a)
+    bs = convert(NTuple{2,Int32}, b)
+    rs = min.(as, bs)
+    return Int16x2(rs...)
+end
+function Base.max(a::Int16x2, b::Int16x2)
+    as = convert(NTuple{2,Int32}, a)
+    bs = convert(NTuple{2,Int32}, b)
+    rs = max.(as, bs)
+    return Int16x2(rs...)
 end
 
 # Int32
