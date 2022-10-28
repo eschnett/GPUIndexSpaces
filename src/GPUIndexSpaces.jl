@@ -7,6 +7,175 @@ using OrderedCollections
 
 ################################################################################
 
+const Code = Union{Expr,Number,Symbol}
+
+export comment
+comment(text, result) = result
+
+function make_uint(i::Integer)
+    @assert i ≥ 0
+    i ≤ typemax(UInt8) && return UInt8(i)
+    i ≤ typemax(UInt16) && return UInt16(i)
+    i ≤ typemax(UInt32) && return UInt32(i)
+    i ≤ typemax(UInt64) && return UInt64(i)
+    @assert false
+end
+
+const Int_UInt_8_16_32 = Union{Int8,Int16,Int32,UInt8,UInt16,UInt32}
+
+export cuda_prmt
+function cuda_prmt(x::UInt32, y::UInt32, op::UInt32)
+    LLVM.Interop.@asmcall("prmt.b32 \$0, \$1, \$2, \$3;", "=r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32}, x, y, op)
+end
+
+function cuda_prmt(x::T, y::T, op::Int_UInt_8_16_32) where {T<:Int_UInt_8_16_32}
+    return T(cuda_prmt(x % UInt32, y % UInt32, op % UInt32)::UInt32)
+end
+
+function cuda_prmt(x::Code, y::Code, op::Int_UInt_8_16_32)
+    return :(LLVM.Interop.@asmcall(
+        "prmt.b32 \$0, \$1, \$2, \$3;", "=r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32}, $x % UInt32, $y % UInt32, $(op % UInt32)
+    ))
+end
+
+export lop3
+function lop3(a::UInt32, b::UInt32, c::UInt32, op::UInt32)
+    z = UInt32(0)
+    return (ifelse(op & 0x01 ≠ 0, ~z, z) & ~a & ~b & ~c) |
+           (ifelse(op & 0x02 ≠ 0, ~z, z) & ~a & ~b & c) |
+           (ifelse(op & 0x04 ≠ 0, ~z, z) & ~a & b & ~c) |
+           (ifelse(op & 0x08 ≠ 0, ~z, z) & ~a & b & c) |
+           (ifelse(op & 0x10 ≠ 0, ~z, z) & a & ~b & ~c) |
+           (ifelse(op & 0x20 ≠ 0, ~z, z) & a & ~b & c) |
+           (ifelse(op & 0x40 ≠ 0, ~z, z) & a & b & ~c) |
+           (ifelse(op & 0x80 ≠ 0, ~z, z) & a & b & c)
+end
+CUDA.@device_override function lop3(x::UInt32, y::UInt32, z::UInt32, op::UInt32)
+    LLVM.Interop.@asmcall(
+        "lop3.b32 \$0, \$1, \$2, \$3, \$4;", "=r,r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32,UInt32}, x, y, z, op
+    )
+end
+function lop3(x::Int_UInt_8_16_32, y::Int_UInt_8_16_32, z::Int_UInt_8_16_32, op::Int_UInt_8_16_32)
+    return lop3(x % UInt32, y % UInt32, z % UInt32, op % UInt32)::UInt32
+end
+
+export make_lop3_lut
+function make_lop3_lut(f)
+    ta = 0xf0
+    tb = 0xcc
+    tc = 0xaa
+    lut = f(ta, tb, tc)::UInt8
+    return lut
+end
+
+"""
+    r = a & mask | b & ~mask
+
+See <https://forums.developer.nvidia.com/t/reverse-lut-for-lop3-lut/110651>:
+    0x01: ~a & ~b & ~c
+    0x02: ~a & ~b &  c
+    0x04: ~a &  b & ~c
+    0x08: ~a &  b &  c
+    0x10:  a & ~b & ~c
+    0x20:  a & ~b &  c
+    0x40:  a &  b & ~c
+    0x80:  a &  b &  c
+
+See <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#logic-and-shift-instructions-lop3>:
+    ta = 0xf0
+    tb = 0xcc
+    tc = 0xaa
+
+    (a & c) | (b & ~c)
+    (ta & tc) | (tb & ~tc) = 0xe4
+"""
+function bitwise_merge end
+bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = (~mask & iffalse) | (mask & iftrue)
+bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = bitwise_merge(mask, iffalse % UInt32, iftrue % UInt32) % Int32
+const bitwise_merge_lut = make_lop3_lut((iftrue, iffalse, mask) -> (~mask & iffalse) | (mask & iftrue))
+CUDA.@device_override function bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32)
+    return lop3(iftrue, iffalse, mask, bitwise_merge_lut)::UInt32
+end
+CUDA.@device_override function bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32)
+    return lop3(iftrue, iffalse, mask, bitwise_merge_lut) % Int32
+end
+export bitwise_merge
+
+bitwise_merge(mask::Code, iffalse::Code, iftrue::Code) = :(lop3($iftrue, $iffalse, $mask, 0xe4)::UInt32)
+
+export unsafe_load4_global
+# Address space 1 is global, 3 is shared
+function unsafe_load4_global(ptr::Core.LLVMPtr{Int32,1})
+    return Base.llvmcall(
+        """
+           %ptr = bitcast i8 addrspace(1)* %0 to [4 x i32] addrspace(1)*
+           %val = load [4 x i32], [4 x i32] addrspace(1)* %ptr, align 16
+           ret [4 x i32] %val
+        """,
+        NTuple{4,Int32},
+        Tuple{Core.LLVMPtr{Int32,1}},
+        ptr,
+    )
+end
+function unsafe_load4_global(ptr::Core.LLVMPtr{Int32,3})
+    return Base.llvmcall(
+        """
+           %ptr = bitcast i8 addrspace(3)* %0 to [4 x i32] addrspace(3)*
+           %val = load [4 x i32], [4 x i32] addrspace(3)* %ptr, align 16
+           ret [4 x i32] %val
+        """,
+        NTuple{4,Int32},
+        Tuple{Core.LLVMPtr{Int32,3}},
+        ptr,
+    )
+end
+unsafe_load4_global(arr::CuDeviceArray{Int32}, idx::Integer) = unsafe_load4_global(pointer(arr, idx))
+function unsafe_load4_global(arr::CuDeviceArray{T}, idx::Integer) where {T}
+    @assert sizeof(T) == sizeof(Int32)
+    res = unsafe_load4_global(reinterpret(Int32, arr), idx)::NTuple{4,Int32}
+    # return ntuple(n -> reinterpret(T, res[n]), 4)::NTuple{4,T}
+    return ntuple(n -> T(res[n] % UInt32), 4)::NTuple{4,T}
+end
+
+export unsafe_store4_global!
+# Address space 1 is global, 3 is shared
+function unsafe_store4_global!(ptr::Core.LLVMPtr{Int32,1}, val::NTuple{4,Int32})
+    return Base.llvmcall(
+        """
+           %ptr = bitcast i8 addrspace(1)* %0 to [4 x i32] addrspace(1)*
+           store [4 x i32] %1, [4 x i32] addrspace(1)* %ptr, align 16
+           ret void
+        """,
+        Nothing,
+        Tuple{Core.LLVMPtr{Int32,1},NTuple{4,Int32}},
+        ptr,
+        val,
+    )
+end
+function unsafe_store4_global!(ptr::Core.LLVMPtr{Int32,3}, val::NTuple{4,Int32})
+    return Base.llvmcall(
+        """
+           %ptr = bitcast i8 addrspace(3)* %0 to [4 x i32] addrspace(3)*
+           store [4 x i32] %1, [4 x i32] addrspace(3)* %ptr, align 16
+           ret void
+        """,
+        Nothing,
+        Tuple{Core.LLVMPtr{Int32,3},NTuple{4,Int32}},
+        ptr,
+        val,
+    )
+end
+function unsafe_store4_global!(arr::CuDeviceArray{Int32}, idx::Integer, val::NTuple{4,Int32})
+    return unsafe_store4_global!(pointer(arr, idx), val)
+end
+function unsafe_store4_global!(arr::CuDeviceArray{T}, idx::Integer, val::NTuple{4,T}) where {T}
+    @assert sizeof(T) == sizeof(Int32)
+    val′ = ntuple(n -> val[n].val % Int32, 4)::NTuple{4,Int32}
+    return unsafe_store4_global!(reinterpret(Int32, arr), idx, val′)
+end
+
+################################################################################
+
 export Int4x2
 struct Int4x2
     val::UInt8
@@ -38,14 +207,16 @@ end
 
 Int4x2(a1::Int32, a2::Int32) = Int4x2((a1 << 0x00) & 0x0f | (a2 << 0x04) & 0xf0)
 
+const xor_and_lut = make_lop3_lut((a, b, c) -> (a ⊻ b) & c)
 Base.convert(::Type{Int4x2}, a::NTuple{2,Int8}) = Int4x2(a[1], a[2])
 function Base.convert(::Type{NTuple{2,Int8}}, a::Int4x2)
-    # TODO: Merge the `⊻ 0x88` and the `& 0x0f` into a single LOP3
-    a1 = a.val ⊻ 0x88                  # a + 8
-    a2_lo = a1 & 0x0f                  # extract low part
+    # a1 = a.val ⊻ 0x88                  # a + 8
+    # a2_lo = a1 & 0x0f                  # extract low part
+    a2_lo = lop3(a.val, 0x08, 0x0f, xor_and_lut)
     a3_lo = a2_lo + 0x78               # a + 128
     a4_lo = a3_lo ⊻ 0x80               # a
-    a2_hi = (a1 >>> 0x04) & 0x0f       # extract high part
+    # a2_hi = (a1 >>> 0x04) & 0x0f       # extract high part
+    a2_hi = lop3(a.val >>> 0x04, 0x08, 0x0f, xor_and_lut)
     a3_hi = a2_hi + 0x78               # a + 128
     a4_hi = a3_hi ⊻ 0x80               # a
     return (a4_lo % Int8, a4_hi % Int8)::NTuple{2,Int8}
@@ -92,12 +263,13 @@ end
 
 Base.convert(::Type{Int4x8}, a::NTuple{2,Int8x4}) = Int4x8(bitwise_merge(0x0f0f0f0f, a[2].val << 0x04, a[1].val))
 function Base.convert(::Type{NTuple{2,Int8x4}}, a::Int4x8)
-    # TODO: Merge the `⊻ 0x88` and the `& 0x0f` into a single LOP3
-    a1 = a.val ⊻ 0x88888888            # a + 8
-    a2_lo = a1 & 0x0f0f0f0f            # extract low part
+    # a1 = a.val ⊻ 0x88888888            # a + 8
+    # a2_lo = a1 & 0x0f0f0f0f            # extract low part
+    a2_lo = lop3(a.val, 0x08080808, 0x0f0f0f0f, xor_and_lut)
     a3_lo = a2_lo + 0x78787878         # a + 128
     a4_lo = a3_lo ⊻ 0x80808080         # a
-    a2_hi = (a1 >>> 0x04) & 0x0f0f0f0f # extract high part
+    # a2_hi = (a1 >>> 0x04) & 0x0f0f0f0f # extract high part
+    a2_hi = lop3(a.val >>> 0x04, 0x08080808, 0x0f0f0f0f, xor_and_lut)
     a3_hi = a2_hi + 0x78787878         # a + 128
     a4_hi = a3_hi ⊻ 0x80808080         # a
     return (Int8x4(a4_lo), Int8x4(a4_hi))::NTuple{2,Int8x4}
@@ -480,184 +652,6 @@ function Base.muladd(a::BFloat16x2, b::BFloat16x2, c::BFloat16x2)
             "fma.rn.bf16x2 \$0, \$1, \$2, \$3;", "=r,r,r,r", UInt32, Tuple{UInt32,UInt32,UInt32}, a.val, b.val, c.val
         )
     )
-end
-
-################################################################################
-
-const Code = Union{Expr,Number,Symbol}
-
-export comment
-comment(text, result) = result
-
-function make_uint(i::Integer)
-    @assert i ≥ 0
-    i ≤ typemax(UInt8) && return UInt8(i)
-    i ≤ typemax(UInt16) && return UInt16(i)
-    i ≤ typemax(UInt32) && return UInt32(i)
-    i ≤ typemax(UInt64) && return UInt64(i)
-    @assert false
-end
-
-const Int_UInt_8_16_32 = Union{Int8,Int16,Int32,UInt8,UInt16,UInt32}
-
-export cuda_prmt
-function cuda_prmt(x::UInt32, y::UInt32, op::UInt32)
-    LLVM.Interop.@asmcall("prmt.b32 \$0, \$1, \$2, \$3;", "=r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32}, x, y, op)
-end
-
-function cuda_prmt(x::T, y::T, op::Int_UInt_8_16_32) where {T<:Int_UInt_8_16_32}
-    return T(cuda_prmt(x % UInt32, y % UInt32, op % UInt32)::UInt32)
-end
-
-function cuda_prmt(x::Code, y::Code, op::Int_UInt_8_16_32)
-    return :(LLVM.Interop.@asmcall(
-        "prmt.b32 \$0, \$1, \$2, \$3;", "=r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32}, $x % UInt32, $y % UInt32, $(op % UInt32)
-    ))
-end
-
-export lop3
-function lop3(a::UInt32, b::UInt32, c::UInt32, op::UInt32)
-    z = UInt32(0)
-    return (ifelse(op & 0x01 ≠ 0, ~z, z) & ~a & ~b & ~c) |
-           (ifelse(op & 0x02 ≠ 0, ~z, z) & ~a & ~b & c) |
-           (ifelse(op & 0x04 ≠ 0, ~z, z) & ~a & b & ~c) |
-           (ifelse(op & 0x08 ≠ 0, ~z, z) & ~a & b & c) |
-           (ifelse(op & 0x10 ≠ 0, ~z, z) & a & ~b & ~c) |
-           (ifelse(op & 0x20 ≠ 0, ~z, z) & a & ~b & c) |
-           (ifelse(op & 0x40 ≠ 0, ~z, z) & a & b & ~c) |
-           (ifelse(op & 0x80 ≠ 0, ~z, z) & a & b & c)
-end
-CUDA.@device_override function lop3(x::UInt32, y::UInt32, z::UInt32, op::UInt32)
-    LLVM.Interop.@asmcall(
-        "lop3.b32 \$0, \$1, \$2, \$3, \$4;", "=r,r,r,r,i", UInt32, Tuple{UInt32,UInt32,UInt32,UInt32}, x, y, z, op
-    )
-end
-function lop3(x::Int_UInt_8_16_32, y::Int_UInt_8_16_32, z::Int_UInt_8_16_32, op::Int_UInt_8_16_32)
-    return lop3(x % UInt32, y % UInt32, z % UInt32, op % UInt32)::UInt32
-end
-
-# lop3(x::Code, y::Code, z::Code, op::Int_UInt_8_16_32) = :(lop3($x, $y, $z, $op))
-# function lop3(x::Code, y::Code, z::Code, op::Int_UInt_8_16_32)
-#     return :(LLVM.Interop.@asmcall(
-#         "lop3.b32 \$0, \$1, \$2, \$3, \$4;",
-#         "=r,r,r,r,i",
-#         UInt32,
-#         Tuple{UInt32,UInt32,UInt32,UInt32},
-#         $x % UInt32,
-#         $y % UInt32,
-#         $z % UInt32,
-#         $(op % UInt32)
-#     ))
-# end
-
-export make_lop3_lut
-function make_lop3_lut(f)
-    ta = 0xf0
-    tb = 0xcc
-    tc = 0xaa
-    lut = f(ta, tb, tc)::UInt8
-    return lut
-end
-
-"""
-    r = a & mask | b & ~mask
-
-See <https://forums.developer.nvidia.com/t/reverse-lut-for-lop3-lut/110651>:
-    0x01: ~a & ~b & ~c
-    0x02: ~a & ~b &  c
-    0x04: ~a &  b & ~c
-    0x08: ~a &  b &  c
-    0x10:  a & ~b & ~c
-    0x20:  a & ~b &  c
-    0x40:  a &  b & ~c
-    0x80:  a &  b &  c
-
-See <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#logic-and-shift-instructions-lop3>:
-    ta = 0xf0
-    tb = 0xcc
-    tc = 0xaa
-
-    (a & c) | (b & ~c)
-    (ta & tc) | (tb & ~tc) = 0xe4
-"""
-function bitwise_merge end
-bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = (~mask & iffalse) | (mask & iftrue)
-bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = bitwise_merge(mask, iffalse % UInt32, iftrue % UInt32) % Int32
-CUDA.@device_override bitwise_merge(mask::UInt32, iffalse::UInt32, iftrue::UInt32) = lop3(iftrue, iffalse, mask, 0xe4)::UInt32
-CUDA.@device_override bitwise_merge(mask::UInt32, iffalse::Int32, iftrue::Int32) = lop3(iftrue, iffalse, mask, 0xe4) % Int32
-export bitwise_merge
-
-bitwise_merge(mask::Code, iffalse::Code, iftrue::Code) = :(lop3($iftrue, $iffalse, $mask, 0xe4)::UInt32)
-
-export unsafe_load4_global
-# Address space 1 is global, 3 is shared
-function unsafe_load4_global(ptr::Core.LLVMPtr{Int32,1})
-    return Base.llvmcall(
-        """
-           %ptr = bitcast i8 addrspace(1)* %0 to [4 x i32] addrspace(1)*
-           %val = load [4 x i32], [4 x i32] addrspace(1)* %ptr, align 16
-           ret [4 x i32] %val
-        """,
-        NTuple{4,Int32},
-        Tuple{Core.LLVMPtr{Int32,1}},
-        ptr,
-    )
-end
-function unsafe_load4_global(ptr::Core.LLVMPtr{Int32,3})
-    return Base.llvmcall(
-        """
-           %ptr = bitcast i8 addrspace(3)* %0 to [4 x i32] addrspace(3)*
-           %val = load [4 x i32], [4 x i32] addrspace(3)* %ptr, align 16
-           ret [4 x i32] %val
-        """,
-        NTuple{4,Int32},
-        Tuple{Core.LLVMPtr{Int32,3}},
-        ptr,
-    )
-end
-unsafe_load4_global(arr::CuDeviceArray{Int32}, idx::Integer) = unsafe_load4_global(pointer(arr, idx))
-function unsafe_load4_global(arr::CuDeviceArray{T}, idx::Integer) where {T}
-    @assert sizeof(T) == sizeof(Int32)
-    res = unsafe_load4_global(reinterpret(Int32, arr), idx)::NTuple{4,Int32}
-    # return ntuple(n -> reinterpret(T, res[n]), 4)::NTuple{4,T}
-    return ntuple(n -> T(res[n] % UInt32), 4)::NTuple{4,T}
-end
-
-export unsafe_store4_global!
-# Address space 1 is global, 3 is shared
-function unsafe_store4_global!(ptr::Core.LLVMPtr{Int32,1}, val::NTuple{4,Int32})
-    return Base.llvmcall(
-        """
-           %ptr = bitcast i8 addrspace(1)* %0 to [4 x i32] addrspace(1)*
-           store [4 x i32] %1, [4 x i32] addrspace(1)* %ptr, align 16
-           ret void
-        """,
-        Nothing,
-        Tuple{Core.LLVMPtr{Int32,1},NTuple{4,Int32}},
-        ptr,
-        val,
-    )
-end
-function unsafe_store4_global!(ptr::Core.LLVMPtr{Int32,3}, val::NTuple{4,Int32})
-    return Base.llvmcall(
-        """
-           %ptr = bitcast i8 addrspace(3)* %0 to [4 x i32] addrspace(3)*
-           store [4 x i32] %1, [4 x i32] addrspace(3)* %ptr, align 16
-           ret void
-        """,
-        Nothing,
-        Tuple{Core.LLVMPtr{Int32,3},NTuple{4,Int32}},
-        ptr,
-        val,
-    )
-end
-function unsafe_store4_global!(arr::CuDeviceArray{Int32}, idx::Integer, val::NTuple{4,Int32})
-    return unsafe_store4_global!(pointer(arr, idx), val)
-end
-function unsafe_store4_global!(arr::CuDeviceArray{T}, idx::Integer, val::NTuple{4,T}) where {T}
-    @assert sizeof(T) == sizeof(Int32)
-    val′ = ntuple(n -> val[n].val % Int32, 4)::NTuple{4,Int32}
-    return unsafe_store4_global!(reinterpret(Int32, arr), idx, val′)
 end
 
 ################################################################################
