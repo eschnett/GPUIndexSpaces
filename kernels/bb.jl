@@ -10,6 +10,22 @@ using Random
 
 # Kernel parameters
 
+# CHORD Pathfinder:
+#     T = 32768
+#     B = 8 or 16
+#     D = 64
+#     F = 16   (per GPU)
+# Full CHORD:
+#     T = 32768
+#     B = 96 or less
+#     D = 512
+#     F = 16   (per GPU)
+# HIRAX:
+#     T = 32768
+#     B = 16
+#     D = 256
+#     F = ???   (per GPU)
+
 const T = 32768                # number of times
 const T1 = 128                  # outer time cadence
 @assert T % T1 == 0
@@ -31,6 +47,25 @@ const T2 = 32                   # chunk size (inner time cadence)
 @assert T2 % 4 == 0
 
 const σ = 5 - round(Int, log2(Wd))
+
+################################################################################
+
+# Benchmark results
+
+# Setup:
+#     T = 32768
+#     T1 = 128
+#     B = 128
+#     D = 512
+#     F = 84 ÷ 2
+#     Wb = 8
+#     Wd = 4
+# Result:
+#     run time 8430.3 μsec
+#     scaled run time 3211.5 μsec (for 16 frequencies)
+#     sampling time 1.7 μs
+#     handling 55705.6 μsec of data
+#     scaled run time 5.8% of a GPU
 
 ################################################################################
 
@@ -773,7 +808,7 @@ function bb!(steps::Vector{AbstractStep}, env::Environment)
     loop!(steps, env, loopIdxT, :(Int32(0):Int32($T ÷ $T1 - 1)), [Time(t) for t in 7:14]) do steps, env
         @assert T1 % T2 == 0
         @assert T1 ÷ T2 == 4
-        unrolled_loop!(steps, env, loopIdxT1, :(Int32(0):Int32($T1 ÷ $T2 - 1)), [Time(5), Time(6)]) do steps, env
+        loop!(steps, env, loopIdxT1, :(Int32(0):Int32($T1 ÷ $T2 - 1)), [Time(5), Time(6)]) do steps, env
             copy_E!(steps, env)
             multiply_A_E!(steps, env)
             reduce_Ju!(steps, env)
@@ -902,10 +937,12 @@ function runcuda()
         kernel(A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
         synchronize()
         if nruns > 0
-            stats = @timed for run in 1:nruns
-                kernel(A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
+            stats = @timed begin
+                for run in 1:nruns
+                    kernel(A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
+                end
+                synchronize()
             end
-            synchronize()
             println("        run time: $(stats.time / nruns * 1.0e+6) μsec")
         end
 
