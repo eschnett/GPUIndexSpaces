@@ -826,12 +826,15 @@ function runcuda()
 
         # Cplx, Dish, Beam, Polr
         A_input = zeros(Int8, 2, nextpow(2, D), nextpow(2, B), 2)
+        # A_input = rand(Int8, 2, nextpow(2, D), nextpow(2, B), 2)
 
         # Dish, Polr, Freq, Time
         E_input = zeros(Int4x2, nextpow(2, D), 2, nextpow(2, F), nextpow(2, T))
+        # E_input = rand(Int4x2, nextpow(2, D), 2, nextpow(2, F), nextpow(2, T))
 
         # Beam, Polr, Freq
         s_input = zeros(Int32, nextpow(2, B), 2, nextpow(2, F))
+        # s_input = rand(Int32(0):Int32(16), nextpow(2, B), 2, nextpow(2, F))
 
         # Time, Polr, Freq, Beam
         J_input = zeros(Int4x2, nextpow(2, T), 2, nextpow(2, F), nextpow(2, B))
@@ -898,12 +901,12 @@ function runcuda()
         attributes(kernel.fun)[CUDA.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES] = shmem_bytes
         kernel(A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
         synchronize()
-        for run in 1:nruns
-            stats = @timed begin
+        if nruns > 0
+            stats = @timed for run in 1:nruns
                 kernel(A_mem, E_mem, s_mem, J_mem; threads=(nthreads, nwarps), blocks=nblocks, shmem=shmem_bytes)
-                synchronize()
             end
-            println("        run time: $(stats.time * 1.0e+6) μsec")
+            synchronize()
+            println("        run time: $(stats.time / nruns * 1.0e+6) μsec")
         end
 
         println("    Copying outputs from device...")

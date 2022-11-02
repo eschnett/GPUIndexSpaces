@@ -3,6 +3,7 @@ module GPUIndexSpaces
 using BFloat16s
 using CUDA
 using LLVM
+using Random
 using OrderedCollections
 
 ################################################################################
@@ -233,6 +234,7 @@ Base.show(io::IO, a::Int4x2) = print(io, convert(NTuple{2,Int32}, a))
 Base.length(::Int4x2) = 1
 
 Base.zero(::Type{Int4x2}) = Int4x2(Int8(0))
+Random.rand(rng::AbstractRNG, ::Random.SamplerType{Int4x2}) = Int4x2(rand(UInt8))
 
 Base.:~(a::Int4x2) = Int4x2(~a.val)
 Base.:&(a::Int4x2, b::Int4x2) = Int4x2(a.val & b.val)
@@ -296,6 +298,7 @@ end
 Base.show(io::IO, a::Int4x8) = print(io, convert(NTuple{8,Int32}, a))
 
 Base.zero(::Type{Int4x8}) = Int4x8(Int32(0))
+Random.rand(rng::AbstractRNG, ::Random.SamplerType{Int4x8}) = Int4x8(rand(UInt32))
 
 Base.:~(a::Int4x8) = Int4x8(~a.val)
 Base.:&(a::Int4x8, b::Int4x8) = Int4x8(a.val & b.val)
@@ -446,6 +449,7 @@ end
 Base.show(io::IO, a::Int8x4) = print(io, convert(NTuple{4,Int32}, a))
 
 Base.zero(::Type{Int8x4}) = Int8x4(Int32(0))
+Random.rand(rng::AbstractRNG, ::Random.SamplerType{Int8x4}) = Int8x4(rand(UInt32))
 
 Base.:~(a::Int8x4) = Int8x4(~a.val)
 Base.:&(a::Int8x4, b::Int8x4) = Int8x4(a.val & b.val)
@@ -523,6 +527,7 @@ end
 Base.show(io::IO, a::Int16x2) = print(io, convert(NTuple{2,Int32}, a))
 
 Base.zero(::Type{Int16x2}) = Int16x2(Int32(0))
+Random.rand(rng::AbstractRNG, ::Random.SamplerType{Int16x2}) = Int16x2(rand(UInt32))
 
 Base.:~(a::Int16x2) = Int16x2(~a.val)
 Base.:&(a::Int16x2, b::Int16x2) = Int16x2(a.val & b.val)
