@@ -1,6 +1,6 @@
-# { Load from memory; Load from memory; Rename indices Dict{Index{:Dish}, Index{:Dish′}}(Dish(6) => Dish′(3), Dish(7) => Dish′(7), Dish(1) => Dish′(1), Dish(5) => Dish′(2), Dish(8) => Dish′(8), Dish(0) => Dish′(0), Dish(4) => Dish′(6), Dish(2) => Dish′(4), Dish(3) => Dish′(5)); Permute Register(0) and SIMD(4); Permute Register(0) and SIMD(3); Permute Thread(1) and Register(2); Permute Thread(2) and Register(3); loop }
+# { Load from memory; Load from memory; Rename indices Dict{Index{:Dish}, Index{:Dish′}}(Dish(5) => Dish′(2), Dish(2) => Dish′(4), Dish(6) => Dish′(3), Dish(4) => Dish′(6), Dish(8) => Dish′(8), Dish(1) => Dish′(1), Dish(3) => Dish′(5), Dish(7) => Dish′(7), Dish(0) => Dish′(0)); Permute Register(0) and SIMD(4); Permute Register(0) and SIMD(3); Permute Thread(1) and Register(2); Permute Thread(2) and Register(3); loop }
 #     Inputs: []
-#     Outputs: [A, A0, A1, A10, A11, A2, A3, A4, Aim, Are, E0, E1, E2, E2im, E2re, Ecopy, J, J2, J2′, J3, Jper, Jper2, Jper3, Jper4, Jper5, Jper6, Jper7, Jstore, Ju, Ju0, Ju1, Ju10, Ju11, Ju11a, Ju11b, Ju12, Ju12a, Ju12b, Ju2, Ju4, Juim, Juim1, Jure, Jure1, Jure2, s]
+#     Outputs: [A, A0, A1, A10, A11, A2, A3, A4, Aim, Are, E0, E1, E2, E2im, E2re, Ecopy, J, J2, J2′, J3, Jper, Jper2, Jper3, Jper4, Jper5, Jper6, Jper7, Jstore, Ju, Ju10, Ju11, Ju11a, Ju11b, Ju12, Ju12a, Ju12b, Ju2, Ju4, Juim, Juim1, Juim2, Jure, Jureneg, Jureneg1, Jurepos, Jurepos1, s]
 #         A::Int32
 #             Beam(0) => Thread(2)
 #             Beam(1) => Thread(3)
@@ -837,71 +837,6 @@
 #             Time(12) => Loop1(5)
 #             Time(13) => Loop1(6)
 #             Time(14) => Loop1(7)
-#         Ju0::Int32
-#             Beam(0) => Thread(2)
-#             Beam(1) => Thread(3)
-#             Beam(2) => Thread(4)
-#             Beam(3) => Loop4(0)
-#             Beam(4) => Warp(2)
-#             Beam(5) => Warp(3)
-#             Beam(6) => Warp(4)
-#             Dish′(7) => Warp(0)
-#             Dish′(8) => Warp(1)
-#             Freq(0) => Block(1)
-#             Freq(1) => Block(2)
-#             Freq(2) => Block(3)
-#             Freq(3) => Block(4)
-#             Freq(4) => Block(5)
-#             Freq(5) => Block(6)
-#             Polr(0) => Block(0)
-#             Time(0) => Register(0)
-#             Time(1) => Thread(0)
-#             Time(2) => Thread(1)
-#             Time(3) => Loop3(0)
-#             Time(4) => Loop3(1)
-#             Time(5) => Loop2(0)
-#             Time(6) => Loop2(1)
-#             Time(7) => Loop1(0)
-#             Time(8) => Loop1(1)
-#             Time(9) => Loop1(2)
-#             Time(10) => Loop1(3)
-#             Time(11) => Loop1(4)
-#             Time(12) => Loop1(5)
-#             Time(13) => Loop1(6)
-#             Time(14) => Loop1(7)
-#         Ju1::Int32
-#             Beam(0) => Thread(2)
-#             Beam(1) => Thread(3)
-#             Beam(2) => Thread(4)
-#             Beam(3) => Loop4(0)
-#             Beam(4) => Warp(2)
-#             Beam(5) => Warp(3)
-#             Beam(6) => Warp(4)
-#             Cplx(0) => Register(1)
-#             Dish′(7) => Warp(0)
-#             Dish′(8) => Warp(1)
-#             Freq(0) => Block(1)
-#             Freq(1) => Block(2)
-#             Freq(2) => Block(3)
-#             Freq(3) => Block(4)
-#             Freq(4) => Block(5)
-#             Freq(5) => Block(6)
-#             Polr(0) => Block(0)
-#             Time(0) => Register(0)
-#             Time(1) => Thread(0)
-#             Time(2) => Thread(1)
-#             Time(3) => Loop3(0)
-#             Time(4) => Loop3(1)
-#             Time(5) => Loop2(0)
-#             Time(6) => Loop2(1)
-#             Time(7) => Loop1(0)
-#             Time(8) => Loop1(1)
-#             Time(9) => Loop1(2)
-#             Time(10) => Loop1(3)
-#             Time(11) => Loop1(4)
-#             Time(12) => Loop1(5)
-#             Time(13) => Loop1(6)
-#             Time(14) => Loop1(7)
 #         Ju10::Int32
 #             Beam(0) => Thread(3)
 #             Beam(1) => Thread(4)
@@ -1256,6 +1191,38 @@
 #             Time(12) => Loop1(5)
 #             Time(13) => Loop1(6)
 #             Time(14) => Loop1(7)
+#         Juim2::Int32
+#             Beam(0) => Thread(2)
+#             Beam(1) => Thread(3)
+#             Beam(2) => Thread(4)
+#             Beam(3) => Loop4(0)
+#             Beam(4) => Warp(2)
+#             Beam(5) => Warp(3)
+#             Beam(6) => Warp(4)
+#             Dish′(7) => Warp(0)
+#             Dish′(8) => Warp(1)
+#             Freq(0) => Block(1)
+#             Freq(1) => Block(2)
+#             Freq(2) => Block(3)
+#             Freq(3) => Block(4)
+#             Freq(4) => Block(5)
+#             Freq(5) => Block(6)
+#             Polr(0) => Block(0)
+#             Time(0) => Register(0)
+#             Time(1) => Thread(0)
+#             Time(2) => Thread(1)
+#             Time(3) => Loop3(0)
+#             Time(4) => Loop3(1)
+#             Time(5) => Loop2(0)
+#             Time(6) => Loop2(1)
+#             Time(7) => Loop1(0)
+#             Time(8) => Loop1(1)
+#             Time(9) => Loop1(2)
+#             Time(10) => Loop1(3)
+#             Time(11) => Loop1(4)
+#             Time(12) => Loop1(5)
+#             Time(13) => Loop1(6)
+#             Time(14) => Loop1(7)
 #         Jure::Int32
 #             Beam(0) => Thread(2)
 #             Beam(1) => Thread(3)
@@ -1288,7 +1255,7 @@
 #             Time(12) => Loop1(5)
 #             Time(13) => Loop1(6)
 #             Time(14) => Loop1(7)
-#         Jure1::Int32
+#         Jureneg::Int32
 #             Beam(0) => Thread(2)
 #             Beam(1) => Thread(3)
 #             Beam(2) => Thread(4)
@@ -1320,7 +1287,71 @@
 #             Time(12) => Loop1(5)
 #             Time(13) => Loop1(6)
 #             Time(14) => Loop1(7)
-#         Jure2::Int32
+#         Jureneg1::Int32
+#             Beam(0) => Thread(2)
+#             Beam(1) => Thread(3)
+#             Beam(2) => Thread(4)
+#             Beam(3) => Loop4(0)
+#             Beam(4) => Warp(2)
+#             Beam(5) => Warp(3)
+#             Beam(6) => Warp(4)
+#             Dish′(7) => Warp(0)
+#             Dish′(8) => Warp(1)
+#             Freq(0) => Block(1)
+#             Freq(1) => Block(2)
+#             Freq(2) => Block(3)
+#             Freq(3) => Block(4)
+#             Freq(4) => Block(5)
+#             Freq(5) => Block(6)
+#             Polr(0) => Block(0)
+#             Time(0) => Register(0)
+#             Time(1) => Thread(0)
+#             Time(2) => Thread(1)
+#             Time(3) => Loop3(0)
+#             Time(4) => Loop3(1)
+#             Time(5) => Loop2(0)
+#             Time(6) => Loop2(1)
+#             Time(7) => Loop1(0)
+#             Time(8) => Loop1(1)
+#             Time(9) => Loop1(2)
+#             Time(10) => Loop1(3)
+#             Time(11) => Loop1(4)
+#             Time(12) => Loop1(5)
+#             Time(13) => Loop1(6)
+#             Time(14) => Loop1(7)
+#         Jurepos::Int32
+#             Beam(0) => Thread(2)
+#             Beam(1) => Thread(3)
+#             Beam(2) => Thread(4)
+#             Beam(3) => Loop4(0)
+#             Beam(4) => Warp(2)
+#             Beam(5) => Warp(3)
+#             Beam(6) => Warp(4)
+#             Dish′(7) => Warp(0)
+#             Dish′(8) => Warp(1)
+#             Freq(0) => Block(1)
+#             Freq(1) => Block(2)
+#             Freq(2) => Block(3)
+#             Freq(3) => Block(4)
+#             Freq(4) => Block(5)
+#             Freq(5) => Block(6)
+#             Polr(0) => Block(0)
+#             Time(0) => Register(0)
+#             Time(1) => Thread(0)
+#             Time(2) => Thread(1)
+#             Time(3) => Loop3(0)
+#             Time(4) => Loop3(1)
+#             Time(5) => Loop2(0)
+#             Time(6) => Loop2(1)
+#             Time(7) => Loop1(0)
+#             Time(8) => Loop1(1)
+#             Time(9) => Loop1(2)
+#             Time(10) => Loop1(3)
+#             Time(11) => Loop1(4)
+#             Time(12) => Loop1(5)
+#             Time(13) => Loop1(6)
+#             Time(14) => Loop1(7)
+#         Jurepos1::Int32
 #             Beam(0) => Thread(2)
 #             Beam(1) => Thread(3)
 #             Beam(2) => Thread(4)
@@ -1384,6 +1415,8 @@ begin
             begin
                 begin end
                 begin end
+                begin end
+                begin end
                 begin
                     begin end
                     begin end
@@ -1398,8 +1431,9 @@ begin
                     begin end
                     begin end
                     begin end
-                    begin end
                 end
+                begin end
+                begin end
                 begin end
                 begin end
                 begin end
@@ -1434,7 +1468,7 @@ end
 begin
     s = @inbounds(
         s_mem[1 + (((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03)]::Int32
-    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1939 =#
+    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2012 =#
     begin
         (A0_0, A0_1, A0_2, A0_3) = unsafe_load4_global(
             A_mem,
@@ -2306,2191 +2340,8337 @@ begin
             )::NTuple{4,Int4x8}
             begin
                 @inbounds E_shared[
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07) << 0x02) + 0,
+                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07) << 0x02),
                     1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                ] = Ecopy_0                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2043 =#
+                ] = Ecopy_0                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2116 =#
                 @inbounds E_shared[
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07) << 0x02 + 1 % Int32) + 0,
+                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07) << 0x02 + 1 % Int32),
                     1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                ] = Ecopy_1                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2043 =#
+                ] = Ecopy_1                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2116 =#
                 @inbounds E_shared[
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07) << 0x02 + 2 % Int32) + 0,
+                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07) << 0x02 + 2 % Int32),
                     1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                ] = Ecopy_2                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2043 =#
+                ] = Ecopy_2                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2116 =#
                 @inbounds E_shared[
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07) << 0x02 + 3 % Int32) + 0,
+                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07) << 0x02 + 3 % Int32),
                     1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                ] = Ecopy_3                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2043 =#
+                ] = Ecopy_3                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2116 =#
             end
             sync_threads()
-            for loopIdx3 in Int32(0):Int32(32 ÷ 8 - 1)
+            begin
                 begin
-                    loopIdx4 = 0
+                    loopIdx3 = 0
                     begin
                         begin
-                            if loopIdx4 == 0
-                                A10_0 = A_0
-                            end
-                            if loopIdx4 == 0
-                                A10_1 = A_1
-                            end
-                            if loopIdx4 == 0
-                                A10_2 = A_2
-                            end
-                            if loopIdx4 == 0
-                                A10_3 = A_3
-                            end
-                            if loopIdx4 == 0
-                                A10_4 = A_4
-                            end
-                            if loopIdx4 == 0
-                                A10_5 = A_5
-                            end
-                            if loopIdx4 == 0
-                                A10_6 = A_6
-                            end
-                            if loopIdx4 == 0
-                                A10_7 = A_7
-                            end
-                            if loopIdx4 == 0
-                                A10_8 = A_8
-                            end
-                            if loopIdx4 == 0
-                                A10_9 = A_9
-                            end
-                            if loopIdx4 == 0
-                                A10_10 = A_10
-                            end
-                            if loopIdx4 == 0
-                                A10_11 = A_11
-                            end
-                            if loopIdx4 == 0
-                                A10_12 = A_12
-                            end
-                            if loopIdx4 == 0
-                                A10_13 = A_13
-                            end
-                            if loopIdx4 == 0
-                                A10_14 = A_14
-                            end
-                            if loopIdx4 == 0
-                                A10_15 = A_15
-                            end
-                            if loopIdx4 == 1
-                                A10_0 = A_16
-                            end
-                            if loopIdx4 == 1
-                                A10_1 = A_17
-                            end
-                            if loopIdx4 == 1
-                                A10_2 = A_18
-                            end
-                            if loopIdx4 == 1
-                                A10_3 = A_19
-                            end
-                            if loopIdx4 == 1
-                                A10_4 = A_20
-                            end
-                            if loopIdx4 == 1
-                                A10_5 = A_21
-                            end
-                            if loopIdx4 == 1
-                                A10_6 = A_22
-                            end
-                            if loopIdx4 == 1
-                                A10_7 = A_23
-                            end
-                            if loopIdx4 == 1
-                                A10_8 = A_24
-                            end
-                            if loopIdx4 == 1
-                                A10_9 = A_25
-                            end
-                            if loopIdx4 == 1
-                                A10_10 = A_26
-                            end
-                            if loopIdx4 == 1
-                                A10_11 = A_27
-                            end
-                            if loopIdx4 == 1
-                                A10_12 = A_28
-                            end
-                            if loopIdx4 == 1
-                                A10_13 = A_29
-                            end
-                            if loopIdx4 == 1
-                                A10_14 = A_30
-                            end
-                            if loopIdx4 == 1
-                                A10_15 = A_31
-                            end
-                        end
-                        begin
-                            Ju_0 = Int32(0)::Int32
-                            Ju_1 = Int32(0)::Int32
-                            Ju_2 = Int32(0)::Int32
-                            Ju_3 = Int32(0)::Int32
-                        end
-                        begin
+                            loopIdx4 = 0
                             begin
-                                loopIdx5 = 0
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_0 = A_0
                                     end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_1 = A_1
                                     end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_2 = A_2
                                     end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_3 = A_3
                                     end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_4 = A_4
                                     end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_5 = A_5
                                     end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_6 = A_6
                                     end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_7 = A_7
                                     end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_8 = A_8
                                     end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_9 = A_9
                                     end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_10 = A_10
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_11 = A_11
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_12 = A_12
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_13 = A_13
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_14 = A_14
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_15 = A_15
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_0 = A_16
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_1 = A_17
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_2 = A_18
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_3 = A_19
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_4 = A_20
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_5 = A_21
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_6 = A_22
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_7 = A_23
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_8 = A_24
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_9 = A_25
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_10 = A_26
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_11 = A_27
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_12 = A_28
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_13 = A_29
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_14 = A_30
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_15 = A_31
                                     end
                                 end
-                            end
-                            begin
-                                loopIdx5 = 1
+                                begin
+                                    Jurepos_0 = Int32(0)::Int32
+                                    Jurepos_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Jureneg_0 = Int32(0)::Int32
+                                    Jureneg_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Juim_0 = Int32(0)::Int32
+                                    Juim_1 = Int32(0)::Int32
+                                end
                                 begin
                                     begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
+                                        loopIdx5 = 0
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
                                         end
                                     end
                                     begin
-                                        Are = A11_0
-                                        Aim = A11_1
+                                        loopIdx5 = 1
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
-                                        E2re = E2_0
-                                        E2im = E2_1
+                                        loopIdx5 = 2
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                     begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
+                                        loopIdx5 = 3
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                     begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
+                                        loopIdx5 = 4
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                     begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
+                                        loopIdx5 = 5
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                     begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
+                                        loopIdx5 = 6
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                     begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
+                                        loopIdx5 = 7
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                 end
-                            end
-                            begin
-                                loopIdx5 = 2
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
+                                    Jure_0 = (Jurepos_0 - Jureneg_0)::Int32
+                                    Jure_1 = (Jurepos_1 - Jureneg_1)::Int32
                                 end
-                            end
-                            begin
-                                loopIdx5 = 3
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
+                                    Ju_0 = Jure_0
+                                    Ju_1 = Jure_1
+                                    Ju_2 = Juim_0
+                                    Ju_3 = Juim_1
                                 end
-                            end
-                            begin
-                                loopIdx5 = 4
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
+                                    Ju2_0 = ((Ju_0 + Int32(4)) >> 3)::Int32
+                                    Ju2_1 = ((Ju_1 + Int32(4)) >> 3)::Int32
+                                    Ju2_2 = ((Ju_2 + Int32(4)) >> 3)::Int32
+                                    Ju2_3 = ((Ju_3 + Int32(4)) >> 3)::Int32
                                 end
-                            end
-                            begin
-                                loopIdx5 = 5
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
+                                    Ju4_0 = Int16x2(Ju2_0, Ju2_2)
+                                    Ju4_1 = Int16x2(Ju2_1, Ju2_3)
                                 end
-                            end
-                            begin
-                                loopIdx5 = 6
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
-                                end
-                            end
-                            begin
-                                loopIdx5 = 7
-                                begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_0                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_1                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
                                 end
                             end
                         end
                         begin
-                            Ju2_0 = ((Ju_0 + Int32(4)) >> 3)::Int32
-                            Ju2_1 = ((Ju_1 + Int32(4)) >> 3)::Int32
-                            Ju2_2 = ((Ju_2 + Int32(4)) >> 3)::Int32
-                            Ju2_3 = ((Ju_3 + Int32(4)) >> 3)::Int32
-                        end
-                        begin
-                            Ju4_0 = Int16x2(Ju2_0, Ju2_2)
-                            Ju4_1 = Int16x2(Ju2_1, Ju2_3)
-                        end
-                        begin
-                            @inbounds Ju_shared[
-                                1 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02) + 0,
-                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
-                                1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
-                            ] = Ju4_0                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2041 =#
-                            @inbounds Ju_shared[
-                                1 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02) + 0,
-                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
-                                1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
-                            ] = Ju4_1                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2041 =#
+                            loopIdx4 = 1
+                            begin
+                                begin
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_0 = A_0
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_1 = A_1
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_2 = A_2
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_3 = A_3
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_4 = A_4
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_5 = A_5
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_6 = A_6
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_7 = A_7
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_8 = A_8
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_9 = A_9
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_10 = A_10
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_11 = A_11
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_12 = A_12
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_13 = A_13
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_14 = A_14
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_15 = A_15
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_0 = A_16
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_1 = A_17
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_2 = A_18
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_3 = A_19
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_4 = A_20
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_5 = A_21
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_6 = A_22
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_7 = A_23
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_8 = A_24
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_9 = A_25
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_10 = A_26
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_11 = A_27
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_12 = A_28
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_13 = A_29
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_14 = A_30
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_15 = A_31
+                                    end
+                                end
+                                begin
+                                    Jurepos_0 = Int32(0)::Int32
+                                    Jurepos_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Jureneg_0 = Int32(0)::Int32
+                                    Jureneg_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Juim_0 = Int32(0)::Int32
+                                    Juim_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    begin
+                                        loopIdx5 = 0
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 1
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 2
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 3
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 4
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 5
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 6
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 7
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                end
+                                begin
+                                    Jure_0 = (Jurepos_0 - Jureneg_0)::Int32
+                                    Jure_1 = (Jurepos_1 - Jureneg_1)::Int32
+                                end
+                                begin
+                                    Ju_0 = Jure_0
+                                    Ju_1 = Jure_1
+                                    Ju_2 = Juim_0
+                                    Ju_3 = Juim_1
+                                end
+                                begin
+                                    Ju2_0 = ((Ju_0 + Int32(4)) >> 3)::Int32
+                                    Ju2_1 = ((Ju_1 + Int32(4)) >> 3)::Int32
+                                    Ju2_2 = ((Ju_2 + Int32(4)) >> 3)::Int32
+                                    Ju2_3 = ((Ju_3 + Int32(4)) >> 3)::Int32
+                                end
+                                begin
+                                    Ju4_0 = Int16x2(Ju2_0, Ju2_2)
+                                    Ju4_1 = Int16x2(Ju2_1, Ju2_3)
+                                end
+                                begin
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_0                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_1                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                end
+                            end
                         end
                     end
                 end
                 begin
-                    loopIdx4 = 1
+                    loopIdx3 = 1
                     begin
                         begin
-                            if loopIdx4 == 0
-                                A10_0 = A_0
-                            end
-                            if loopIdx4 == 0
-                                A10_1 = A_1
-                            end
-                            if loopIdx4 == 0
-                                A10_2 = A_2
-                            end
-                            if loopIdx4 == 0
-                                A10_3 = A_3
-                            end
-                            if loopIdx4 == 0
-                                A10_4 = A_4
-                            end
-                            if loopIdx4 == 0
-                                A10_5 = A_5
-                            end
-                            if loopIdx4 == 0
-                                A10_6 = A_6
-                            end
-                            if loopIdx4 == 0
-                                A10_7 = A_7
-                            end
-                            if loopIdx4 == 0
-                                A10_8 = A_8
-                            end
-                            if loopIdx4 == 0
-                                A10_9 = A_9
-                            end
-                            if loopIdx4 == 0
-                                A10_10 = A_10
-                            end
-                            if loopIdx4 == 0
-                                A10_11 = A_11
-                            end
-                            if loopIdx4 == 0
-                                A10_12 = A_12
-                            end
-                            if loopIdx4 == 0
-                                A10_13 = A_13
-                            end
-                            if loopIdx4 == 0
-                                A10_14 = A_14
-                            end
-                            if loopIdx4 == 0
-                                A10_15 = A_15
-                            end
-                            if loopIdx4 == 1
-                                A10_0 = A_16
-                            end
-                            if loopIdx4 == 1
-                                A10_1 = A_17
-                            end
-                            if loopIdx4 == 1
-                                A10_2 = A_18
-                            end
-                            if loopIdx4 == 1
-                                A10_3 = A_19
-                            end
-                            if loopIdx4 == 1
-                                A10_4 = A_20
-                            end
-                            if loopIdx4 == 1
-                                A10_5 = A_21
-                            end
-                            if loopIdx4 == 1
-                                A10_6 = A_22
-                            end
-                            if loopIdx4 == 1
-                                A10_7 = A_23
-                            end
-                            if loopIdx4 == 1
-                                A10_8 = A_24
-                            end
-                            if loopIdx4 == 1
-                                A10_9 = A_25
-                            end
-                            if loopIdx4 == 1
-                                A10_10 = A_26
-                            end
-                            if loopIdx4 == 1
-                                A10_11 = A_27
-                            end
-                            if loopIdx4 == 1
-                                A10_12 = A_28
-                            end
-                            if loopIdx4 == 1
-                                A10_13 = A_29
-                            end
-                            if loopIdx4 == 1
-                                A10_14 = A_30
-                            end
-                            if loopIdx4 == 1
-                                A10_15 = A_31
-                            end
-                        end
-                        begin
-                            Ju_0 = Int32(0)::Int32
-                            Ju_1 = Int32(0)::Int32
-                            Ju_2 = Int32(0)::Int32
-                            Ju_3 = Int32(0)::Int32
-                        end
-                        begin
+                            loopIdx4 = 0
                             begin
-                                loopIdx5 = 0
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_0 = A_0
                                     end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_1 = A_1
                                     end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_2 = A_2
                                     end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_3 = A_3
                                     end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_4 = A_4
                                     end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_5 = A_5
                                     end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_6 = A_6
                                     end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_7 = A_7
                                     end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_8 = A_8
                                     end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_9 = A_9
                                     end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_10 = A_10
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_11 = A_11
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_12 = A_12
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_13 = A_13
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_14 = A_14
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_15 = A_15
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_0 = A_16
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_1 = A_17
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_2 = A_18
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_3 = A_19
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_4 = A_20
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_5 = A_21
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_6 = A_22
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_7 = A_23
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_8 = A_24
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_9 = A_25
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_10 = A_26
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_11 = A_27
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_12 = A_28
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_13 = A_29
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_14 = A_30
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_15 = A_31
                                     end
                                 end
-                            end
-                            begin
-                                loopIdx5 = 1
+                                begin
+                                    Jurepos_0 = Int32(0)::Int32
+                                    Jurepos_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Jureneg_0 = Int32(0)::Int32
+                                    Jureneg_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Juim_0 = Int32(0)::Int32
+                                    Juim_1 = Int32(0)::Int32
+                                end
                                 begin
                                     begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
+                                        loopIdx5 = 0
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
                                         end
                                     end
                                     begin
-                                        Are = A11_0
-                                        Aim = A11_1
+                                        loopIdx5 = 1
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
                                     begin
-                                        E2re = E2_0
-                                        E2im = E2_1
+                                        loopIdx5 = 2
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                     begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
+                                        loopIdx5 = 3
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                     begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
+                                        loopIdx5 = 4
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                     begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
+                                        loopIdx5 = 5
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                     begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
+                                        loopIdx5 = 6
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                     begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
+                                        loopIdx5 = 7
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
                                     end
                                 end
-                            end
-                            begin
-                                loopIdx5 = 2
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
+                                    Jure_0 = (Jurepos_0 - Jureneg_0)::Int32
+                                    Jure_1 = (Jurepos_1 - Jureneg_1)::Int32
                                 end
-                            end
-                            begin
-                                loopIdx5 = 3
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
+                                    Ju_0 = Jure_0
+                                    Ju_1 = Jure_1
+                                    Ju_2 = Juim_0
+                                    Ju_3 = Juim_1
                                 end
-                            end
-                            begin
-                                loopIdx5 = 4
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
+                                    Ju2_0 = ((Ju_0 + Int32(4)) >> 3)::Int32
+                                    Ju2_1 = ((Ju_1 + Int32(4)) >> 3)::Int32
+                                    Ju2_2 = ((Ju_2 + Int32(4)) >> 3)::Int32
+                                    Ju2_3 = ((Ju_3 + Int32(4)) >> 3)::Int32
                                 end
-                            end
-                            begin
-                                loopIdx5 = 5
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
+                                    Ju4_0 = Int16x2(Ju2_0, Ju2_2)
+                                    Ju4_1 = Int16x2(Ju2_1, Ju2_3)
                                 end
-                            end
-                            begin
-                                loopIdx5 = 6
                                 begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
-                                end
-                            end
-                            begin
-                                loopIdx5 = 7
-                                begin
-                                    begin
-                                        if loopIdx5 == 0
-                                            A11_0 = A10_0
-                                        end
-                                        if loopIdx5 == 0
-                                            A11_1 = A10_1
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_0 = A10_2
-                                        end
-                                        if loopIdx5 == 1
-                                            A11_1 = A10_3
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_0 = A10_4
-                                        end
-                                        if loopIdx5 == 2
-                                            A11_1 = A10_5
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_0 = A10_6
-                                        end
-                                        if loopIdx5 == 3
-                                            A11_1 = A10_7
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_0 = A10_8
-                                        end
-                                        if loopIdx5 == 4
-                                            A11_1 = A10_9
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_0 = A10_10
-                                        end
-                                        if loopIdx5 == 5
-                                            A11_1 = A10_11
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_0 = A10_12
-                                        end
-                                        if loopIdx5 == 6
-                                            A11_1 = A10_13
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_0 = A10_14
-                                        end
-                                        if loopIdx5 == 7
-                                            A11_1 = A10_15
-                                        end
-                                    end
-                                    begin
-                                        Are = A11_0
-                                        Aim = A11_1
-                                    end
-                                    E0 = @inbounds(
-                                        E_shared[
-                                            1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
-                                            1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                        ]::Int4x8
-                                    ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1937 =#
-                                    E1 = E0
-                                    (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
-                                    begin
-                                        E2re = E2_0
-                                        E2im = E2_1
-                                    end
-                                    begin
-                                        Ju0_0 = Int32(0)::Int32
-                                        Ju0_1 = Int32(0)::Int32
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure1_0, Jure1_1) = D_frag
-                                    end
-                                    begin
-                                        Jure2_0 = (-Jure1_0)::Int32
-                                        Jure2_1 = (-Jure1_1)::Int32
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Jure2_0, Jure2_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Jure_0, Jure_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Are::Int8x4
-                                        B_frag = E2im::Int8x4
-                                        C_frag = (Ju0_0, Ju0_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim1_0, Juim1_1) = D_frag
-                                    end
-                                    begin
-                                        A_frag = Aim::Int8x4
-                                        B_frag = E2re::Int8x4
-                                        C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                        D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
-                                        (Juim_0, Juim_1) = D_frag
-                                    end
-                                    begin
-                                        Ju1_0 = Jure_0
-                                        Ju1_1 = Jure_1
-                                        Ju1_2 = Juim_0
-                                        Ju1_3 = Juim_1
-                                    end
-                                    begin
-                                        Ju_0 += Ju1_0
-                                        Ju_1 += Ju1_1
-                                        Ju_2 += Ju1_2
-                                        Ju_3 += Ju1_3
-                                    end
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_0                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_1                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
                                 end
                             end
                         end
                         begin
-                            Ju2_0 = ((Ju_0 + Int32(4)) >> 3)::Int32
-                            Ju2_1 = ((Ju_1 + Int32(4)) >> 3)::Int32
-                            Ju2_2 = ((Ju_2 + Int32(4)) >> 3)::Int32
-                            Ju2_3 = ((Ju_3 + Int32(4)) >> 3)::Int32
+                            loopIdx4 = 1
+                            begin
+                                begin
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_0 = A_0
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_1 = A_1
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_2 = A_2
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_3 = A_3
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_4 = A_4
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_5 = A_5
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_6 = A_6
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_7 = A_7
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_8 = A_8
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_9 = A_9
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_10 = A_10
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_11 = A_11
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_12 = A_12
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_13 = A_13
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_14 = A_14
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_15 = A_15
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_0 = A_16
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_1 = A_17
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_2 = A_18
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_3 = A_19
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_4 = A_20
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_5 = A_21
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_6 = A_22
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_7 = A_23
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_8 = A_24
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_9 = A_25
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_10 = A_26
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_11 = A_27
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_12 = A_28
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_13 = A_29
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_14 = A_30
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_15 = A_31
+                                    end
+                                end
+                                begin
+                                    Jurepos_0 = Int32(0)::Int32
+                                    Jurepos_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Jureneg_0 = Int32(0)::Int32
+                                    Jureneg_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Juim_0 = Int32(0)::Int32
+                                    Juim_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    begin
+                                        loopIdx5 = 0
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 1
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 2
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 3
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 4
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 5
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 6
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 7
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                end
+                                begin
+                                    Jure_0 = (Jurepos_0 - Jureneg_0)::Int32
+                                    Jure_1 = (Jurepos_1 - Jureneg_1)::Int32
+                                end
+                                begin
+                                    Ju_0 = Jure_0
+                                    Ju_1 = Jure_1
+                                    Ju_2 = Juim_0
+                                    Ju_3 = Juim_1
+                                end
+                                begin
+                                    Ju2_0 = ((Ju_0 + Int32(4)) >> 3)::Int32
+                                    Ju2_1 = ((Ju_1 + Int32(4)) >> 3)::Int32
+                                    Ju2_2 = ((Ju_2 + Int32(4)) >> 3)::Int32
+                                    Ju2_3 = ((Ju_3 + Int32(4)) >> 3)::Int32
+                                end
+                                begin
+                                    Ju4_0 = Int16x2(Ju2_0, Ju2_2)
+                                    Ju4_1 = Int16x2(Ju2_1, Ju2_3)
+                                end
+                                begin
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_0                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_1                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                end
+                            end
+                        end
+                    end
+                end
+                begin
+                    loopIdx3 = 2
+                    begin
+                        begin
+                            loopIdx4 = 0
+                            begin
+                                begin
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_0 = A_0
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_1 = A_1
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_2 = A_2
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_3 = A_3
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_4 = A_4
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_5 = A_5
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_6 = A_6
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_7 = A_7
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_8 = A_8
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_9 = A_9
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_10 = A_10
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_11 = A_11
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_12 = A_12
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_13 = A_13
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_14 = A_14
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_15 = A_15
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_0 = A_16
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_1 = A_17
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_2 = A_18
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_3 = A_19
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_4 = A_20
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_5 = A_21
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_6 = A_22
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_7 = A_23
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_8 = A_24
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_9 = A_25
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_10 = A_26
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_11 = A_27
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_12 = A_28
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_13 = A_29
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_14 = A_30
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_15 = A_31
+                                    end
+                                end
+                                begin
+                                    Jurepos_0 = Int32(0)::Int32
+                                    Jurepos_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Jureneg_0 = Int32(0)::Int32
+                                    Jureneg_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Juim_0 = Int32(0)::Int32
+                                    Juim_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    begin
+                                        loopIdx5 = 0
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 1
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 2
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 3
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 4
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 5
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 6
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 7
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                end
+                                begin
+                                    Jure_0 = (Jurepos_0 - Jureneg_0)::Int32
+                                    Jure_1 = (Jurepos_1 - Jureneg_1)::Int32
+                                end
+                                begin
+                                    Ju_0 = Jure_0
+                                    Ju_1 = Jure_1
+                                    Ju_2 = Juim_0
+                                    Ju_3 = Juim_1
+                                end
+                                begin
+                                    Ju2_0 = ((Ju_0 + Int32(4)) >> 3)::Int32
+                                    Ju2_1 = ((Ju_1 + Int32(4)) >> 3)::Int32
+                                    Ju2_2 = ((Ju_2 + Int32(4)) >> 3)::Int32
+                                    Ju2_3 = ((Ju_3 + Int32(4)) >> 3)::Int32
+                                end
+                                begin
+                                    Ju4_0 = Int16x2(Ju2_0, Ju2_2)
+                                    Ju4_1 = Int16x2(Ju2_1, Ju2_3)
+                                end
+                                begin
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_0                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_1                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                end
+                            end
                         end
                         begin
-                            Ju4_0 = Int16x2(Ju2_0, Ju2_2)
-                            Ju4_1 = Int16x2(Ju2_1, Ju2_3)
+                            loopIdx4 = 1
+                            begin
+                                begin
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_0 = A_0
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_1 = A_1
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_2 = A_2
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_3 = A_3
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_4 = A_4
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_5 = A_5
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_6 = A_6
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_7 = A_7
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_8 = A_8
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_9 = A_9
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_10 = A_10
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_11 = A_11
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_12 = A_12
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_13 = A_13
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_14 = A_14
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_15 = A_15
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_0 = A_16
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_1 = A_17
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_2 = A_18
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_3 = A_19
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_4 = A_20
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_5 = A_21
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_6 = A_22
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_7 = A_23
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_8 = A_24
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_9 = A_25
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_10 = A_26
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_11 = A_27
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_12 = A_28
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_13 = A_29
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_14 = A_30
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_15 = A_31
+                                    end
+                                end
+                                begin
+                                    Jurepos_0 = Int32(0)::Int32
+                                    Jurepos_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Jureneg_0 = Int32(0)::Int32
+                                    Jureneg_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Juim_0 = Int32(0)::Int32
+                                    Juim_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    begin
+                                        loopIdx5 = 0
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 1
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 2
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 3
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 4
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 5
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 6
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 7
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                end
+                                begin
+                                    Jure_0 = (Jurepos_0 - Jureneg_0)::Int32
+                                    Jure_1 = (Jurepos_1 - Jureneg_1)::Int32
+                                end
+                                begin
+                                    Ju_0 = Jure_0
+                                    Ju_1 = Jure_1
+                                    Ju_2 = Juim_0
+                                    Ju_3 = Juim_1
+                                end
+                                begin
+                                    Ju2_0 = ((Ju_0 + Int32(4)) >> 3)::Int32
+                                    Ju2_1 = ((Ju_1 + Int32(4)) >> 3)::Int32
+                                    Ju2_2 = ((Ju_2 + Int32(4)) >> 3)::Int32
+                                    Ju2_3 = ((Ju_3 + Int32(4)) >> 3)::Int32
+                                end
+                                begin
+                                    Ju4_0 = Int16x2(Ju2_0, Ju2_2)
+                                    Ju4_1 = Int16x2(Ju2_1, Ju2_3)
+                                end
+                                begin
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_0                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_1                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                end
+                            end
+                        end
+                    end
+                end
+                begin
+                    loopIdx3 = 3
+                    begin
+                        begin
+                            loopIdx4 = 0
+                            begin
+                                begin
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_0 = A_0
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_1 = A_1
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_2 = A_2
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_3 = A_3
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_4 = A_4
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_5 = A_5
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_6 = A_6
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_7 = A_7
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_8 = A_8
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_9 = A_9
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_10 = A_10
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_11 = A_11
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_12 = A_12
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_13 = A_13
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_14 = A_14
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_15 = A_15
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_0 = A_16
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_1 = A_17
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_2 = A_18
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_3 = A_19
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_4 = A_20
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_5 = A_21
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_6 = A_22
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_7 = A_23
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_8 = A_24
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_9 = A_25
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_10 = A_26
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_11 = A_27
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_12 = A_28
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_13 = A_29
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_14 = A_30
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_15 = A_31
+                                    end
+                                end
+                                begin
+                                    Jurepos_0 = Int32(0)::Int32
+                                    Jurepos_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Jureneg_0 = Int32(0)::Int32
+                                    Jureneg_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Juim_0 = Int32(0)::Int32
+                                    Juim_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    begin
+                                        loopIdx5 = 0
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 1
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 2
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 3
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 4
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 5
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 6
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 7
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                end
+                                begin
+                                    Jure_0 = (Jurepos_0 - Jureneg_0)::Int32
+                                    Jure_1 = (Jurepos_1 - Jureneg_1)::Int32
+                                end
+                                begin
+                                    Ju_0 = Jure_0
+                                    Ju_1 = Jure_1
+                                    Ju_2 = Juim_0
+                                    Ju_3 = Juim_1
+                                end
+                                begin
+                                    Ju2_0 = ((Ju_0 + Int32(4)) >> 3)::Int32
+                                    Ju2_1 = ((Ju_1 + Int32(4)) >> 3)::Int32
+                                    Ju2_2 = ((Ju_2 + Int32(4)) >> 3)::Int32
+                                    Ju2_3 = ((Ju_3 + Int32(4)) >> 3)::Int32
+                                end
+                                begin
+                                    Ju4_0 = Int16x2(Ju2_0, Ju2_2)
+                                    Ju4_1 = Int16x2(Ju2_1, Ju2_3)
+                                end
+                                begin
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_0                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_1                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                end
+                            end
                         end
                         begin
-                            @inbounds Ju_shared[
-                                1 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02) + 0,
-                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
-                                1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
-                            ] = Ju4_0                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2041 =#
-                            @inbounds Ju_shared[
-                                1 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02) + 0,
-                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
-                                1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
-                            ] = Ju4_1                            #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2041 =#
+                            loopIdx4 = 1
+                            begin
+                                begin
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_0 = A_0
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_1 = A_1
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_2 = A_2
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_3 = A_3
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_4 = A_4
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_5 = A_5
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_6 = A_6
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_7 = A_7
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_8 = A_8
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_9 = A_9
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_10 = A_10
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_11 = A_11
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_12 = A_12
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_13 = A_13
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_14 = A_14
+                                    end
+                                    if loopIdx4 == 0x0000000000000000
+                                        A10_15 = A_15
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_0 = A_16
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_1 = A_17
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_2 = A_18
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_3 = A_19
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_4 = A_20
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_5 = A_21
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_6 = A_22
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_7 = A_23
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_8 = A_24
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_9 = A_25
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_10 = A_26
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_11 = A_27
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_12 = A_28
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_13 = A_29
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_14 = A_30
+                                    end
+                                    if loopIdx4 == 0x0000000000000001
+                                        A10_15 = A_31
+                                    end
+                                end
+                                begin
+                                    Jurepos_0 = Int32(0)::Int32
+                                    Jurepos_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Jureneg_0 = Int32(0)::Int32
+                                    Jureneg_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    Juim_0 = Int32(0)::Int32
+                                    Juim_1 = Int32(0)::Int32
+                                end
+                                begin
+                                    begin
+                                        loopIdx5 = 0
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 1
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 2
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 3
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 4
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 5
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 6
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                    begin
+                                        loopIdx5 = 7
+                                        begin
+                                            begin
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_0 = A10_0
+                                                end
+                                                if loopIdx5 == 0x0000000000000000
+                                                    A11_1 = A10_1
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_0 = A10_2
+                                                end
+                                                if loopIdx5 == 0x0000000000000001
+                                                    A11_1 = A10_3
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_0 = A10_4
+                                                end
+                                                if loopIdx5 == 0x0000000000000002
+                                                    A11_1 = A10_5
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_0 = A10_6
+                                                end
+                                                if loopIdx5 == 0x0000000000000003
+                                                    A11_1 = A10_7
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_0 = A10_8
+                                                end
+                                                if loopIdx5 == 0x0000000000000004
+                                                    A11_1 = A10_9
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_0 = A10_10
+                                                end
+                                                if loopIdx5 == 0x0000000000000005
+                                                    A11_1 = A10_11
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_0 = A10_12
+                                                end
+                                                if loopIdx5 == 0x0000000000000006
+                                                    A11_1 = A10_13
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_0 = A10_14
+                                                end
+                                                if loopIdx5 == 0x0000000000000007
+                                                    A11_1 = A10_15
+                                                end
+                                            end
+                                            begin
+                                                Are = A11_0
+                                                Aim = A11_1
+                                            end
+                                            E0 = @inbounds(
+                                                E_shared[
+                                                    1 + ((loopIdx5 % Int32) & 0x07 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x05 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x03),
+                                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                                ]::Int4x8
+                                            ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2010 =#
+                                            E1 = E0
+                                            (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E1)
+                                            begin
+                                                E2re = E2_0
+                                                E2im = E2_1
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jurepos1_0, Jurepos1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Jureneg1_0, Jureneg1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Are::Int8x4
+                                                B_frag = E2im::Int8x4
+                                                C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim1_0, Juim1_1) = D_frag
+                                            end
+                                            begin
+                                                A_frag = Aim::Int8x4
+                                                B_frag = E2re::Int8x4
+                                                C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
+                                                D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                                (Juim2_0, Juim2_1) = D_frag
+                                            end
+                                            begin
+                                                Jurepos_0 = Jurepos1_0
+                                                Jurepos_1 = Jurepos1_1
+                                            end
+                                            begin
+                                                Jureneg_0 = Jureneg1_0
+                                                Jureneg_1 = Jureneg1_1
+                                            end
+                                            begin
+                                                Juim_0 = Juim2_0
+                                                Juim_1 = Juim2_1
+                                            end
+                                        end
+                                    end
+                                end
+                                begin
+                                    Jure_0 = (Jurepos_0 - Jureneg_0)::Int32
+                                    Jure_1 = (Jurepos_1 - Jureneg_1)::Int32
+                                end
+                                begin
+                                    Ju_0 = Jure_0
+                                    Ju_1 = Jure_1
+                                    Ju_2 = Juim_0
+                                    Ju_3 = Juim_1
+                                end
+                                begin
+                                    Ju2_0 = ((Ju_0 + Int32(4)) >> 3)::Int32
+                                    Ju2_1 = ((Ju_1 + Int32(4)) >> 3)::Int32
+                                    Ju2_2 = ((Ju_2 + Int32(4)) >> 3)::Int32
+                                    Ju2_3 = ((Ju_3 + Int32(4)) >> 3)::Int32
+                                end
+                                begin
+                                    Ju4_0 = Int16x2(Ju2_0, Ju2_2)
+                                    Ju4_1 = Int16x2(Ju2_1, Ju2_3)
+                                end
+                                begin
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_0                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                    @inbounds Ju_shared[
+                                        1 + 0 + (((loopIdx4 % Int32) & 0x01) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x1c) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
+                                        1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
+                                        1 + (((threadIdx()).y - Int32(1)) % Int32) & 0x03,
+                                    ] = Ju4_1                                    #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2114 =#
+                                end
+                            end
                         end
                     end
                 end
@@ -4503,112 +10683,112 @@ begin
                         1 + (((threadIdx()).x - Int32(1)) % Int32) & 0x07,
                         1 + 0x00,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_1 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + (((threadIdx()).x - Int32(1)) % Int32) & 0x07,
                         1 + 1 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_2 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + (((threadIdx()).x - Int32(1)) % Int32) & 0x07,
                         1 + 2 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_3 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + (((threadIdx()).x - Int32(1)) % Int32) & 0x07,
                         1 + 3 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_8 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 8 % Int32),
                         1 + 0x00,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_9 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 8 % Int32),
                         1 + 1 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_10 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 8 % Int32),
                         1 + 2 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_11 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 8 % Int32),
                         1 + 3 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_16 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 16 % Int32),
                         1 + 0x00,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_17 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 16 % Int32),
                         1 + 1 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_18 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 16 % Int32),
                         1 + 2 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_19 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 16 % Int32),
                         1 + 3 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_24 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 24 % Int32),
                         1 + 0x00,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_25 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 24 % Int32),
                         1 + 1 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_26 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 24 % Int32),
                         1 + 2 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
                 Ju10_27 = @inbounds(
                     Ju_shared[
                         1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x1f) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
                         1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 24 % Int32),
                         1 + 3 % Int32,
                     ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1935 =#
+                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2008 =#
             end
             begin
                 (Ju11_0, Ju11_4) = convert(NTuple{2,Int32}, Ju10_0)
@@ -4730,16 +10910,16 @@ begin
             end
             J3 = Int4x8(J2′_0, J2′_4, J2′_8, J2′_12, J2′_16, J2′_20, J2′_24, J2′_28)
             begin
-                if loopIdx2 == 0
+                if loopIdx2 == 0x0000000000000000
                     Jper_0 = J3
                 end
-                if loopIdx2 == 1
+                if loopIdx2 == 0x0000000000000001
                     Jper_1 = J3
                 end
-                if loopIdx2 == 2
+                if loopIdx2 == 0x0000000000000002
                     Jper_2 = J3
                 end
-                if loopIdx2 == 3
+                if loopIdx2 == 0x0000000000000003
                     Jper_3 = J3
                 end
             end
@@ -4937,6 +11117,7 @@ begin
         unsafe_store4_global!(
             J_mem,
             1 +
+            0 +
             (
                 ((loopIdx1 % Int32) & 0xff) << 0x05 +
                 ((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x0d +
@@ -4947,8 +11128,7 @@ begin
                     ((((threadIdx()).x - Int32(1)) % Int32) & 0x02) << 0x03 +
                     ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) << 0x11
                 )
-            ) +
-            0,
+            ),
             (Jstore_0, Jstore_1, Jstore_2, Jstore_3),
         )
     end
