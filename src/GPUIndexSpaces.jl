@@ -1276,10 +1276,10 @@ function select!(
     stmts = Code[]
     for r in 0:register_mask
         if r & ~register_mask == 0
-            i = sum((r & 1 << register.bit ≠ 0) << (i - 1) for (i, register) in enumerate(registers))
+            i = sum(UInt[(r & 1 << register.bit ≠ 0) << (i - 1) for (i, register) in enumerate(registers)])
             rname = register_mask == 0 ? "" : "_$r"
-            lhsr = r & ~sum(1 << register.bit for register in registers)
-            lhsrname = register_mask & ~sum(1 << register.bit for register in registers) == 0 ? "" : "_$lhsr"
+            lhsr = r & ~sum(UInt[1 << register.bit for register in registers])
+            lhsrname = register_mask & ~sum(UInt[1 << register.bit for register in registers]) == 0 ? "" : "_$lhsr"
             push!(
                 stmts,
                 quote
@@ -1389,8 +1389,9 @@ function unselect!(
     stmts = Code[]
     for r in 0:register_mask
         if r & ~register_mask == 0
-            i = sum((r & 1 << register.bit ≠ 0) << (i - 1) for (i, (index_register, register)) in enumerate(index_registers))
-            rname = register_mask & ~sum(1 << register.bit for (index_register, register) in index_registers) == 0 ? "" : "_$r"
+            i = sum(UInt[(r & 1 << register.bit ≠ 0) << (i - 1) for (i, (index_register, register)) in enumerate(index_registers)])
+            rname =
+                register_mask & ~sum(UInt[1 << register.bit for (index_register, register) in index_registers]) == 0 ? "" : "_$r"
 
             lhsr = r
             lhsrname = register_mask == 0 ? "" : "_$lhsr"
