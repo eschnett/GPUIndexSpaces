@@ -1382,6 +1382,7 @@ function unselect!(
 
     all_registers = [v for (k, v) in lhsmap if v isa Register]
     register_mask = sum(UInt[1 << reg.bit for reg in all_registers])
+    index_register_mask = sum(UInt[1 << register.bit for (index_register, register) in index_registers])
 
     @assert all((1 << register.bit) & register_mask ≠ 0 for (register_index, register) in index_registers)
 
@@ -1390,8 +1391,8 @@ function unselect!(
     for r in 0:register_mask
         if r & ~register_mask == 0
             i = sum(UInt[(r & 1 << register.bit ≠ 0) << (i - 1) for (i, (index_register, register)) in enumerate(index_registers)])
-            rname =
-                register_mask & ~sum(UInt[1 << register.bit for (index_register, register) in index_registers]) == 0 ? "" : "_$r"
+            rhsr = r & ~index_register_mask
+            rname = register_mask & ~index_register_mask == 0 ? "" : "_$rhsr"
 
             lhsr = r
             lhsrname = register_mask == 0 ? "" : "_$lhsr"
