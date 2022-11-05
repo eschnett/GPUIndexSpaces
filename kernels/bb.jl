@@ -42,31 +42,72 @@ const T2 = 32
 @assert T1 % T2 == 0
 @assert T2 % 4 == 0
 
+# macro CHORD(x)
+#     return esc(x)
+# end
+# macro PATHFINDER(x)
+#     return :()
+# end
+# macro CHORDARR(x)
+#     return :([$(esc(x))])
+# end
+# macro PATHFINDERARR(x)
+#     return :([])
+# end
+
+macro CHORD(x)
+    return :()
+end
+macro PATHFINDER(x)
+    return esc(x)
+end
+macro CHORDARR(x)
+    return :([])
+end
+macro PATHFINDERARR(x)
+    return :([$(esc(x))])
+end
+
+# # CHORD
+# 
+# # number of beams
+# # const B = 96
+# @CHORD const B = 128
+# 
+# # number of dishes
+# @CHORD const D = 512
+# 
+# # frequency channels per GPU
+# # const F = 16
+# @CHORD const F = 84 ÷ 2
+# # const F = 1
+# 
+# # A matrix tiling
+# # const Wb, Wd, Wp = 6, 4, 1
+# @CHORD const Wb, Wd, Wp = 8, 4, 1
+
+# PATHFINDER
+
 # number of beams
-# const B = 96
-const B = 128
-#PATHFINDER const B = 16
+const B = 16
 
 # number of dishes
-const D = 512
-#PATHFINDER const D = 64
+const D = 64
 
 # frequency channels per GPU
-# const F = 16
-const F = 84 ÷ 2
-#PATHFINDER const F = 84
+const F = 84
 # const F = 1
 
 # A matrix tiling
-# const Wb, Wd = 6, 4
-const Wb, Wd = 8, 4
-#PATHFINDER const Wb, Wd = 2, 1
+const Wb, Wd, Wp = 2, 1, 2
+
 @assert B % Wb == 0
 @assert B ÷ Wb % 8 == 0         # for tensor cores
 @assert D % Wd == 0
+@assert D % Wd % 8 == 0         # for tensor cores
 
 # warps per block
-const W = Wb * Wd
+const W = Wb * Wd * Wp
 
 const σ = 5 - round(Int, log2(Wd))
 
@@ -96,7 +137,6 @@ const σ = 5 - round(Int, log2(Wd))
 const Cplx = Index{:Cplx}       # 1 bit (0:re, 1:im)
 const Polr = Index{:Polr}       # 1 bit
 const Dish = Index{:Dish}       # 9 bits
-# const Dish = Index{:Dish}     # 9 bits
 const Freq = Index{:Freq}       # 8 bits here
 const Time = Index{:Time}       # 15 bits
 const Beam = Index{:Beam}       # 7 bits (0...95)
@@ -144,8 +184,8 @@ const map_E_shared = let
             Dish(0) => SIMD(3),
             Dish(1) => SIMD(4),
             [Dish(d) => Memory(m += 1) for d in 2:(ceil(Int, log2(D)) - 1)]...,
-            #PATHFINDER Polr(0) => Memory(m += 1),
-            Polr(0) => Block(b += 1),
+            (@CHORDARR Polr(0) => Block(b += 1))...,
+            (@PATHFINDERARR Polr(0) => Memory(m += 1))...,
             [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
             # TODO: Make padding a compile-time constant, not a run-time choice
             [Time(t) => Memory2(m2 += 1) for t in 0:4]...,
@@ -156,10 +196,12 @@ const map_E_shared = let
 end
 
 # Defined in section 3
-@assert Wd == 4
-@assert Wb == 8
-#PATHFINDER @assert Wd == 1
-#PATHFINDER @assert Wb == 2
+@CHORD @assert Wd == 4
+@CHORD @assert Wb == 8
+@CHORD @assert Wp == 1
+@PATHFINDER @assert Wd == 1
+@PATHFINDER @assert Wb == 2
+@PATHFINDER @assert Wp == 2
 const map_Ecopy_registers = let
     b = -1
     Layout(
@@ -172,36 +214,36 @@ const map_Ecopy_registers = let
             Dish(3) => Register(1),
             Dish(4) => Thread(0),
             Dish(5) => Thread(1),
-            Dish(6) => Thread(2),
-            Dish(7) => Warp(0),
-            Dish(8) => Warp(1),
-            #PATHFINDER Polr(0) => Thread(2),
+            (@CHORDARR Dish(6) => Thread(2))...,
+            (@CHORDARR Dish(7) => Warp(0))...,
+            (@CHORDARR Dish(8) => Warp(1))...,
             Time(0) => Thread(3),
             Time(1) => Thread(4),
-            Time(2) => Warp(2),
-            Time(3) => Warp(3),
-            Time(4) => Warp(4),
-            #PATHFINDER Time(2) => Warp(0),
-            #PATHFINDER Time(3) => Register(2),
-            #PATHFINDER Time(4) => Register(3),
+            (@CHORDARR Time(2) => Warp(2))...,
+            (@CHORDARR Time(3) => Warp(3))...,
+            (@CHORDARR Time(4) => Warp(4))...,
+            (@PATHFINDERARR Time(2) => Register(2))...,
+            (@PATHFINDERARR Time(3) => Thread(2))..., # TODO: check shared memory access
+            (@PATHFINDERARR Time(4) => Warp(0))...,
             Time(5) => LoopT1(0),
             Time(6) => LoopT1(1),
             [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
-            Polr(0) => Block(b += 1),
+            (@CHORDARR Polr(0) => Block(b += 1))...,
+            (@PATHFINDERARR Polr(0) => Warp(1))...,
             [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
         ),
     )
 end
 
-@assert Wd == 4
-@assert D ÷ Wd % 16 == 0
-@assert D ÷ Wd ÷ 16 == 8
-#PATHFINDER @assert Wd == 1
-#PATHFINDER @assert D ÷ Wd % 8 == 0
-#PATHFINDER @assert D ÷ Wd ÷ 8 == 8
+@CHORD @assert Wd == 4
+@CHORD @assert D ÷ Wd % 16 == 0
+@CHORD @assert D ÷ Wd ÷ 16 == 8
+@PATHFINDER @assert Wd == 1
+@PATHFINDER @assert D ÷ Wd % 16 == 0
+@PATHFINDER @assert D ÷ Wd ÷ 16 == 4
 @assert T2 % 8 == 0
 @assert T2 ÷ 8 == 4
-const map_E_registers = let
+const map_E_registers_load_shared = let
     b = -1
     Layout(
         Int32,
@@ -209,14 +251,16 @@ const map_E_registers = let
             Cplx(0) => SIMD(2),
             Dish(0) => SIMD(3),
             Dish(1) => SIMD(4),
-            Dish(5) => Thread(0),
-            Dish(6) => Thread(1),
-            #PATHFINDER Polr(0) => Thread(1),
             Dish(2) => LoopD(0),
             Dish(3) => LoopD(1),
-            Dish(4) => LoopD(2),
-            Dish(7) => Warp(0),    # since Wd = 4
-            Dish(8) => Warp(1),    # since Wd = 4
+            (@CHORDARR Dish(4) => LoopD(2))...,
+            (@CHORDARR Dish(5) => Thread(0))...,
+            (@CHORDARR Dish(6) => Thread(1))...,
+            (@CHORDARR Dish(7) => Warp(0))..., # since Wd = 4
+            (@CHORDARR Dish(8) => Warp(1))..., # since Wd = 4
+            (@PATHFINDERARR Dish(4) => Thread(0))..., # TODO: check shared memory access
+            (@PATHFINDERARR Dish(5) => Thread(1))...,
+            (@PATHFINDERARR Polr(0) => Warp(1))...,
             Time(0) => Thread(2),
             Time(1) => Thread(3),
             Time(2) => Thread(4),
@@ -225,7 +269,40 @@ const map_E_registers = let
             Time(5) => LoopT1(0),
             Time(6) => LoopT1(1),
             [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
-            Polr(0) => Block(b += 1),
+            (@CHORDARR Polr(0) => Block(b += 1))...,
+            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
+        ),
+    )
+end
+
+# Section 4, eqn (16)
+const map_E_registers_multiply = let
+    b = -1
+    Layout(
+        Int32,
+        Dict(
+            Cplx(0) => Register(0),
+            Dish(0) => SIMD(3), # mma input 0  
+            Dish(1) => SIMD(4), # mma input 1
+            Dish(2) => LoopD(0),
+            Dish(3) => LoopD(1),
+            (@CHORDARR Dish(4) => LoopD(2))...,
+            (@CHORDARR Dish(5) => Thread(0))...,      # mma input 2
+            (@CHORDARR Dish(6) => Thread(1))...,      # mma input 3
+            (@CHORDARR Dish(7) => Warp(0))...,        # since Wd = 4
+            (@CHORDARR Dish(8) => Warp(1))...,        # since Wd = 4
+            (@PATHFINDERARR Dish(4) => Thread(0))..., # mma input 2
+            (@PATHFINDERARR Dish(5) => Thread(1))..., # mma input 3
+            Time(0) => Thread(2), # mma spectator 0
+            Time(1) => Thread(3), # mma spectator 1
+            Time(2) => Thread(4), # mma spectator 2
+            Time(3) => LoopT2(0),
+            Time(4) => LoopT2(1),
+            Time(5) => LoopT1(0),
+            Time(6) => LoopT1(1),
+            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
+            (@CHORDARR Polr(0) => Block(b += 1))...,
+            (@PATHFINDERARR Polr(0) => Warp(1))...,
             [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
         ),
     )
@@ -250,11 +327,11 @@ const map_A_global = let
             # Cplx(0) => Memory(0 + 0),
             # Dish(0) => SIMD(3),
             # Dish(1) => SIMD(4),
-            # Dish(5) => Memory(5 + 0),
-            # Dish(6) => Memory(5 + 1),
             # Dish(2) => Memory(0 + 1),
             # Dish(3) => Memory(0 + 2),
             # Dish(4) => Memory(0 + 3),
+            # Dish(5) => Memory(5 + 0),
+            # Dish(6) => Memory(5 + 1),
             # Dish(7) => Memory(10 + 0),
             # Dish(8) => Memory(10 + 1),
             # Beam(0) => Memory(5 + 2),
@@ -269,35 +346,120 @@ const map_A_global = let
 end
 
 # Section 4, eqn (17)
-@assert Wd == 4
-@assert Wb == 8
-#PATHFINDER @assert Wd == 1
-#PATHFINDER @assert Wb == 2
+@CHORD @assert Wd == 4
+@CHORD @assert Wb == 8
+@CHORD @assert Wp == 1
+@PATHFINDER @assert Wd == 1
+@PATHFINDER @assert Wb == 2
+@PATHFINDER @assert Wp == 2
 const map_A_registers = let
     b = -1
     Layout(
         Int32,
         Dict(
             Cplx(0) => Register(0),
-            Dish(0) => SIMD(3),
-            Dish(1) => SIMD(4),
-            Dish(5) => Thread(0),
-            Dish(6) => Thread(1),
-            #PATHFINDER Polr(0) => Thread(1),
+            Dish(0) => SIMD(3),     # mma input 0
+            Dish(1) => SIMD(4),     # mma input 1
             Dish(2) => Register(1),
             Dish(3) => Register(2),
-            Dish(4) => Register(3),
-            Dish(7) => Warp(0),     # since Wd = 4
-            Dish(8) => Warp(1),     # since Wd = 4
-            Beam(0) => Thread(2),
-            Beam(1) => Thread(3),
-            Beam(2) => Thread(4),
-            Beam(3) => Register(4),
-            Beam(4) => Warp(2),     # since Wb = 8
-            Beam(5) => Warp(3),     # since Wb = 8
-            Beam(6) => Warp(4),     # since Wb = 8
-            #PATHFINDER Beam(3) => Warp(0), # since Wb = 2
-            Polr(0) => Block(b += 1),
+            (@CHORDARR Dish(4) => Register(3))...,
+            (@CHORDARR Dish(5) => Thread(0))...,      # mma input 2
+            (@CHORDARR Dish(6) => Thread(1))...,      # mma input 3
+            (@CHORDARR Dish(7) => Warp(0))...,        # since Wd = 4
+            (@CHORDARR Dish(8) => Warp(1))...,        # since Wd = 4
+            (@PATHFINDERARR Dish(4) => Thread(0))..., # mma input 2
+            (@PATHFINDERARR Dish(5) => Thread(1))..., # mma input 3
+            Beam(0) => Thread(2), # mma output 0
+            Beam(1) => Thread(3), # mma output 1
+            Beam(2) => Thread(4), # mma output 2
+            (@CHORDARR Beam(3) => Register(4))...,
+            (@CHORDARR Beam(4) => Warp(2))...,     # since Wb = 8
+            (@CHORDARR Beam(5) => Warp(3))...,     # since Wb = 8
+            (@CHORDARR Beam(6) => Warp(4))...,     # since Wb = 8
+            (@PATHFINDERARR Beam(3) => Warp(0))...,
+            (@CHORDARR Polr(0) => Block(b += 1))...,
+            (@PATHFINDERARR Polr(0) => Warp(1))...,
+            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
+        ),
+    )
+end
+
+const map_Jureim_registers = let
+    b = -1
+    Layout(
+        Int32,
+        Dict(
+            (@CHORDARR Dish(7) => Warp(0))...,
+            (@CHORDARR Dish(8) => Warp(1))...,
+            Time(0) => Register(0), # mma spectator 0
+            Time(1) => Thread(0),   # mma spectator 1
+            Time(2) => Thread(1),   # mma spectator 2
+            Time(3) => LoopT2(0),
+            Time(4) => LoopT2(1),
+            Time(5) => LoopT1(0),
+            Time(6) => LoopT1(1),
+            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
+            Beam(0) => Thread(2), # mma output 0
+            Beam(1) => Thread(3), # mma output 1
+            Beam(2) => Thread(4), # mma output 2
+            (@CHORDARR Beam(3) => LoopB(0))...,
+            (@CHORDARR Beam(4) => Warp(2))...,   # since Wb = 8
+            (@CHORDARR Beam(5) => Warp(3))...,   # since Wb = 8
+            (@CHORDARR Beam(6) => Warp(4))...,   # since Wb = 8
+            (@PATHFINDERARR Beam(3) => Warp(0))...,
+            (@CHORDARR Polr(0) => Block(b += 1))...,
+            (@PATHFINDERARR Polr(0) => Warp(1))...,
+            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
+        ),
+    )
+end
+
+const map_Ju_shared = let
+    m = m2 = m3 = -1
+    b = -1
+    Layout(
+        Int32,
+        Dict(
+            Cplx(0) => SIMD(4),
+            [Beam(b) => Memory(m += 1) for b in 0:(ceil(Int, log2(B)) - 1)]...,
+            [Time(t) => Memory2(m2 += 1) for t in 0:ceil(Int, log2(T2) - 1)]...,
+            [Time(t) => LoopT1(t - 5) for t in 5:(ceil(Int, log2(T1)) - 1)]...,
+            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
+            (@CHORDARR Dish(7) => Memory3(m3 += 1))...,
+            (@CHORDARR Dish(8) => Memory3(m3 += 1))...,
+            (@CHORDARR Polr(0) => Block(b += 1))...,
+            (@PATHFINDERARR Polr(0) => Memory3(m3 += 1))...,
+            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
+        ),
+    )
+end
+
+# Section 5, eqn (22)
+const map_Ju_registers_load_shared = let
+    b = -1
+    Layout(
+        Int32,
+        Dict(
+            Cplx(0) => SIMD(4),
+            (@CHORDARR Dish(7) => Register(0))...,
+            (@CHORDARR Dish(8) => Register(1))...,
+            Beam(0) => Thread(3),
+            Beam(1) => Thread(4),
+            Beam(2) => Warp(0),
+            Beam(3) => Warp(1),
+            (@CHORDARR Beam(4) => Warp(2))...,
+            (@CHORDARR Beam(5) => Warp(3))...,
+            (@CHORDARR Beam(6) => Warp(4))...,
+            Time(0) => Thread(0),
+            Time(1) => Thread(1),
+            Time(2) => Thread(2),
+            Time(3) => Register(3),
+            Time(4) => Register(4),
+            Time(5) => LoopT1(0),
+            Time(6) => LoopT1(1),
+            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
+            (@CHORDARR Polr(0) => Block(b += 1))...,
+            (@PATHFINDERARR Polr(0) => Register(5))...,
             [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
         ),
     )
@@ -310,26 +472,15 @@ const map_s_global = let
     Layout(
         Int32,
         Dict(
-            Beam(0) => Memory(m += 1),
-            Beam(1) => Memory(m += 1),
-            Beam(2) => Memory(m += 1),
-            Beam(3) => Memory(m += 1),
-            Beam(4) => Memory(m += 1),
-            Beam(5) => Memory(m += 1),
-            Beam(6) => Memory(m += 1),
+            [Beam(b) => Memory(m += 1) for b in 0:(ceil(Int, log2(B)) - 1)]...,
             Polr(0) => Memory(m += 1),
-            Freq(0) => Memory(m += 1),
-            Freq(1) => Memory(m += 1),
-            Freq(2) => Memory(m += 1),
-            Freq(3) => Memory(m += 1),
-            Freq(4) => Memory(m += 1),
-            Freq(5) => Memory(m += 1),
-            Freq(6) => Memory(m += 1),
-            Freq(7) => Memory(m += 1),
+            [Freq(f) => Memory(m += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
         ),
     )
 end
 
+# This must correspond to `map_J_registers`
+# TODO: Use the same map
 const map_s_registers = let
     b = -1
     Layout(
@@ -339,14 +490,11 @@ const map_s_registers = let
             Beam(1) => Thread(4),
             Beam(2) => Warp(0),
             Beam(3) => Warp(1),
-            Beam(4) => Warp(2),
-            Beam(5) => Warp(3),
-            Beam(6) => Warp(4),
-            Polr(0) => Block(b += 1),
-            #TODO "don't use Warp(1:3). copy `map_J_registers` instead."
-            #PATHFINDER Beam(3) => Warp(1),
-            #PATHFINDER Beam(4) => Warp(2),
-            #PATHFINDER Polr(0) => Warp(3),
+            (@CHORDARR Beam(4) => Warp(2))...,
+            (@CHORDARR Beam(5) => Warp(3))...,
+            (@CHORDARR Beam(6) => Warp(4))...,
+            (@CHORDARR Polr(0) => Block(b += 1))...,
+            (@PATHFINDERARR Polr(0) => Register(5))...,
             [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
         ),
     )
@@ -369,31 +517,11 @@ const map_J_global = let
     )
 end
 
-const map_Ju_shared = let
-    m = m2 = m3 = -1
-    b = -1
-    Layout(
-        Int32,
-        Dict(
-            Cplx(0) => SIMD(4),
-            [Beam(b) => Memory(m += 1) for b in 0:(ceil(Int, log2(B)) - 1)]...,
-            [Time(t) => Memory2(m2 += 1) for t in 0:ceil(Int, log2(T2) - 1)]...,
-            [Time(t) => LoopT1(t - 5) for t in 5:(ceil(Int, log2(T1)) - 1)]...,
-            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
-            Dish(7) => Memory3(m3 += 1),
-            Dish(8) => Memory3(m3 += 1),
-            Polr(0) => Block(b += 1),
-            #PATHFINDER Polr(0) => Memory3(m3 += 1),
-            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
-        ),
-    )
-end
-
 ################################################################################
 
 function read_A!(steps::Vector{AbstractStep}, env::Environment)
-    @assert B == 128
-    #PATHFINDER @assert B == 16
+    @CHORD @assert B == 128
+    @PATHFINDER @assert B == 16
     map_A0_registers = let
         b = -1
         Layout(
@@ -403,37 +531,43 @@ function read_A!(steps::Vector{AbstractStep}, env::Environment)
                 Dish(0) => SIMD(4),     # want SIMD(3)
                 Dish(1) => Register(0), # want SIMD(4)
                 Dish(2) => Register(1), # final
-                Dish(3) => Thread(1),   # want Register(2)
-                Dish(4) => Thread(2),   # want Register(3)
-                Dish(5) => Thread(0),   # final
-                Dish(6) => Register(2), # want Thread(1)
-                Dish(7) => Warp(0),     # final
-                Dish(8) => Warp(1),     # final
-                #PATHFINDER Polr(0) => Register(2), # want Thread(1)
-                Beam(0) => Register(3), # want Thread(2)
-                Beam(1) => Thread(3),   # final
-                Beam(2) => Thread(4),   # final
-                Beam(3) => Register(4), # final
-                Beam(4) => Warp(2),
-                Beam(5) => Warp(3),
-                Beam(6) => Warp(4),
-                #PATHFINDER Beam(3) => ???,
-                #PATHFINDER Beam(4) => ???,
-                Polr(0) => Block(b += 1),
+                (@CHORDARR Dish(3) => Thread(1))..., # want Register(2)
+                (@CHORDARR Dish(4) => Thread(2))..., # want Register(3)
+                (@CHORDARR Dish(5) => Thread(0))..., # final
+                (@CHORDARR Dish(6) => Register(2))..., # want Thread(1)
+                (@CHORDARR Dish(7) => Warp(0))...,     # final
+                (@CHORDARR Dish(8) => Warp(1))...,     # final
+                (@CHORDARR Beam(0) => Register(3))..., # want Thread(2)
+                (@CHORDARR Beam(1) => Thread(3))...,   # final
+                (@CHORDARR Beam(2) => Thread(4))...,   # final
+                (@CHORDARR Beam(3) => Register(4))..., # final
+                (@CHORDARR Beam(4) => Warp(2))...,
+                (@CHORDARR Beam(5) => Warp(3))...,
+                (@CHORDARR Beam(6) => Warp(4))...,
+                (@CHORDARR Polr(0) => Block(b += 1))...,
+                (@PATHFINDERARR Dish(3) => Thread(2))..., # want Register(2)
+                (@PATHFINDERARR Dish(4) => Thread(0))..., # final
+                (@PATHFINDERARR Dish(5) => Thread(1))..., # final
+                (@PATHFINDERARR Beam(0) => Register(2))..., # want Thread(2)
+                (@PATHFINDERARR Beam(1) => Thread(3))...,   # final
+                (@PATHFINDERARR Beam(2) => Thread(4))...,   # final
+                (@PATHFINDERARR Beam(3) => Warp(0))...,
+                (@PATHFINDERARR Polr(0) => Warp(1))...,
                 [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
             ),
         )
     end
     load!(steps, env, :A0, map_A0_registers, :A_mem, map_A_global; align=16)
-    # rename!(steps, env, :A1, :A0, Dict(Dish(d) => Dish′(dish2dish′[d]) for d in 0:(ceil(Int, log2(D)) - 1)))
     # Make Dish(1) correct
     permute!(steps, env, :A2, :A0, Register(0), SIMD(4))
     # Make Cplx(0) and Dish(0) correct
     permute!(steps, env, :A3, :A2, Register(0), SIMD(3))
     # Make Dish(3), Dish(6) correct
-    permute!(steps, env, :A4, :A3, Register(2), Thread(1))
+    @CHORD permute!(steps, env, :A4, :A3, Register(2), Thread(1))
     # Make Dish(4), Beam(0) correct
-    permute!(steps, env, :A, :A4, Register(3), Thread(2))
+    @CHORD permute!(steps, env, :A, :A4, Register(3), Thread(2))
+    # Make Dish(3), Beam(0) correct
+    @PATHFINDER permute!(steps, env, :A, :A3, Register(2), Thread(2))
     @assert env[:A] == map_A_registers
     return nothing
 end
@@ -451,121 +585,40 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
     @assert T2 % 8 == 0
     @assert T2 ÷ 8 == 4
     unrolled_loop!(steps, env, loopIdxT2, :(Int32(0):Int32($T2 ÷ 8 - 1)), [Time(3), Time(4)]) do steps, env
-        @assert B ÷ Wb % 8 == 0
-        @assert B ÷ Wb ÷ 8 == 2
-        #PATHFINDER @assert B ÷ Wb % 8 == 0
-        #PATHFINDER @assert B ÷ Wb ÷ 8 == 1
-        unrolled_loop!(steps, env, loopIdxB, :(Int32(0):Int32($B ÷ $Wb ÷ 8 - 1)), [Beam(6)]) do steps, env
-            #PATHFINDER unrolled_loop!(steps, env, loopIdxB, :(Int32(0):Int32($B ÷ $Wb ÷ 8 - 1)), Beam[]) do steps, env
-            select!(steps, env, :A10, :A, [Register(4)], :($loopIdxB))
-            #PATHFINDER select!(steps, env, :A10, :A, Register[], :($loopIdxB))
+        @CHORD @assert B ÷ Wb % 8 == 0
+        @CHORD @assert B ÷ Wb ÷ 8 == 2
+        @PATHFINDER @assert B ÷ Wb % 8 == 0
+        @PATHFINDER @assert B ÷ Wb ÷ 8 == 1
+        unrolled_loop!(
+            steps, env, loopIdxB, :(Int32(0):Int32($B ÷ $Wb ÷ 8 - 1)), [Beam(b) for b in 6:(6 + ceil(Int, log2(B ÷ Wb ÷ 8)) - 1)]
+        ) do steps, env
+            @CHORD select!(steps, env, :A10, :A, [Register(4)], :($loopIdxB))
+            @PATHFINDER select!(steps, env, :A10, :A, Register[], :($loopIdxB))
 
-            map_Jureim_registers = let
-                b = -1
-                Layout(
-                    Int32,
-                    Dict(
-                        Dish(7) => Warp(0),
-                        Dish(8) => Warp(1),
-                        Time(0) => Register(0),
-                        Time(1) => Thread(0),
-                        Time(2) => Thread(1),
-                        Time(3) => LoopT2(0),
-                        Time(4) => LoopT2(1),
-                        Time(5) => LoopT1(0),
-                        Time(6) => LoopT1(1),
-                        [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
-                        Beam(0) => Thread(2),
-                        Beam(1) => Thread(3),
-                        Beam(2) => Thread(4),
-                        Beam(3) => LoopB(0),    # since Wb = 8
-                        Beam(4) => Warp(2),     # since Wb = 8
-                        Beam(5) => Warp(3),     # since Wb = 8
-                        Beam(6) => Warp(4),     # since Wb = 8
-                        Polr(0) => Block(b += 1),
-                        [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
-                    ),
-                )
-            end
             constant!(steps, env, :Jurepos, map_Jureim_registers, :(Int32(0)))
             constant!(steps, env, :Jureneg, map_Jureim_registers, :(Int32(0)))
             constant!(steps, env, :Juim, map_Jureim_registers, :(Int32(0)))
 
-            @assert D ÷ Wd % 16 == 0
-            @assert D ÷ Wd ÷ 16 == 8
-            #PATHFINDER @assert D ÷ Wd % 8 == 0
-            #PATHFINDER @assert D ÷ Wd ÷ 8 == 8
-            unrolled_loop!(steps, env, loopIdxD, :(Int32(0):Int32($D ÷ $Wd ÷ 16 - 1)), [Dish(2), Dish(3), Dish(4)]) do steps, env
-                #PATHFINDER unrolled_loop!(steps, env, loopIdxD, :(Int32(0):Int32($D ÷ $Wd ÷ 8 - 1)), [Dish(2), Dish(3), Dish(4)]) do steps, env
-                select!(steps, env, :A11, :A10, [Register(1), Register(2), Register(3)], :($loopIdxD))
+            @CHORD @assert D ÷ Wd % 16 == 0
+            @CHORD @assert D ÷ Wd ÷ 16 == 8
+            @PATHFINDER @assert D ÷ Wd % 16 == 0
+            @PATHFINDER @assert D ÷ Wd ÷ 16 == 4
+            unrolled_loop!(
+                steps,
+                env,
+                loopIdxD,
+                :(Int32(0):Int32($D ÷ $Wd ÷ 16 - 1)),
+                [Dish(d) for d in 2:(2 + ceil(Int, log2(D ÷ Wd ÷ 16)) - 1)],
+            ) do steps, env
+                @CHORD select!(steps, env, :A11, :A10, [Register(1), Register(2), Register(3)], :($loopIdxD))
+                @PATHFINDER select!(steps, env, :A11, :A10, [Register(1), Register(2)], :($loopIdxD))
                 split!(steps, env, :Are, :Aim, :A11, Cplx(0))
 
-                map_E0_registers = let
-                    b = -1
-                    Layout(
-                        Int32,
-                        Dict(
-                            Cplx(0) => SIMD(2),
-                            Dish(0) => SIMD(3),
-                            Dish(1) => SIMD(4),
-                            Dish(2) => LoopD(0), # since Wd = 4
-                            Dish(3) => LoopD(1), # since Wd = 4
-                            Dish(4) => LoopD(2), # since Wd = 4
-                            Dish(5) => Thread(0),
-                            Dish(6) => Thread(1),
-                            Dish(7) => Warp(0), # since Wd = 4
-                            Dish(8) => Warp(1), # since Wd = 4
-                            #PATHFINDER Polr(0) => Thread(1),
-                            Time(0) => Thread(2),
-                            Time(1) => Thread(3),
-                            Time(2) => Thread(4),
-                            Time(3) => LoopT2(0),
-                            Time(4) => LoopT2(1),
-                            Time(5) => LoopT1(0),
-                            Time(6) => LoopT1(1),
-                            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
-                            Polr(0) => Block(b += 1),
-                            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
-                        ),
-                    )
-                end
-                load!(steps, env, :E0, map_E0_registers, :E_shared, map_E_shared; align=4)
-                # rename!(steps, env, :E1, :E0, Dict(Dish(d) => Dish′(dish2dish′[d]) for d in 0:(ceil(Int, log2(D)) - 1)))
-                @assert env[:E0] == map_E_registers
+                load!(steps, env, :E0, map_E_registers_load_shared, :E_shared, map_E_shared; align=4)
 
-                # Section 4, eqn (16)
-                map_E2_registers = let
-                    b = -1
-                    Layout(
-                        Int32,
-                        Dict(
-                            Cplx(0) => Register(0),
-                            Dish(0) => SIMD(3),
-                            Dish(1) => SIMD(4),
-                            Dish(5) => Thread(0),
-                            Dish(6) => Thread(1),
-                            #PATHFINDER Polr(0) => Thread(1),
-                            Dish(2) => LoopD(0),
-                            Dish(3) => LoopD(1),
-                            Dish(4) => LoopD(2),
-                            Dish(7) => Warp(0),  # since Wd = 4
-                            Dish(8) => Warp(1),  # since Wd = 4
-                            Time(0) => Thread(2),
-                            Time(1) => Thread(3),
-                            Time(2) => Thread(4),
-                            Time(3) => LoopT2(0),
-                            Time(4) => LoopT2(1),
-                            Time(5) => LoopT1(0),
-                            Time(6) => LoopT1(1),
-                            [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
-                            Polr(0) => Block(b += 1),
-                            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
-                        ),
-                    )
-                end
                 # TODO: Don't undo offset encoding, don't shift right; fold this into a fixup after multiplying by A
                 widen!(steps, env, :E2, :E0, SIMD(2) => Register(0))
-                @assert env[:E2] == map_E2_registers
+                @assert env[:E2] == map_E_registers_multiply
 
                 split!(steps, env, :E2re, :E2im, :E2, Cplx(0))
 
@@ -586,8 +639,7 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
 
             # TODO: Break ties to even?
             @assert σ ≥ 1
-            apply!(steps, env, :Ju2, :Ju, Ju -> :(($Ju + Int32($(1 << (σ - 1)))) >> $σ))
-            # apply!(steps, env, :Ju2, :Ju, Ju -> :($Ju))
+            apply!(steps, env, :Ju2, :Ju, Ju -> :(($Ju + Int32($(1 << (σ - 1)))) >> UInt32($σ)))
 
             # Note: `cvs_pack_s16` saturates, so we don't need to clamp
             # apply!(steps, env, :Ju3, :Ju2, J -> :(clamp($J, (-Int32(0x7fff)):(+Int32(0x7fff)))))
@@ -598,25 +650,26 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                     Int32,
                     Dict(
                         Cplx(0) => SIMD(4),
-                        Time(0) => Register(0),
-                        Time(1) => Thread(0),
-                        Time(2) => Thread(1),
+                        (@CHORDARR Dish(7) => Warp(0))..., # since Wd = 4
+                        (@CHORDARR Dish(8) => Warp(1))..., # since Wd = 4
                         Beam(0) => Thread(2),
                         Beam(1) => Thread(3),
                         Beam(2) => Thread(4),
+                        (@CHORDARR Beam(3) => LoopB(0))...,
+                        (@CHORDARR Beam(4) => Warp(2))..., # since Wb = 8
+                        (@CHORDARR Beam(5) => Warp(3))..., # since Wb = 8
+                        (@CHORDARR Beam(6) => Warp(4))..., # since Wb = 8
+                        (@PATHFINDERARR Beam(3) => Warp(0))...,
+                        Time(0) => Register(0),
+                        Time(1) => Thread(0),
+                        Time(2) => Thread(1),
                         Time(3) => LoopT2(0),
                         Time(4) => LoopT2(1),
-                        Beam(3) => LoopB(0),
-                        Dish(7) => Warp(0),     # since Wd = 4
-                        Dish(8) => Warp(1),     # since Wd = 4
-                        Beam(4) => Warp(2),     # since Wb = 8
-                        Beam(5) => Warp(3),     # since Wb = 8
-                        Beam(6) => Warp(4),     # since Wb = 8
-                        #PATHFINDER Beam(4) => Warp(0),
                         Time(5) => LoopT1(0),
                         Time(6) => LoopT1(1),
                         [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
-                        Polr(0) => Block(b += 1),
+                        (@CHORDARR Polr(0) => Block(b += 1))...,
+                        (@PATHFINDERARR Polr(0) => Warp(1))...,
                         [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
                     ),
                 )
@@ -636,43 +689,18 @@ end
 
 # Step 3: reduce and quantize
 function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
-    # Section 5, eqn (22)
-    map_Ju10_registers = let
-        b = -1
-        Layout(
-            Int32,
-            Dict(
-                Cplx(0) => SIMD(4),
-                Beam(0) => Thread(3),
-                Beam(1) => Thread(4),
-                Beam(2) => Warp(0),
-                Beam(3) => Warp(1),
-                Beam(4) => Warp(2),
-                Beam(5) => Warp(3),
-                Beam(6) => Warp(4),
-                Time(0) => Thread(0),
-                Time(1) => Thread(1),
-                Time(2) => Thread(2),
-                Time(3) => Register(3),
-                Time(4) => Register(4),
-                Time(5) => LoopT1(0),
-                Time(6) => LoopT1(1),
-                [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
-                Dish(7) => Register(0),
-                Dish(8) => Register(1),
-                Polr(0) => Block(b += 1),
-                [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
-            ),
-        )
-    end
-    load!(steps, env, :Ju10, map_Ju10_registers, :Ju_shared, map_Ju_shared; align=4)
+    load!(steps, env, :Ju10, map_Ju_registers_load_shared, :Ju_shared, map_Ju_shared; align=4)
     widen!(steps, env, :Ju11, :Ju10, SIMD(4) => Register(2))
-    split!(steps, env, :Ju11a, :Ju11b, :Ju11, Register(0))
-    #TODO apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :(add_sat($Ju11a, $Ju11b)))
-    apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :($Ju11a + $Ju11b))
-    split!(steps, env, :Ju12a, :Ju12b, :Ju12, Register(1))
-    #TODO apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :(add_sat($Ju12a, $Ju12b)))
-    apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :($Ju12a + $Ju12b))
+
+    @CHORD split!(steps, env, :Ju11a, :Ju11b, :Ju11, Register(0))
+    #TODO @CHORD apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :(add_sat($Ju11a, $Ju11b)))
+    @CHORD apply!(steps, env, :Ju12, :Ju11a, :Ju11b, (Ju11a, Ju11b) -> :($Ju11a + $Ju11b))
+    @CHORD split!(steps, env, :Ju12a, :Ju12b, :Ju12, Register(1))
+    #TODO @CHORD apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :(add_sat($Ju12a, $Ju12b)))
+    @CHORD apply!(steps, env, :J, :Ju12a, :Ju12b, (Ju12a, Ju12b) -> :($Ju12a + $Ju12b))
+
+    @PATHFINDER apply!(steps, env, :J, :Ju11, Ju11 -> :($Ju11))
+
     # Section 5, eqn. (24)
     map_J_registers = let
         b = -1
@@ -694,18 +722,18 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(1) => Thread(4),
                 Beam(2) => Warp(0),
                 Beam(3) => Warp(1),
-                Beam(4) => Warp(2),
-                Beam(5) => Warp(3),
-                Beam(6) => Warp(4),
-                Polr(0) => Block(b += 1),
+                (@CHORDARR Beam(4) => Warp(2))...,
+                (@CHORDARR Beam(5) => Warp(3))...,
+                (@CHORDARR Beam(6) => Warp(4))...,
+                (@CHORDARR Polr(0) => Block(b += 1))...,
+                (@PATHFINDERARR Polr(0) => Register(5))...,
                 [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
             ),
         )
     end
     @assert env[:J] == map_J_registers
 
-    apply!(steps, env, :J2, :J, :s, (J, s) -> :(($J + (Int32(1) << ($s % UInt32 - UInt32(1)))) >> (s % UInt32)))
-    # apply!(steps, env, :J2, :J, J -> :($J))
+    apply!(steps, env, :J2, :J, :s, (J, s) -> :(($J + (Int32(1) << ($s % UInt32 - UInt32(1)))) >> ($s % UInt32)))
 
     # TODO: Try this: Shift values left by 4, rely on saturation when converting, then shift right and mask (doesn't work)
     # TODO: Try this: Pack to Int16, the clamp, then pack to Int8 (doesn't work, no efficient 16-bit clamp)
@@ -730,10 +758,11 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(1) => Thread(4),
                 Beam(2) => Warp(0),
                 Beam(3) => Warp(1),
-                Beam(4) => Warp(2),
-                Beam(5) => Warp(3),
-                Beam(6) => Warp(4),
-                Polr(0) => Block(b += 1),
+                (@CHORDARR Beam(4) => Warp(2))...,
+                (@CHORDARR Beam(5) => Warp(3))...,
+                (@CHORDARR Beam(6) => Warp(4))...,
+                (@CHORDARR Polr(0) => Block(b += 1))...,
+                (@PATHFINDERARR Polr(0) => Register(5))...,
                 [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
             ),
         )
@@ -764,10 +793,11 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(1) => Thread(4),
                 Beam(2) => Warp(0),
                 Beam(3) => Warp(1),
-                Beam(4) => Warp(2),
-                Beam(5) => Warp(3),
-                Beam(6) => Warp(4),
-                Polr(0) => Block(b += 1),
+                (@CHORDARR Beam(4) => Warp(2))...,
+                (@CHORDARR Beam(5) => Warp(3))...,
+                (@CHORDARR Beam(6) => Warp(4))...,
+                (@CHORDARR Polr(0) => Block(b += 1))...,
+                (@PATHFINDERARR Polr(0) => Register(5))...,
                 [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
             ),
         )
@@ -800,10 +830,11 @@ function write_J!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(1) => Thread(4),
                 Beam(2) => Warp(0),
                 Beam(3) => Warp(1),
-                Beam(4) => Warp(2),
-                Beam(5) => Warp(3),
-                Beam(6) => Warp(4),
-                Polr(0) => Block(b += 1),
+                (@CHORDARR Beam(4) => Warp(2))...,
+                (@CHORDARR Beam(5) => Warp(3))...,
+                (@CHORDARR Beam(6) => Warp(4))...,
+                (@CHORDARR Polr(0) => Block(b += 1))...,
+                (@PATHFINDERARR Polr(0) => Register(5))...,
                 [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
             ),
         )
@@ -836,10 +867,11 @@ function write_J!(steps::Vector{AbstractStep}, env::Environment)
                 Beam(1) => Thread(4),
                 Beam(2) => Warp(0),
                 Beam(3) => Warp(1),
-                Beam(4) => Warp(2),
-                Beam(5) => Warp(3),
-                Beam(6) => Warp(4),
-                Polr(0) => Block(b += 1),
+                (@CHORDARR Beam(4) => Warp(2))...,
+                (@CHORDARR Beam(5) => Warp(3))...,
+                (@CHORDARR Beam(6) => Warp(4))...,
+                (@CHORDARR Polr(0) => Block(b += 1))...,
+                (@PATHFINDERARR Polr(0) => Register(5))...,
                 [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
             ),
         )
@@ -877,7 +909,7 @@ bb_allsteps = Seq(bb_steps)
 
 @assert D % 4 == 0
 const E_shared_size = (D ÷ 4 + 1, T2)
-const Ju_shared_size = (B + 4, T2, Wd)
+const Ju_shared_size = (B + 4, T2, Wd * Wp)
 
 const E_shared_length = prod(E_shared_size)
 const Ju_shared_length = prod(Ju_shared_size)
@@ -972,8 +1004,8 @@ function runcuda()
 
         println("    Compiling kernel...")
         nthreads = 32
-        nwarps = Wb * Wd
-        nblocks = 2 * F                 # Polr, Freq
+        nwarps = W
+        nblocks = 2 ÷ Wp * F            # Polr, Freq
         @assert shmem_bytes ≤ 99 * 1024 # NVIDIA A10 has 99 kB shared memory
 
         blocks_per_sm = 1
@@ -1023,7 +1055,7 @@ function runcuda()
     return nothing
 end
 
-println(bb_allsteps)
+# println(bb_allsteps)
 if CUDA.functional()
     # @device_code_lowered runcuda()
     # @device_code_typed runcuda()
