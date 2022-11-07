@@ -1997,7 +1997,7 @@ function load!(
                                 # ($lhsname0, $lhsname1, $lhsname2, $lhsname3) =
                                 #     ($mem[1 + $index], $mem[2 + $index], $mem[3 + $index], $mem[4 + $index])::NTuple{4,$type}
                                 ($lhsname0, $lhsname1, $lhsname2, $lhsname3) =
-                                    unsafe_load4_global($mem, 1 + $index)::NTuple{4,$type}
+                                    unsafe_load4_global($mem, ($index) + 1)::NTuple{4,$type}
                             ),
                         )
                     end
@@ -2006,11 +2006,11 @@ function load!(
                 @assert false
             else
                 if have_memory3
-                    push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2, 1 + $index3]::$type))
+                    push!(stmts, :($lhsname = @inbounds $mem[($index) + 1, ($index2) + 1, ($index3) + 1]::$type))
                 elseif have_memory2
-                    push!(stmts, :($lhsname = @inbounds $mem[1 + $index, 1 + $index2]::$type))
+                    push!(stmts, :($lhsname = @inbounds $mem[($index) + 1, ($index2) + 1]::$type))
                 else
-                    push!(stmts, :($lhsname = @inbounds $mem[1 + $index]::$type))
+                    push!(stmts, :($lhsname = @inbounds $mem[($index) + 1]::$type))
                 end
             end
         end
@@ -2093,14 +2093,16 @@ function store!(
                                 stmts,
                                 :(unsafe_store4_global!(
                                     $mem,
-                                    1 + $offset + size($mem, 1) * $index2 + $index,
+                                    ((size($mem, 1) * $index2 + $index) + $offset) + 1,
                                     ($rhsname0, $rhsname1, $rhsname2, $rhsname3),
                                 )),
                             )
                         else
                             push!(
                                 stmts,
-                                :(unsafe_store4_global!($mem, 1 + $offset + $index, ($rhsname0, $rhsname1, $rhsname2, $rhsname3))),
+                                :(unsafe_store4_global!(
+                                    $mem, (($index) + $offset) + 1, ($rhsname0, $rhsname1, $rhsname2, $rhsname3)
+                                )),
                             )
                         end
                     else
@@ -2112,15 +2114,15 @@ function store!(
             else
                 if operator === :(=)
                     if have_memory3
-                        push!(stmts, :(@inbounds $mem[1 + $offset + $index, 1 + $index2, 1 + $index3] = $rhsname))
+                        push!(stmts, :(@inbounds $mem[(($index) + $offset) + 1, ($index2) + 1, ($index3) + 1] = $rhsname))
                     elseif have_memory2
-                        push!(stmts, :(@inbounds $mem[1 + $offset + $index, 1 + $index2] = $rhsname))
+                        push!(stmts, :(@inbounds $mem[(($index) + $offset) + 1, ($index2) + 1] = $rhsname))
                     else
-                        push!(stmts, :(@inbounds $mem[1 + $offset + $index] = $rhsname))
+                        push!(stmts, :(@inbounds $mem[(($index) + $offset) + 1] = $rhsname))
                     end
                 elseif operator === :(+=)
                     @assert !have_memory2 && !have_memory3
-                    push!(stmts, :(@inbounds $mem[1 + $index] += $rhsname))
+                    push!(stmts, :(@inbounds $mem[($index) + 1] += $rhsname))
                 else
                     @assert false
                 end

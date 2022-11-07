@@ -98,7 +98,7 @@ end
 @PATHFINDER const D = 64
 
 # frequency channels per GPU
-@PATHFINDER const F = 84
+@PATHFINDER const F = 84 * 8
 # const F = 1
 
 # A matrix tiling
@@ -118,7 +118,7 @@ const σ = round(Int, log2(D / Wd)) - 4
 
 # Benchmark results
 
-# Setup:
+# Setup for CHORD:
 #     T = 32768
 #     T1 = 128
 #     B = 128
@@ -126,12 +126,29 @@ const σ = round(Int, log2(D / Wd)) - 4
 #     F = 84 ÷ 2
 #     Wb = 8
 #     Wd = 4
+#     Wp = 1
 # Result:
 #     run time 8430.3 μsec
 #     scaled run time 3211.5 μsec (for 16 frequencies)
 #     sampling time 1.7 μs
 #     handling 55705.6 μsec of data
 #     scaled run time 5.8% of a GPU
+
+# Setup for pathfinder:
+#     T = 32768
+#     T1 = 128
+#     B = 16
+#     D = 64
+#     F = 84 * 8
+#     Wb = 2
+#     Wd = 1
+#     Wp = 2
+# Result:
+#     run time 6668.047029 μsec
+#     scaled run time 158.8 μsec (for 16 frequencies) TODO: correct number of frequencies
+#     sampling time 1.7 μs
+#     handling 55705.6 μsec of data
+#     scaled run time 0.285% of a GPU
 
 ################################################################################
 
@@ -187,13 +204,13 @@ const map_E_shared = let
             Dish(0) => SIMD(3),
             Dish(1) => SIMD(4),
             [Dish(d) => Memory(m += 1) for d in 2:(ceil(Int, log2(D)) - 1)]...,
-            (@CHORDARR Polr(0) => Block(b += 1))...,
-            (@PATHFINDERARR Polr(0) => Memory(m += 1))...,
-            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
             # TODO: Make padding a compile-time constant, not a run-time choice
             [Time(t) => Memory2(m2 += 1) for t in 0:4]...,
             [Time(t) => LoopT1(t - 5) for t in 5:(ceil(Int, log2(T1)) - 1)]...,
             [Time(t) => LoopT(t - 7) for t in 7:(ceil(Int, log2(T)) - 1)]...,
+            (@CHORDARR Polr(0) => Block(b += 1))...,
+            (@PATHFINDERARR Polr(0) => Memory(m += 1))...,
+            [Freq(f) => Block(b += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
         ),
     )
 end
@@ -941,7 +958,7 @@ function runcuda()
 
     Random.seed!(0)
     niters = 1
-    nruns = 0
+    nruns = 1000
     for iter in 1:niters
         println("Iteration $iter:")
         println("    Setting up inputs...")
@@ -1013,7 +1030,7 @@ function runcuda()
         nblocks = 2 ÷ Wp * F            # Polr, Freq
         @assert shmem_bytes ≤ 99 * 1024 # NVIDIA A10 has 99 kB shared memory
 
-        blocks_per_sm = 1
+        blocks_per_sm = 32 ÷ W
         # maxregs = 65536 ÷ (nthreads * nwarps * blocks_per_sm)
         kernel = @cuda launch = false minthreads = nthreads * nwarps blocks_per_sm = blocks_per_sm runsteps(
             A_mem, E_mem, s_mem, J_mem

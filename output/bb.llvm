@@ -1,0 +1,2607 @@
+; PTX CompilerJob of kernel #runsteps(CuDeviceVector{Int8x4, 1}, CuDeviceVector{Int4x8, 1}, CuDeviceVector{Int32, 1}, CuDeviceVector{Int4x8, 1}) for sm_86, minthreads=128, blocks_per_sm=8, always_inline=false
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/kernels/bb.jl:928 within `runsteps`
+define ptx_kernel void @_Z19julia_runsteps_645313CuDeviceArrayI6Int8x4Li1ELi1EES_I6Int4x8Li1ELi1EES_I5Int32Li1ELi1EES_IS1_Li1ELi1EE([1 x i64] %state, { i8 addrspace(1)*, i64, [1 x i64], i64 } %0, { i8 addrspace(1)*, i64, [1 x i64], i64 } %1, { i8 addrspace(1)*, i64, [1 x i64], i64 } %2, { i8 addrspace(1)*, i64, [1 x i64], i64 } %3) local_unnamed_addr #4 {
+conversion:
+  %.fca.0.extract570 = extractvalue { i8 addrspace(1)*, i64, [1 x i64], i64 } %0, 0
+  %.fca.0.extract561 = extractvalue { i8 addrspace(1)*, i64, [1 x i64], i64 } %1, 0
+  %.fca.0.extract552 = extractvalue { i8 addrspace(1)*, i64, [1 x i64], i64 } %2, 0
+  %.fca.0.extract546 = extractvalue { i8 addrspace(1)*, i64, [1 x i64], i64 } %3, 0
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/kernels/bb.jl:929 within `runsteps`
+; ┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/memory_shared.jl:62 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/memory_shared.jl:48 within `CuDynamicSharedArray`
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/memory_shared.jl:66 within `dynamic_smem_size`
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %4 = call i32 asm sideeffect "mov.u32 $0, %dynamic_smem_size;", "=r"() #5
+; ││└└└
+; ││┌ @ operators.jl:382 within `>`
+; │││┌ @ int.jl:487 within `<` @ promotion.jl:428 @ int.jl:480
+      %5 = icmp ugt i32 %4, 4223
+; ││└└
+    br i1 %5, label %L11, label %L9
+
+L9:                                               ; preds = %conversion
+; ││ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/memory_shared.jl:49 within `CuDynamicSharedArray`
+    call fastcc void @gpu_report_exception(i64 ptrtoint ([10 x i8]* @exception1 to i64)) #6
+    call fastcc void @gpu_signal_exception([1 x i64] %state)
+    call void asm sideeffect "exit;", ""() #7
+    unreachable
+
+L11:                                              ; preds = %conversion
+; └└
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/kernels/bb.jl:930 within `runsteps`
+  br i1 icmp ne (i64 and (i64 ptrtoint (i8 addrspace(3)* addrspacecast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 0) to i8 addrspace(3)*) to i64), i64 127), i64 0), label %L7240, label %L27
+
+L27:                                              ; preds = %L11
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/kernels/bb.jl:931 within `runsteps`
+; ┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/memory_shared.jl:62 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/memory_shared.jl:48 within `CuDynamicSharedArray`
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/memory_shared.jl:66 within `dynamic_smem_size`
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %6 = call i32 asm sideeffect "mov.u32 $0, %dynamic_smem_size;", "=r"() #5
+; ││└└└
+; ││┌ @ operators.jl:382 within `>`
+; │││┌ @ int.jl:487 within `<` @ promotion.jl:428 @ int.jl:480
+      %7 = icmp ugt i32 %6, 9343
+; ││└└
+    br i1 %7, label %L36, label %L34
+
+L34:                                              ; preds = %L27
+; ││ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/memory_shared.jl:49 within `CuDynamicSharedArray`
+    call fastcc void @gpu_report_exception(i64 ptrtoint ([10 x i8]* @exception1 to i64)) #6
+    call fastcc void @gpu_signal_exception([1 x i64] %state)
+    call void asm sideeffect "exit;", ""() #7
+    unreachable
+
+L36:                                              ; preds = %L27
+; └└
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/kernels/bb.jl:932 within `runsteps`
+  br i1 icmp ne (i64 and (i64 ptrtoint (i8 addrspace(3)* addrspacecast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to i8 addrspace(3)*) to i64), i64 127), i64 0), label %L7237, label %L50
+
+L50:                                              ; preds = %L36
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/kernels/bb.jl:934 within `runsteps`
+; ┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:78 within `#blockIdx`
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:56 within `blockIdx_x`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:6 within `_index`
+; ││││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:6 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %8 = call i32 @llvm.nvvm.read.ptx.sreg.ctaid.x()
+; │└└└└
+; │┌ @ int.jl:496 within `<<`
+    %9 = shl i32 %8, 5
+    %10 = and i32 %9, 32736
+; │└
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:92 within `#threadIdx`
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:46 within `threadIdx_y`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:6 within `_index`
+; ││││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:6 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %11 = call i32 @llvm.nvvm.read.ptx.sreg.tid.y()
+; │└└└└
+; │┌ @ int.jl:496 within `<<`
+    %12 = shl nuw nsw i32 %11, 2
+    %13 = and i32 %12, 12
+; │└
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:92 within `#threadIdx`
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:46 within `threadIdx_x`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:6 within `_index`
+; ││││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/indexing.jl:6 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %14 = call i32 @llvm.nvvm.read.ptx.sreg.tid.x()
+; │└└└└
+; │┌ @ int.jl:497 within `>>>`
+    %15 = lshr i32 %14, 3
+    %16 = and i32 %15, 3
+; │└
+; │┌ @ operators.jl:591 within `+` @ int.jl:87
+    %17 = or i32 %13, %10
+    %18 = or i32 %17, %16
+; │└
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192 within `getindex`
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+; │││││││┌ @ int.jl:86 within `-`
+          %19 = zext i32 %18 to i64
+; │││││││└
+         %20 = bitcast i8 addrspace(1)* %.fca.0.extract552 to i32 addrspace(1)*
+         %21 = getelementptr inbounds i32, i32 addrspace(1)* %20, i64 %19
+         %22 = load i32, i32 addrspace(1)* %21, align 4
+; │││││││┌ @ int.jl:86 within `-`
+          %23 = or i32 %18, 16
+          %24 = zext i32 %23 to i64
+; │││││││└
+         %25 = getelementptr inbounds i32, i32 addrspace(1)* %20, i64 %24
+         %26 = load i32, i32 addrspace(1)* %25, align 4
+; │└└└└└└
+; │┌ @ int.jl:496 within `<<`
+    %27 = shl nuw nsw i32 %11, 8
+    %28 = and i32 %27, 768
+; │└
+; │┌ @ int.jl:991 within `&` @ int.jl:340
+    %29 = and i32 %14, 4
+; │└
+; │┌ @ int.jl:496 within `<<`
+    %30 = shl nuw nsw i32 %14, 3
+    %31 = and i32 %30, 216
+; │└
+; │┌ @ int.jl:87 within `+`
+    %32 = or i32 %29, %31
+    %33 = or i32 %32, %28
+; │└
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:136 within `unsafe_load4_global` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:133
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:80 within `pointer`
+; │││┌ @ abstractarray.jl:1194 within `_memory_offset`
+; ││││┌ @ int.jl:88 within `*`
+       %34 = shl nuw nsw i32 %33, 2
+       %35 = or i32 %34, 4
+       %36 = zext i32 %35 to i64
+       %37 = add nsw i64 %36, -4
+; │││└└
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:110 within `+`
+      %38 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract570, i64 %37
+; ││└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:136 within `unsafe_load4_global` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:133 @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:110
+    %val.i.elt = bitcast i8 addrspace(1)* %38 to i32 addrspace(1)*
+    %val.i.unpack = load i32, i32 addrspace(1)* %val.i.elt, align 16
+    %val.i.elt579 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract570, i64 %36
+    %39 = bitcast i8 addrspace(1)* %val.i.elt579 to i32 addrspace(1)*
+    %val.i.unpack580 = load i32, i32 addrspace(1)* %39, align 4
+    %val.i.elt581 = getelementptr inbounds i8, i8 addrspace(1)* %38, i64 8
+    %40 = bitcast i8 addrspace(1)* %val.i.elt581 to i32 addrspace(1)*
+    %val.i.unpack582 = load i32, i32 addrspace(1)* %40, align 8
+    %val.i.elt583 = getelementptr inbounds i8, i8 addrspace(1)* %38, i64 12
+    %41 = bitcast i8 addrspace(1)* %val.i.elt583 to i32 addrspace(1)*
+    %val.i.unpack584 = load i32, i32 addrspace(1)* %41, align 4
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:136 within `unsafe_load4_global` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:133
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:80 within `pointer`
+; │││┌ @ abstractarray.jl:1194 within `_memory_offset`
+; ││││┌ @ int.jl:88 within `*`
+       %42 = or i32 %34, 132
+       %43 = zext i32 %42 to i64
+       %44 = add nsw i64 %43, -4
+; │││└└
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:110 within `+`
+      %45 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract570, i64 %44
+; ││└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:136 within `unsafe_load4_global` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:133 @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:110
+    %val.i2057.elt = bitcast i8 addrspace(1)* %45 to i32 addrspace(1)*
+    %val.i2057.unpack = load i32, i32 addrspace(1)* %val.i2057.elt, align 16
+    %val.i2057.elt586 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract570, i64 %43
+    %46 = bitcast i8 addrspace(1)* %val.i2057.elt586 to i32 addrspace(1)*
+    %val.i2057.unpack587 = load i32, i32 addrspace(1)* %46, align 4
+    %val.i2057.elt588 = getelementptr inbounds i8, i8 addrspace(1)* %45, i64 8
+    %47 = bitcast i8 addrspace(1)* %val.i2057.elt588 to i32 addrspace(1)*
+    %val.i2057.unpack589 = load i32, i32 addrspace(1)* %47, align 8
+    %val.i2057.elt590 = getelementptr inbounds i8, i8 addrspace(1)* %45, i64 12
+    %48 = bitcast i8 addrspace(1)* %val.i2057.elt590 to i32 addrspace(1)*
+    %val.i2057.unpack591 = load i32, i32 addrspace(1)* %48, align 4
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2316 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2263 within `get_lo16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %49 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %val.i.unpack, i32 %val.i.unpack580, i32 21520) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2317 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2264 within `get_hi16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %50 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %val.i.unpack, i32 %val.i.unpack580, i32 30258) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2316 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2263 within `get_lo16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %51 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %val.i.unpack582, i32 %val.i.unpack584, i32 21520) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2317 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2264 within `get_hi16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %52 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %val.i.unpack582, i32 %val.i.unpack584, i32 30258) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2316 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2263 within `get_lo16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %53 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %val.i2057.unpack, i32 %val.i2057.unpack587, i32 21520) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2317 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2264 within `get_hi16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %54 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %val.i2057.unpack, i32 %val.i2057.unpack587, i32 30258) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2316 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2263 within `get_lo16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %55 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %val.i2057.unpack589, i32 %val.i2057.unpack591, i32 21520) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2317 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2264 within `get_hi16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %56 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %val.i2057.unpack589, i32 %val.i2057.unpack591, i32 30258) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %57 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %49, i32 %50, i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %58 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %49, i32 %50, i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %59 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %51, i32 %52, i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %60 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %51, i32 %52, i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %61 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %53, i32 %54, i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %62 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %53, i32 %54, i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %63 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %55, i32 %56, i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %64 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %55, i32 %56, i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2421 within `macro expansion`
+; │┌ @ operators.jl:282 within `!=`
+; ││┌ @ bool.jl:35 within `!`
+     %.not599 = icmp eq i32 %29, 0
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2436 within `macro expansion`
+   %value_phi = select i1 %.not599, i32 %61, i32 %57
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %65 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %value_phi, i32 4, i32 31)
+    %.1008 = select i1 %.not599, i32 %62, i32 %58
+    %.1009 = select i1 %.not599, i32 %65, i32 %61
+    %.1010 = select i1 %.not599, i32 %57, i32 %65
+    %66 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.1008, i32 4, i32 31)
+    %.1011 = select i1 %.not599, i32 %63, i32 %59
+    %.1012 = select i1 %.not599, i32 %66, i32 %62
+    %.1013 = select i1 %.not599, i32 %58, i32 %66
+    %67 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.1011, i32 4, i32 31)
+    %.1014 = select i1 %.not599, i32 %64, i32 %60
+    %.1015 = select i1 %.not599, i32 %67, i32 %63
+    %.1016 = select i1 %.not599, i32 %59, i32 %67
+    %68 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.1014, i32 4, i32 31)
+    %.1017 = select i1 %.not599, i32 %68, i32 %64
+    %.1018 = select i1 %.not599, i32 %60, i32 %68
+    %69 = shl i32 %8, 7
+    %70 = and i32 %69, 130944
+    %71 = shl nuw nsw i32 %11, 5
+    %72 = and i32 %71, 64
+    %73 = shl nuw nsw i32 %11, 21
+    %74 = and i32 %73, 2097152
+    %75 = or i32 %72, %74
+    %76 = shl nuw nsw i32 %14, 4
+    %77 = and i32 %76, 48
+    %78 = shl nuw nsw i32 %14, 14
+    %79 = and i32 %78, 393216
+    %80 = shl nuw nsw i32 %14, 18
+    %81 = and i32 %80, 1048576
+    %82 = shl nuw nsw i32 %11, 3
+    %83 = and i32 %82, 16
+    %84 = shl nuw nsw i32 %14, 2
+    %85 = and i32 %84, 12
+    %86 = or i32 %83, %85
+    %87 = or i32 %86, 1
+    %88 = shl nuw nsw i32 %11, 4
+    %89 = and i32 %88, 16
+    %90 = shl nuw nsw i32 %14, 1
+    %91 = and i32 %90, 8
+    %92 = or i32 %16, %91
+    %93 = or i32 %92, %89
+    %narrow615 = mul nuw nsw i32 %93, 33
+    %narrow616 = add nuw nsw i32 %87, %narrow615
+    %94 = zext i32 %narrow616 to i64
+    %95 = add nsw i64 %94, -1
+    %96 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %95, i64 0
+    %narrow617 = or i32 %86, 2
+    %narrow620 = add nuw nsw i32 %narrow617, %narrow615
+    %97 = zext i32 %narrow620 to i64
+    %98 = add nsw i64 %97, -1
+    %99 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %98, i64 0
+    %100 = or i32 %86, 3
+    %narrow623 = add nuw nsw i32 %100, %narrow615
+    %101 = zext i32 %narrow623 to i64
+    %102 = add nsw i64 %101, -1
+    %103 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %102, i64 0
+    %104 = or i32 %83, 4
+    %narrow626 = add nuw nsw i32 %104, %85
+    %narrow628 = add nuw nsw i32 %narrow626, %narrow615
+    %105 = zext i32 %narrow628 to i64
+    %106 = add nsw i64 %105, -1
+    %107 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %106, i64 0
+    %108 = or i32 %89, %16
+    %109 = or i32 %108, %91
+    %110 = or i32 %109, 4
+    %narrow630 = mul nuw nsw i32 %110, 33
+    %narrow631 = add nuw nsw i32 %87, %narrow630
+    %111 = zext i32 %narrow631 to i64
+    %112 = add nsw i64 %111, -1
+    %113 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %112, i64 0
+    %narrow635 = add nuw nsw i32 %narrow617, %narrow630
+    %114 = zext i32 %narrow635 to i64
+    %115 = add nsw i64 %114, -1
+    %116 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %115, i64 0
+    %narrow638 = add nuw nsw i32 %100, %narrow630
+    %117 = zext i32 %narrow638 to i64
+    %118 = add nsw i64 %117, -1
+    %119 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %118, i64 0
+    %narrow643 = add nuw nsw i32 %narrow626, %narrow630
+    %120 = zext i32 %narrow643 to i64
+    %121 = add nsw i64 %120, -1
+    %122 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %121, i64 0
+    %123 = lshr i32 %14, 2
+    %124 = and i32 %123, 7
+    %narrow645 = mul nuw nsw i32 %124, 33
+    %narrow646 = add nuw nsw i32 %87, %narrow645
+    %125 = zext i32 %narrow646 to i64
+    %126 = add nsw i64 %125, -1
+    %127 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %126, i64 0
+    %narrow650 = add nuw nsw i32 %narrow617, %narrow645
+    %128 = zext i32 %narrow650 to i64
+    %129 = add nsw i64 %128, -1
+    %130 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %129, i64 0
+    %narrow654 = add nuw nsw i32 %100, %narrow645
+    %131 = zext i32 %narrow654 to i64
+    %132 = add nsw i64 %131, -1
+    %133 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %132, i64 0
+    %narrow660 = add nuw nsw i32 %narrow626, %narrow645
+    %134 = zext i32 %narrow660 to i64
+    %135 = add nsw i64 %134, -1
+    %136 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %135, i64 0
+    %137 = and i32 %82, 8
+    %138 = and i32 %90, 6
+    %139 = or i32 %138, 1
+    %140 = lshr i32 %11, 1
+    %141 = and i32 %140, 1
+    %142 = or i32 %137, 1
+    %narrow664 = add nuw nsw i32 %142, %124
+    %143 = zext i32 %narrow664 to i64
+    %narrow665 = mul nuw nsw i32 %139, 20
+    %144 = zext i32 %narrow665 to i64
+    %narrow666 = mul nuw nsw i32 %141, 640
+    %145 = zext i32 %narrow666 to i64
+    %146 = add nuw nsw i64 %143, -21
+    %147 = add nsw i64 %146, %144
+    %148 = add nuw nsw i64 %147, %145
+    %149 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %148, i64 0
+    %narrow672 = add nuw nsw i32 %narrow664, %narrow665
+    %narrow674 = add nuw nsw i32 %narrow672, %narrow666
+    %150 = zext i32 %narrow674 to i64
+    %151 = add nsw i64 %150, -1
+    %152 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %151, i64 0
+    %153 = or i32 %124, 8
+    %narrow676 = mul nuw nsw i32 %153, 33
+    %narrow677 = add nuw nsw i32 %87, %narrow676
+    %154 = zext i32 %narrow677 to i64
+    %155 = add nsw i64 %154, -1
+    %156 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %155, i64 0
+    %narrow682 = add nuw nsw i32 %narrow617, %narrow676
+    %157 = zext i32 %narrow682 to i64
+    %158 = add nsw i64 %157, -1
+    %159 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %158, i64 0
+    %narrow686 = add nuw nsw i32 %100, %narrow676
+    %160 = zext i32 %narrow686 to i64
+    %161 = add nsw i64 %160, -1
+    %162 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %161, i64 0
+    %narrow692 = add nuw nsw i32 %narrow626, %narrow676
+    %163 = zext i32 %narrow692 to i64
+    %164 = add nsw i64 %163, -1
+    %165 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %164, i64 0
+    %166 = or i32 %138, 9
+    %narrow697 = mul nuw nsw i32 %166, 20
+    %167 = zext i32 %narrow697 to i64
+    %168 = add nsw i64 %146, %167
+    %169 = add nuw nsw i64 %168, %145
+    %170 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %169, i64 0
+    %narrow704 = add nuw nsw i32 %narrow664, %narrow697
+    %narrow706 = add nuw nsw i32 %narrow704, %narrow666
+    %171 = zext i32 %narrow706 to i64
+    %172 = add nsw i64 %171, -1
+    %173 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %172, i64 0
+    %174 = or i32 %124, 16
+    %narrow708 = mul nuw nsw i32 %174, 33
+    %narrow709 = add nuw nsw i32 %87, %narrow708
+    %175 = zext i32 %narrow709 to i64
+    %176 = add nsw i64 %175, -1
+    %177 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %176, i64 0
+    %narrow714 = add nuw nsw i32 %narrow617, %narrow708
+    %178 = zext i32 %narrow714 to i64
+    %179 = add nsw i64 %178, -1
+    %180 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %179, i64 0
+    %narrow718 = add nuw nsw i32 %100, %narrow708
+    %181 = zext i32 %narrow718 to i64
+    %182 = add nsw i64 %181, -1
+    %183 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %182, i64 0
+    %narrow724 = add nuw nsw i32 %narrow626, %narrow708
+    %184 = zext i32 %narrow724 to i64
+    %185 = add nsw i64 %184, -1
+    %186 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %185, i64 0
+    %187 = or i32 %138, 17
+    %narrow729 = mul nuw nsw i32 %187, 20
+    %188 = zext i32 %narrow729 to i64
+    %189 = add nsw i64 %146, %188
+    %190 = add nuw nsw i64 %189, %145
+    %191 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %190, i64 0
+    %narrow736 = add nuw nsw i32 %narrow664, %narrow729
+    %narrow738 = add nuw nsw i32 %narrow736, %narrow666
+    %192 = zext i32 %narrow738 to i64
+    %193 = add nsw i64 %192, -1
+    %194 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %193, i64 0
+    %195 = or i32 %124, 24
+    %narrow740 = mul nuw nsw i32 %195, 33
+    %narrow741 = add nuw nsw i32 %87, %narrow740
+    %196 = zext i32 %narrow741 to i64
+    %197 = add nsw i64 %196, -1
+    %198 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %197, i64 0
+    %narrow746 = add nuw nsw i32 %narrow617, %narrow740
+    %199 = zext i32 %narrow746 to i64
+    %200 = add nsw i64 %199, -1
+    %201 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %200, i64 0
+    %narrow750 = add nuw nsw i32 %100, %narrow740
+    %202 = zext i32 %narrow750 to i64
+    %203 = add nsw i64 %202, -1
+    %204 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %203, i64 0
+    %narrow756 = add nuw nsw i32 %narrow626, %narrow740
+    %205 = zext i32 %narrow756 to i64
+    %206 = add nsw i64 %205, -1
+    %207 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* bitcast ([0 x i8] addrspace(3)* @shmem to [1 x i32] addrspace(3)*), i64 %206, i64 0
+    %208 = or i32 %138, 25
+    %narrow761 = mul nuw nsw i32 %208, 20
+    %209 = zext i32 %narrow761 to i64
+    %210 = add nsw i64 %146, %209
+    %211 = add nuw nsw i64 %210, %145
+    %212 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %211, i64 0
+    %narrow768 = add nuw nsw i32 %narrow664, %narrow761
+    %narrow770 = add nuw nsw i32 %narrow768, %narrow666
+    %213 = zext i32 %narrow770 to i64
+    %214 = add nsw i64 %213, -1
+    %215 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %214, i64 0
+    %216 = and i32 %14, 7
+    %narrow774 = mul nuw nsw i32 %216, 20
+    %217 = or i32 %13, 1
+    %narrow773 = add nuw nsw i32 %217, %16
+    %narrow775 = add nuw nsw i32 %narrow773, %narrow774
+    %218 = zext i32 %narrow775 to i64
+    %219 = add nsw i64 %218, -1
+    %220 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %219, i64 0
+    %221 = or i32 %216, 8
+    %narrow780 = mul nuw nsw i32 %221, 20
+    %narrow781 = add nuw nsw i32 %narrow773, %narrow780
+    %222 = zext i32 %narrow781 to i64
+    %223 = add nsw i64 %222, -1
+    %224 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %223, i64 0
+    %225 = or i32 %216, 16
+    %narrow786 = mul nuw nsw i32 %225, 20
+    %narrow787 = add nuw nsw i32 %narrow773, %narrow786
+    %226 = zext i32 %narrow787 to i64
+    %227 = add nsw i64 %226, -1
+    %228 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %227, i64 0
+    %229 = or i32 %216, 24
+    %narrow792 = mul nuw nsw i32 %229, 20
+    %narrow793 = add nuw nsw i32 %narrow773, %narrow792
+    %230 = zext i32 %narrow793 to i64
+    %231 = add nsw i64 %230, -1
+    %232 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %231, i64 0
+    %narrow797 = or i32 %13, %16
+    %narrow799 = or i32 %narrow797, 640
+    %233 = add nuw nsw i32 %narrow799, %narrow774
+    %234 = zext i32 %233 to i64
+    %235 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %234, i64 0
+    %236 = add nuw nsw i32 %narrow799, %narrow780
+    %237 = zext i32 %236 to i64
+    %238 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %237, i64 0
+    %239 = add nuw nsw i32 %narrow799, %narrow786
+    %240 = zext i32 %239 to i64
+    %241 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %240, i64 0
+    %242 = add nuw nsw i32 %narrow799, %narrow792
+    %243 = zext i32 %242 to i64
+    %244 = getelementptr inbounds [1 x i32], [1 x i32] addrspace(3)* addrspacecast ([1 x i32]* bitcast (i8* getelementptr ([0 x i8], [0 x i8]* addrspacecast ([0 x i8] addrspace(3)* @shmem to [0 x i8]*), i64 0, i64 4224) to [1 x i32]*) to [1 x i32] addrspace(3)*), i64 %243, i64 0
+    %245 = add i32 %22, -1
+    %246 = shl nuw i32 1, %245
+    %247 = icmp ugt i32 %245, 31
+    %248 = select i1 %247, i32 0, i32 %246
+    %249 = icmp ult i32 %22, 31
+    %.v = select i1 %249, i32 %22, i32 31
+    %250 = add i32 %26, -1
+    %251 = shl nuw i32 1, %250
+    %252 = icmp ugt i32 %250, 31
+    %253 = select i1 %252, i32 0, i32 %251
+    %254 = icmp ult i32 %26, 31
+    %.v845 = select i1 %254, i32 %26, i32 31
+    %255 = and i32 %14, 1
+    %.not886 = icmp eq i32 %255, 0
+    %256 = and i32 %14, 2
+    %.not895 = icmp eq i32 %256, 0
+    %257 = shl i32 %8, 16
+    %258 = and i32 %257, 67043328
+    %259 = shl i32 %11, 28
+    %260 = and i32 %259, 805306368
+    %261 = and i32 %30, 32
+    %262 = shl nuw nsw i32 %14, 5
+    %263 = and i32 %262, 64
+    %264 = shl i32 %14, 23
+    %265 = and i32 %264, 201326592
+    %266 = and i32 %76, 16
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1044 within `macro expansion`
+   br label %L657
+
+L657:                                             ; preds = %L6672, %L50
+   %value_phi238 = phi i32 [ 0, %L50 ], [ %639, %L6672 ]
+   %value_phi242 = phi i32 [ 0, %L50 ], [ %value_phi1374, %L6672 ]
+   %value_phi243 = phi i32 [ 0, %L50 ], [ %value_phi1375, %L6672 ]
+   %value_phi244 = phi i32 [ 0, %L50 ], [ %value_phi260., %L6672 ]
+   %value_phi245 = phi i32 [ 0, %L50 ], [ %value_phi261., %L6672 ]
+   %value_phi246 = phi i32 [ 0, %L50 ], [ %value_phi1370, %L6672 ]
+   %value_phi247 = phi i32 [ 0, %L50 ], [ %value_phi1371, %L6672 ]
+   %value_phi250 = phi i32 [ 0, %L50 ], [ %value_phi1366, %L6672 ]
+   %value_phi251 = phi i32 [ 0, %L50 ], [ %value_phi1367, %L6672 ]
+   %value_phi252 = phi i32 [ 0, %L50 ], [ %value_phi268., %L6672 ]
+   %value_phi253 = phi i32 [ 0, %L50 ], [ %value_phi269., %L6672 ]
+   %value_phi254 = phi i32 [ 0, %L50 ], [ %value_phi1362, %L6672 ]
+   %value_phi255 = phi i32 [ 0, %L50 ], [ %value_phi1363, %L6672 ]
+   %267 = shl i32 %value_phi238, 24
+   %268 = or i32 %267, 4
+   %269 = or i32 %267, 524292
+   br label %L676
+
+L676:                                             ; preds = %L676, %L657
+   %value_phi258 = phi i32 [ %value_phi242, %L657 ], [ %value_phi1374, %L676 ]
+   %value_phi259 = phi i32 [ %value_phi243, %L657 ], [ %value_phi1375, %L676 ]
+   %value_phi260 = phi i32 [ %value_phi244, %L657 ], [ %value_phi260., %L676 ]
+   %value_phi261 = phi i32 [ %value_phi245, %L657 ], [ %value_phi261., %L676 ]
+   %value_phi262 = phi i32 [ %value_phi246, %L657 ], [ %value_phi1370, %L676 ]
+   %value_phi263 = phi i32 [ %value_phi247, %L657 ], [ %value_phi1371, %L676 ]
+   %value_phi266 = phi i32 [ %value_phi250, %L657 ], [ %value_phi1366, %L676 ]
+   %value_phi267 = phi i32 [ %value_phi251, %L657 ], [ %value_phi1367, %L676 ]
+   %value_phi268 = phi i32 [ %value_phi252, %L657 ], [ %value_phi268., %L676 ]
+   %value_phi269 = phi i32 [ %value_phi253, %L657 ], [ %value_phi269., %L676 ]
+   %value_phi270 = phi i32 [ %value_phi254, %L657 ], [ %value_phi1362, %L676 ]
+   %value_phi271 = phi i32 [ %value_phi255, %L657 ], [ %value_phi1363, %L676 ]
+   %value_phi272 = phi i32 [ 0, %L657 ], [ %578, %L676 ]
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ int.jl:496 within `<<`
+    %270 = shl i32 %value_phi272, 22
+; │└
+; │┌ @ operators.jl:591 within `+` @ int.jl:87
+    %271 = add nuw nsw i32 %268, %270
+    %272 = or i32 %271, %70
+    %273 = or i32 %272, %75
+; ││ @ operators.jl:591 within `+`
+; ││┌ @ operators.jl:548 within `afoldl`
+; │││┌ @ int.jl:87 within `+`
+      %274 = or i32 %273, %77
+; │││└
+; │││ @ operators.jl:549 within `afoldl`
+; │││┌ @ int.jl:87 within `+`
+      %275 = or i32 %274, %79
+; ││└└
+; ││ @ int.jl:991 within `+` @ int.jl:87
+    %276 = add i32 %275, %81
+; │└
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:136 within `unsafe_load4_global` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:133
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:80 within `pointer`
+; │││┌ @ abstractarray.jl:1194 within `_memory_offset`
+; ││││┌ @ int.jl:88 within `*`
+       %277 = zext i32 %276 to i64
+       %278 = add nsw i64 %277, -4
+; │││└└
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:110 within `+`
+      %279 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract561, i64 %278
+; ││└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:136 within `unsafe_load4_global` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:133 @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:110
+    %val.i2110.elt = bitcast i8 addrspace(1)* %279 to i32 addrspace(1)*
+    %val.i2110.unpack = load i32, i32 addrspace(1)* %val.i2110.elt, align 16
+    %val.i2110.elt600 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract561, i64 %277
+    %280 = bitcast i8 addrspace(1)* %val.i2110.elt600 to i32 addrspace(1)*
+    %val.i2110.unpack601 = load i32, i32 addrspace(1)* %280, align 4
+    %val.i2110.elt602 = getelementptr inbounds i8, i8 addrspace(1)* %279, i64 8
+    %281 = bitcast i8 addrspace(1)* %val.i2110.elt602 to i32 addrspace(1)*
+    %val.i2110.unpack603 = load i32, i32 addrspace(1)* %281, align 8
+    %val.i2110.elt604 = getelementptr inbounds i8, i8 addrspace(1)* %279, i64 12
+    %282 = bitcast i8 addrspace(1)* %val.i2110.elt604 to i32 addrspace(1)*
+    %val.i2110.unpack605 = load i32, i32 addrspace(1)* %282, align 4
+; │└
+; │┌ @ operators.jl:591 within `+` @ int.jl:87
+    %283 = add nuw nsw i32 %269, %270
+    %284 = or i32 %283, %70
+    %285 = or i32 %284, %75
+; ││ @ operators.jl:591 within `+`
+; ││┌ @ operators.jl:548 within `afoldl`
+; │││┌ @ int.jl:87 within `+`
+      %286 = or i32 %285, %77
+; │││└
+; │││ @ operators.jl:549 within `afoldl`
+; │││┌ @ int.jl:87 within `+`
+      %287 = or i32 %286, %79
+; ││└└
+; ││ @ int.jl:991 within `+` @ int.jl:87
+    %narrow = add i32 %287, %81
+; │└
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:136 within `unsafe_load4_global` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:133
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:80 within `pointer`
+; │││┌ @ abstractarray.jl:1194 within `_memory_offset`
+; ││││┌ @ int.jl:88 within `*`
+       %288 = zext i32 %narrow to i64
+       %289 = add nsw i64 %288, -4
+; │││└└
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:110 within `+`
+      %290 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract561, i64 %289
+; ││└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:136 within `unsafe_load4_global` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:133 @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:110
+    %val.i2157.elt = bitcast i8 addrspace(1)* %290 to i32 addrspace(1)*
+    %val.i2157.unpack = load i32, i32 addrspace(1)* %val.i2157.elt, align 16
+    %val.i2157.elt607 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract561, i64 %288
+    %291 = bitcast i8 addrspace(1)* %val.i2157.elt607 to i32 addrspace(1)*
+    %val.i2157.unpack608 = load i32, i32 addrspace(1)* %291, align 4
+    %val.i2157.elt609 = getelementptr inbounds i8, i8 addrspace(1)* %290, i64 8
+    %292 = bitcast i8 addrspace(1)* %val.i2157.elt609 to i32 addrspace(1)*
+    %val.i2157.unpack610 = load i32, i32 addrspace(1)* %292, align 8
+    %val.i2157.elt611 = getelementptr inbounds i8, i8 addrspace(1)* %290, i64 12
+    %293 = bitcast i8 addrspace(1)* %val.i2157.elt611 to i32 addrspace(1)*
+    %val.i2157.unpack612 = load i32, i32 addrspace(1)* %293, align 4
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2138 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:207 within `setindex!` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:194
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:153 within `#arrayset`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:162 within `arrayset_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:84 within `unsafe_store!`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:44 within `pointerset`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:44 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         store i32 %val.i2110.unpack, i32 addrspace(3)* %96, align 4
+         store i32 %val.i2110.unpack601, i32 addrspace(3)* %99, align 4
+         store i32 %val.i2110.unpack603, i32 addrspace(3)* %103, align 4
+         store i32 %val.i2110.unpack605, i32 addrspace(3)* %107, align 4
+         store i32 %val.i2157.unpack, i32 addrspace(3)* %113, align 4
+         store i32 %val.i2157.unpack608, i32 addrspace(3)* %116, align 4
+         store i32 %val.i2157.unpack610, i32 addrspace(3)* %119, align 4
+         store i32 %val.i2157.unpack612, i32 addrspace(3)* %122, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1082 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/synchronization.jl:14 within `sync_threads`
+    call void @llvm.nvvm.barrier0()
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack = load i32, i32 addrspace(3)* %127, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %294 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %295 = add i32 %294, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %296 = xor i32 %295, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %297 = lshr i32 %.unpack, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %298 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %297, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %299 = add i32 %298, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %300 = xor i32 %299, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2373 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1010, i32 %296, i32 0, i32 0) #5
+    %res0.i2374 = extractvalue { i32, i32 } %res.i2373, 0
+    %res1.i2375 = extractvalue { i32, i32 } %res.i2373, 1
+    %res.i2368 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1013, i32 %300, i32 0, i32 0) #5
+    %res0.i2369 = extractvalue { i32, i32 } %res.i2368, 0
+    %res1.i2370 = extractvalue { i32, i32 } %res.i2368, 1
+    %res.i2363 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1010, i32 %300, i32 0, i32 0) #5
+    %res0.i2364 = extractvalue { i32, i32 } %res.i2363, 0
+    %res1.i2365 = extractvalue { i32, i32 } %res.i2363, 1
+    %res.i2358 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1013, i32 %296, i32 %res0.i2364, i32 %res1.i2365) #5
+    %res0.i2359 = extractvalue { i32, i32 } %res.i2358, 0
+    %res1.i2360 = extractvalue { i32, i32 } %res.i2358, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack651 = load i32, i32 addrspace(3)* %130, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %301 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack651, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %302 = add i32 %301, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %303 = xor i32 %302, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %304 = lshr i32 %.unpack651, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %305 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %304, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %306 = add i32 %305, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %307 = xor i32 %306, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2353 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1016, i32 %303, i32 %res0.i2374, i32 %res1.i2375) #5
+    %res0.i2354 = extractvalue { i32, i32 } %res.i2353, 0
+    %res1.i2355 = extractvalue { i32, i32 } %res.i2353, 1
+    %res.i2348 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1018, i32 %307, i32 %res0.i2369, i32 %res1.i2370) #5
+    %res0.i2349 = extractvalue { i32, i32 } %res.i2348, 0
+    %res1.i2350 = extractvalue { i32, i32 } %res.i2348, 1
+    %res.i2343 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1016, i32 %307, i32 %res0.i2359, i32 %res1.i2360) #5
+    %res0.i2344 = extractvalue { i32, i32 } %res.i2343, 0
+    %res1.i2345 = extractvalue { i32, i32 } %res.i2343, 1
+    %res.i2338 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1018, i32 %303, i32 %res0.i2344, i32 %res1.i2345) #5
+    %res0.i2339 = extractvalue { i32, i32 } %res.i2338, 0
+    %res1.i2340 = extractvalue { i32, i32 } %res.i2338, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack655 = load i32, i32 addrspace(3)* %133, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %308 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack655, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %309 = add i32 %308, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %310 = xor i32 %309, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %311 = lshr i32 %.unpack655, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %312 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %311, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %313 = add i32 %312, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %314 = xor i32 %313, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2333 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1009, i32 %310, i32 %res0.i2354, i32 %res1.i2355) #5
+    %res0.i2334 = extractvalue { i32, i32 } %res.i2333, 0
+    %res1.i2335 = extractvalue { i32, i32 } %res.i2333, 1
+    %res.i2328 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1012, i32 %314, i32 %res0.i2349, i32 %res1.i2350) #5
+    %res0.i2329 = extractvalue { i32, i32 } %res.i2328, 0
+    %res1.i2330 = extractvalue { i32, i32 } %res.i2328, 1
+    %res.i2323 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1009, i32 %314, i32 %res0.i2339, i32 %res1.i2340) #5
+    %res0.i2324 = extractvalue { i32, i32 } %res.i2323, 0
+    %res1.i2325 = extractvalue { i32, i32 } %res.i2323, 1
+    %res.i2318 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1012, i32 %310, i32 %res0.i2324, i32 %res1.i2325) #5
+    %res0.i2319 = extractvalue { i32, i32 } %res.i2318, 0
+    %res1.i2320 = extractvalue { i32, i32 } %res.i2318, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack661 = load i32, i32 addrspace(3)* %136, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %315 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack661, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %316 = add i32 %315, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %317 = xor i32 %316, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %318 = lshr i32 %.unpack661, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %319 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %318, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %320 = add i32 %319, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %321 = xor i32 %320, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2313 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1015, i32 %317, i32 %res0.i2334, i32 %res1.i2335) #5
+    %res0.i2314 = extractvalue { i32, i32 } %res.i2313, 0
+    %res1.i2315 = extractvalue { i32, i32 } %res.i2313, 1
+    %res.i2308 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1017, i32 %321, i32 %res0.i2329, i32 %res1.i2330) #5
+    %res0.i2309 = extractvalue { i32, i32 } %res.i2308, 0
+    %res1.i2310 = extractvalue { i32, i32 } %res.i2308, 1
+    %res.i2303 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1015, i32 %321, i32 %res0.i2319, i32 %res1.i2320) #5
+    %res0.i2304 = extractvalue { i32, i32 } %res.i2303, 0
+    %res1.i2305 = extractvalue { i32, i32 } %res.i2303, 1
+    %res.i2298 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1017, i32 %317, i32 %res0.i2304, i32 %res1.i2305) #5
+    %res0.i2299 = extractvalue { i32, i32 } %res.i2298, 0
+    %res1.i2300 = extractvalue { i32, i32 } %res.i2298, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1635 within `macro expansion`
+; │┌ @ int.jl:86 within `-`
+    %322 = add i32 %res0.i2314, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1589 within `macro expansion`
+; │┌ @ int.jl:87 within `+`
+    %323 = sub i32 %322, %res0.i2309
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %324 = ashr i32 %323, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1635 within `macro expansion`
+; │┌ @ int.jl:86 within `-`
+    %325 = add i32 %res1.i2315, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1589 within `macro expansion`
+; │┌ @ int.jl:87 within `+`
+    %326 = sub i32 %325, %res1.i2310
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %327 = ashr i32 %326, 2
+; │└
+; │┌ @ int.jl:87 within `+`
+    %328 = add i32 %res0.i2299, 2
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %329 = ashr i32 %328, 2
+; │└
+; │┌ @ int.jl:87 within `+`
+    %330 = add i32 %res1.i2300, 2
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %331 = ashr i32 %330, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2769 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:509 within `Int16x2`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:524 within `cvt_pack_s16`
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %332 = call i32 asm "cvt.pack.sat.s16.s32 $0, $1, $2;", "=r,r,r"(i32 %329, i32 %324) #5
+       %333 = call i32 asm "cvt.pack.sat.s16.s32 $0, $1, $2;", "=r,r,r"(i32 %331, i32 %327) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2138 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:207 within `setindex!` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:194
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:153 within `#arrayset`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:162 within `arrayset_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:84 within `unsafe_store!`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:44 within `pointerset`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:44 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         store i32 %332, i32 addrspace(3)* %149, align 4
+         store i32 %333, i32 addrspace(3)* %152, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack678 = load i32, i32 addrspace(3)* %156, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %334 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack678, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %335 = add i32 %334, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %336 = xor i32 %335, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %337 = lshr i32 %.unpack678, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %338 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %337, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %339 = add i32 %338, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %340 = xor i32 %339, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2293 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1010, i32 %336, i32 0, i32 0) #5
+    %res0.i2294 = extractvalue { i32, i32 } %res.i2293, 0
+    %res1.i2295 = extractvalue { i32, i32 } %res.i2293, 1
+    %res.i2288 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1013, i32 %340, i32 0, i32 0) #5
+    %res0.i2289 = extractvalue { i32, i32 } %res.i2288, 0
+    %res1.i2290 = extractvalue { i32, i32 } %res.i2288, 1
+    %res.i2283 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1010, i32 %340, i32 0, i32 0) #5
+    %res0.i2284 = extractvalue { i32, i32 } %res.i2283, 0
+    %res1.i2285 = extractvalue { i32, i32 } %res.i2283, 1
+    %res.i2278 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1013, i32 %336, i32 %res0.i2284, i32 %res1.i2285) #5
+    %res0.i2279 = extractvalue { i32, i32 } %res.i2278, 0
+    %res1.i2280 = extractvalue { i32, i32 } %res.i2278, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack683 = load i32, i32 addrspace(3)* %159, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %341 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack683, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %342 = add i32 %341, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %343 = xor i32 %342, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %344 = lshr i32 %.unpack683, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %345 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %344, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %346 = add i32 %345, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %347 = xor i32 %346, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2273 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1016, i32 %343, i32 %res0.i2294, i32 %res1.i2295) #5
+    %res0.i2274 = extractvalue { i32, i32 } %res.i2273, 0
+    %res1.i2275 = extractvalue { i32, i32 } %res.i2273, 1
+    %res.i2268 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1018, i32 %347, i32 %res0.i2289, i32 %res1.i2290) #5
+    %res0.i2269 = extractvalue { i32, i32 } %res.i2268, 0
+    %res1.i2270 = extractvalue { i32, i32 } %res.i2268, 1
+    %res.i2263 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1016, i32 %347, i32 %res0.i2279, i32 %res1.i2280) #5
+    %res0.i2264 = extractvalue { i32, i32 } %res.i2263, 0
+    %res1.i2265 = extractvalue { i32, i32 } %res.i2263, 1
+    %res.i2258 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1018, i32 %343, i32 %res0.i2264, i32 %res1.i2265) #5
+    %res0.i2259 = extractvalue { i32, i32 } %res.i2258, 0
+    %res1.i2260 = extractvalue { i32, i32 } %res.i2258, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack687 = load i32, i32 addrspace(3)* %162, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %348 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack687, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %349 = add i32 %348, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %350 = xor i32 %349, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %351 = lshr i32 %.unpack687, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %352 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %351, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %353 = add i32 %352, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %354 = xor i32 %353, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2253 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1009, i32 %350, i32 %res0.i2274, i32 %res1.i2275) #5
+    %res0.i2254 = extractvalue { i32, i32 } %res.i2253, 0
+    %res1.i2255 = extractvalue { i32, i32 } %res.i2253, 1
+    %res.i2248 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1012, i32 %354, i32 %res0.i2269, i32 %res1.i2270) #5
+    %res0.i2249 = extractvalue { i32, i32 } %res.i2248, 0
+    %res1.i2250 = extractvalue { i32, i32 } %res.i2248, 1
+    %res.i2243 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1009, i32 %354, i32 %res0.i2259, i32 %res1.i2260) #5
+    %res0.i2244 = extractvalue { i32, i32 } %res.i2243, 0
+    %res1.i2245 = extractvalue { i32, i32 } %res.i2243, 1
+    %res.i2238 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1012, i32 %350, i32 %res0.i2244, i32 %res1.i2245) #5
+    %res0.i2239 = extractvalue { i32, i32 } %res.i2238, 0
+    %res1.i2240 = extractvalue { i32, i32 } %res.i2238, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack693 = load i32, i32 addrspace(3)* %165, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %355 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack693, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %356 = add i32 %355, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %357 = xor i32 %356, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %358 = lshr i32 %.unpack693, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %359 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %358, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %360 = add i32 %359, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %361 = xor i32 %360, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2233 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1015, i32 %357, i32 %res0.i2254, i32 %res1.i2255) #5
+    %res0.i2234 = extractvalue { i32, i32 } %res.i2233, 0
+    %res1.i2235 = extractvalue { i32, i32 } %res.i2233, 1
+    %res.i2228 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1017, i32 %361, i32 %res0.i2249, i32 %res1.i2250) #5
+    %res0.i2229 = extractvalue { i32, i32 } %res.i2228, 0
+    %res1.i2230 = extractvalue { i32, i32 } %res.i2228, 1
+    %res.i2223 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1015, i32 %361, i32 %res0.i2239, i32 %res1.i2240) #5
+    %res0.i2224 = extractvalue { i32, i32 } %res.i2223, 0
+    %res1.i2225 = extractvalue { i32, i32 } %res.i2223, 1
+    %res.i2218 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1017, i32 %357, i32 %res0.i2224, i32 %res1.i2225) #5
+    %res0.i2219 = extractvalue { i32, i32 } %res.i2218, 0
+    %res1.i2220 = extractvalue { i32, i32 } %res.i2218, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1635 within `macro expansion`
+; │┌ @ int.jl:86 within `-`
+    %362 = add i32 %res0.i2234, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1589 within `macro expansion`
+; │┌ @ int.jl:87 within `+`
+    %363 = sub i32 %362, %res0.i2229
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %364 = ashr i32 %363, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1635 within `macro expansion`
+; │┌ @ int.jl:86 within `-`
+    %365 = add i32 %res1.i2235, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1589 within `macro expansion`
+; │┌ @ int.jl:87 within `+`
+    %366 = sub i32 %365, %res1.i2230
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %367 = ashr i32 %366, 2
+; │└
+; │┌ @ int.jl:87 within `+`
+    %368 = add i32 %res0.i2219, 2
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %369 = ashr i32 %368, 2
+; │└
+; │┌ @ int.jl:87 within `+`
+    %370 = add i32 %res1.i2220, 2
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %371 = ashr i32 %370, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2769 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:509 within `Int16x2`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:524 within `cvt_pack_s16`
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %372 = call i32 asm "cvt.pack.sat.s16.s32 $0, $1, $2;", "=r,r,r"(i32 %369, i32 %364) #5
+       %373 = call i32 asm "cvt.pack.sat.s16.s32 $0, $1, $2;", "=r,r,r"(i32 %371, i32 %367) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2138 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:207 within `setindex!` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:194
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:153 within `#arrayset`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:162 within `arrayset_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:84 within `unsafe_store!`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:44 within `pointerset`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:44 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         store i32 %372, i32 addrspace(3)* %170, align 4
+         store i32 %373, i32 addrspace(3)* %173, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack710 = load i32, i32 addrspace(3)* %177, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %374 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack710, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %375 = add i32 %374, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %376 = xor i32 %375, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %377 = lshr i32 %.unpack710, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %378 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %377, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %379 = add i32 %378, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %380 = xor i32 %379, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2213 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1010, i32 %376, i32 0, i32 0) #5
+    %res0.i2214 = extractvalue { i32, i32 } %res.i2213, 0
+    %res1.i2215 = extractvalue { i32, i32 } %res.i2213, 1
+    %res.i2208 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1013, i32 %380, i32 0, i32 0) #5
+    %res0.i2209 = extractvalue { i32, i32 } %res.i2208, 0
+    %res1.i2210 = extractvalue { i32, i32 } %res.i2208, 1
+    %res.i2203 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1010, i32 %380, i32 0, i32 0) #5
+    %res0.i2204 = extractvalue { i32, i32 } %res.i2203, 0
+    %res1.i2205 = extractvalue { i32, i32 } %res.i2203, 1
+    %res.i2198 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1013, i32 %376, i32 %res0.i2204, i32 %res1.i2205) #5
+    %res0.i2199 = extractvalue { i32, i32 } %res.i2198, 0
+    %res1.i2200 = extractvalue { i32, i32 } %res.i2198, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack715 = load i32, i32 addrspace(3)* %180, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %381 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack715, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %382 = add i32 %381, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %383 = xor i32 %382, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %384 = lshr i32 %.unpack715, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %385 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %384, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %386 = add i32 %385, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %387 = xor i32 %386, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2193 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1016, i32 %383, i32 %res0.i2214, i32 %res1.i2215) #5
+    %res0.i2194 = extractvalue { i32, i32 } %res.i2193, 0
+    %res1.i2195 = extractvalue { i32, i32 } %res.i2193, 1
+    %res.i2188 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1018, i32 %387, i32 %res0.i2209, i32 %res1.i2210) #5
+    %res0.i2189 = extractvalue { i32, i32 } %res.i2188, 0
+    %res1.i2190 = extractvalue { i32, i32 } %res.i2188, 1
+    %res.i2183 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1016, i32 %387, i32 %res0.i2199, i32 %res1.i2200) #5
+    %res0.i2184 = extractvalue { i32, i32 } %res.i2183, 0
+    %res1.i2185 = extractvalue { i32, i32 } %res.i2183, 1
+    %res.i2178 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1018, i32 %383, i32 %res0.i2184, i32 %res1.i2185) #5
+    %res0.i2179 = extractvalue { i32, i32 } %res.i2178, 0
+    %res1.i2180 = extractvalue { i32, i32 } %res.i2178, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack719 = load i32, i32 addrspace(3)* %183, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %388 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack719, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %389 = add i32 %388, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %390 = xor i32 %389, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %391 = lshr i32 %.unpack719, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %392 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %391, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %393 = add i32 %392, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %394 = xor i32 %393, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2173 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1009, i32 %390, i32 %res0.i2194, i32 %res1.i2195) #5
+    %res0.i2174 = extractvalue { i32, i32 } %res.i2173, 0
+    %res1.i2175 = extractvalue { i32, i32 } %res.i2173, 1
+    %res.i2168 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1012, i32 %394, i32 %res0.i2189, i32 %res1.i2190) #5
+    %res0.i2169 = extractvalue { i32, i32 } %res.i2168, 0
+    %res1.i2170 = extractvalue { i32, i32 } %res.i2168, 1
+    %res.i2163 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1009, i32 %394, i32 %res0.i2179, i32 %res1.i2180) #5
+    %res0.i2164 = extractvalue { i32, i32 } %res.i2163, 0
+    %res1.i2165 = extractvalue { i32, i32 } %res.i2163, 1
+    %res.i2158 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1012, i32 %390, i32 %res0.i2164, i32 %res1.i2165) #5
+    %res0.i2159 = extractvalue { i32, i32 } %res.i2158, 0
+    %res1.i2160 = extractvalue { i32, i32 } %res.i2158, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack725 = load i32, i32 addrspace(3)* %186, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %395 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack725, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %396 = add i32 %395, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %397 = xor i32 %396, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %398 = lshr i32 %.unpack725, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %399 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %398, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %400 = add i32 %399, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %401 = xor i32 %400, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2151 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1015, i32 %397, i32 %res0.i2174, i32 %res1.i2175) #5
+    %res0.i2152 = extractvalue { i32, i32 } %res.i2151, 0
+    %res1.i2153 = extractvalue { i32, i32 } %res.i2151, 1
+    %res.i2146 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1017, i32 %401, i32 %res0.i2169, i32 %res1.i2170) #5
+    %res0.i2147 = extractvalue { i32, i32 } %res.i2146, 0
+    %res1.i2148 = extractvalue { i32, i32 } %res.i2146, 1
+    %res.i2141 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1015, i32 %401, i32 %res0.i2159, i32 %res1.i2160) #5
+    %res0.i2142 = extractvalue { i32, i32 } %res.i2141, 0
+    %res1.i2143 = extractvalue { i32, i32 } %res.i2141, 1
+    %res.i2136 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1017, i32 %397, i32 %res0.i2142, i32 %res1.i2143) #5
+    %res0.i2137 = extractvalue { i32, i32 } %res.i2136, 0
+    %res1.i2138 = extractvalue { i32, i32 } %res.i2136, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1635 within `macro expansion`
+; │┌ @ int.jl:86 within `-`
+    %402 = add i32 %res0.i2152, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1589 within `macro expansion`
+; │┌ @ int.jl:87 within `+`
+    %403 = sub i32 %402, %res0.i2147
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %404 = ashr i32 %403, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1635 within `macro expansion`
+; │┌ @ int.jl:86 within `-`
+    %405 = add i32 %res1.i2153, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1589 within `macro expansion`
+; │┌ @ int.jl:87 within `+`
+    %406 = sub i32 %405, %res1.i2148
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %407 = ashr i32 %406, 2
+; │└
+; │┌ @ int.jl:87 within `+`
+    %408 = add i32 %res0.i2137, 2
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %409 = ashr i32 %408, 2
+; │└
+; │┌ @ int.jl:87 within `+`
+    %410 = add i32 %res1.i2138, 2
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %411 = ashr i32 %410, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2769 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:509 within `Int16x2`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:524 within `cvt_pack_s16`
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %412 = call i32 asm "cvt.pack.sat.s16.s32 $0, $1, $2;", "=r,r,r"(i32 %409, i32 %404) #5
+       %413 = call i32 asm "cvt.pack.sat.s16.s32 $0, $1, $2;", "=r,r,r"(i32 %411, i32 %407) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2138 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:207 within `setindex!` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:194
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:153 within `#arrayset`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:162 within `arrayset_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:84 within `unsafe_store!`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:44 within `pointerset`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:44 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         store i32 %412, i32 addrspace(3)* %191, align 4
+         store i32 %413, i32 addrspace(3)* %194, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack742 = load i32, i32 addrspace(3)* %198, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %414 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack742, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %415 = add i32 %414, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %416 = xor i32 %415, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %417 = lshr i32 %.unpack742, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %418 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %417, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %419 = add i32 %418, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %420 = xor i32 %419, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2131 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1010, i32 %416, i32 0, i32 0) #5
+    %res0.i2132 = extractvalue { i32, i32 } %res.i2131, 0
+    %res1.i2133 = extractvalue { i32, i32 } %res.i2131, 1
+    %res.i2126 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1013, i32 %420, i32 0, i32 0) #5
+    %res0.i2127 = extractvalue { i32, i32 } %res.i2126, 0
+    %res1.i2128 = extractvalue { i32, i32 } %res.i2126, 1
+    %res.i2121 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1010, i32 %420, i32 0, i32 0) #5
+    %res0.i2122 = extractvalue { i32, i32 } %res.i2121, 0
+    %res1.i2123 = extractvalue { i32, i32 } %res.i2121, 1
+    %res.i2116 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1013, i32 %416, i32 %res0.i2122, i32 %res1.i2123) #5
+    %res0.i2117 = extractvalue { i32, i32 } %res.i2116, 0
+    %res1.i2118 = extractvalue { i32, i32 } %res.i2116, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack747 = load i32, i32 addrspace(3)* %201, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %421 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack747, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %422 = add i32 %421, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %423 = xor i32 %422, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %424 = lshr i32 %.unpack747, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %425 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %424, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %426 = add i32 %425, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %427 = xor i32 %426, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2111 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1016, i32 %423, i32 %res0.i2132, i32 %res1.i2133) #5
+    %res0.i2112 = extractvalue { i32, i32 } %res.i2111, 0
+    %res1.i2113 = extractvalue { i32, i32 } %res.i2111, 1
+    %res.i2104 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1018, i32 %427, i32 %res0.i2127, i32 %res1.i2128) #5
+    %res0.i2105 = extractvalue { i32, i32 } %res.i2104, 0
+    %res1.i2106 = extractvalue { i32, i32 } %res.i2104, 1
+    %res.i2099 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1016, i32 %427, i32 %res0.i2117, i32 %res1.i2118) #5
+    %res0.i2100 = extractvalue { i32, i32 } %res.i2099, 0
+    %res1.i2101 = extractvalue { i32, i32 } %res.i2099, 1
+    %res.i2094 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1018, i32 %423, i32 %res0.i2100, i32 %res1.i2101) #5
+    %res0.i2095 = extractvalue { i32, i32 } %res.i2094, 0
+    %res1.i2096 = extractvalue { i32, i32 } %res.i2094, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack751 = load i32, i32 addrspace(3)* %204, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %428 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack751, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %429 = add i32 %428, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %430 = xor i32 %429, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %431 = lshr i32 %.unpack751, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %432 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %431, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %433 = add i32 %432, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %434 = xor i32 %433, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2089 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1009, i32 %430, i32 %res0.i2112, i32 %res1.i2113) #5
+    %res0.i2090 = extractvalue { i32, i32 } %res.i2089, 0
+    %res1.i2091 = extractvalue { i32, i32 } %res.i2089, 1
+    %res.i2084 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1012, i32 %434, i32 %res0.i2105, i32 %res1.i2106) #5
+    %res0.i2085 = extractvalue { i32, i32 } %res.i2084, 0
+    %res1.i2086 = extractvalue { i32, i32 } %res.i2084, 1
+    %res.i2079 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1009, i32 %434, i32 %res0.i2095, i32 %res1.i2096) #5
+    %res0.i2080 = extractvalue { i32, i32 } %res.i2079, 0
+    %res1.i2081 = extractvalue { i32, i32 } %res.i2079, 1
+    %res.i2074 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1012, i32 %430, i32 %res0.i2080, i32 %res1.i2081) #5
+    %res0.i2075 = extractvalue { i32, i32 } %res.i2074, 0
+    %res1.i2076 = extractvalue { i32, i32 } %res.i2074, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack757 = load i32, i32 addrspace(3)* %207, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2597 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:282 within `convert`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %435 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %.unpack757, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:283 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %436 = add i32 %435, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:284 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %437 = xor i32 %436, -2139062144
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:286 within `convert`
+; ││┌ @ int.jl:497 within `>>>`
+     %438 = lshr i32 %.unpack757, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %439 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %438, i32 134744072, i32 252645135, i32 40) #5
+; ││└└└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:287 within `convert`
+; ││┌ @ int.jl:87 within `+`
+     %440 = add i32 %439, 2021161080
+; ││└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:288 within `convert`
+; ││┌ @ int.jl:366 within `xor`
+     %441 = xor i32 %440, -2139062144
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3214 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:3097 within `mma_m8n8k16`
+    %res.i2069 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1015, i32 %437, i32 %res0.i2090, i32 %res1.i2091) #5
+    %res0.i2070 = extractvalue { i32, i32 } %res.i2069, 0
+    %res1.i2071 = extractvalue { i32, i32 } %res.i2069, 1
+    %res.i2064 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1017, i32 %441, i32 %res0.i2085, i32 %res1.i2086) #5
+    %res0.i2065 = extractvalue { i32, i32 } %res.i2064, 0
+    %res1.i2066 = extractvalue { i32, i32 } %res.i2064, 1
+    %res.i2059 = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1015, i32 %441, i32 %res0.i2075, i32 %res1.i2076) #5
+    %res0.i2060 = extractvalue { i32, i32 } %res.i2059, 0
+    %res1.i2061 = extractvalue { i32, i32 } %res.i2059, 1
+    %res.i = call { i32, i32 } asm sideeffect "mma.sync.aligned.m8n8k16.row.col.satfinite.s32.s8.s8.s32 {$0, $1}, {$2}, {$3}, {$4, $5};", "=r,=r,r,r,r,r"(i32 %.1017, i32 %437, i32 %res0.i2060, i32 %res1.i2061) #5
+    %res0.i = extractvalue { i32, i32 } %res.i, 0
+    %res1.i = extractvalue { i32, i32 } %res.i, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1635 within `macro expansion`
+; │┌ @ int.jl:86 within `-`
+    %442 = add i32 %res0.i2070, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1589 within `macro expansion`
+; │┌ @ int.jl:87 within `+`
+    %443 = sub i32 %442, %res0.i2065
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %444 = ashr i32 %443, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1635 within `macro expansion`
+; │┌ @ int.jl:86 within `-`
+    %445 = add i32 %res1.i2071, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1589 within `macro expansion`
+; │┌ @ int.jl:87 within `+`
+    %446 = sub i32 %445, %res1.i2066
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %447 = ashr i32 %446, 2
+; │└
+; │┌ @ int.jl:87 within `+`
+    %448 = add i32 %res0.i, 2
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %449 = ashr i32 %448, 2
+; │└
+; │┌ @ int.jl:87 within `+`
+    %450 = add i32 %res1.i, 2
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %451 = ashr i32 %450, 2
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2769 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:509 within `Int16x2`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:524 within `cvt_pack_s16`
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %452 = call i32 asm "cvt.pack.sat.s16.s32 $0, $1, $2;", "=r,r,r"(i32 %449, i32 %444) #5
+       %453 = call i32 asm "cvt.pack.sat.s16.s32 $0, $1, $2;", "=r,r,r"(i32 %451, i32 %447) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2138 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:207 within `setindex!` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:194
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:153 within `#arrayset`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:162 within `arrayset_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:84 within `unsafe_store!`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:44 within `pointerset`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:44 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         store i32 %452, i32 addrspace(3)* %212, align 4
+         store i32 %453, i32 addrspace(3)* %215, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1082 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/synchronization.jl:14 within `sync_threads`
+    call void @llvm.nvvm.barrier0()
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2023 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:204 within `getindex` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:192
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:111 within `#arrayref`
+; │││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:119 within `arrayref_bits`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:81 within `unsafe_load`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `pointerref`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:9 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %.unpack776 = load i32, i32 addrspace(3)* %220, align 4
+         %.unpack782 = load i32, i32 addrspace(3)* %224, align 4
+         %.unpack788 = load i32, i32 addrspace(3)* %228, align 4
+         %.unpack794 = load i32, i32 addrspace(3)* %232, align 4
+         %.unpack801 = load i32, i32 addrspace(3)* %235, align 4
+         %.unpack808 = load i32, i32 addrspace(3)* %238, align 4
+         %.unpack815 = load i32, i32 addrspace(3)* %241, align 4
+         %.unpack822 = load i32, i32 addrspace(3)* %244, align 4
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2578 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:514 within `convert`
+; ││┌ @ int.jl:516 within `rem`
+     %sext = shl i32 %.unpack776, 16
+     %454 = ashr exact i32 %sext, 16
+     %455 = ashr i32 %.unpack776, 16
+     %sext824 = shl i32 %.unpack782, 16
+     %456 = ashr exact i32 %sext824, 16
+     %457 = ashr i32 %.unpack782, 16
+     %sext826 = shl i32 %.unpack788, 16
+     %458 = ashr exact i32 %sext826, 16
+     %459 = ashr i32 %.unpack788, 16
+     %sext828 = shl i32 %.unpack794, 16
+     %460 = ashr exact i32 %sext828, 16
+     %461 = ashr i32 %.unpack794, 16
+     %sext830 = shl i32 %.unpack801, 16
+     %462 = ashr exact i32 %sext830, 16
+     %463 = ashr i32 %.unpack801, 16
+     %sext832 = shl i32 %.unpack808, 16
+     %464 = ashr exact i32 %sext832, 16
+     %465 = ashr i32 %.unpack808, 16
+     %sext834 = shl i32 %.unpack815, 16
+     %466 = ashr exact i32 %sext834, 16
+     %467 = ashr i32 %.unpack815, 16
+     %sext836 = shl i32 %.unpack822, 16
+     %468 = ashr exact i32 %sext836, 16
+     %469 = ashr i32 %.unpack822, 16
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1635 within `macro expansion`
+; │┌ @ int.jl:87 within `+`
+    %470 = add i32 %454, %248
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %471 = ashr i32 %470, %.v
+; │└
+; │┌ @ int.jl:87 within `+`
+    %472 = add i32 %455, %248
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %473 = ashr i32 %472, %.v
+; │└
+; │┌ @ int.jl:87 within `+`
+    %474 = add i32 %456, %248
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %475 = ashr i32 %474, %.v
+; │└
+; │┌ @ int.jl:87 within `+`
+    %476 = add i32 %457, %248
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %477 = ashr i32 %476, %.v
+; │└
+; │┌ @ int.jl:87 within `+`
+    %478 = add i32 %458, %248
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %479 = ashr i32 %478, %.v
+; │└
+; │┌ @ int.jl:87 within `+`
+    %480 = add i32 %459, %248
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %481 = ashr i32 %480, %.v
+; │└
+; │┌ @ int.jl:87 within `+`
+    %482 = add i32 %460, %248
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %483 = ashr i32 %482, %.v
+; │└
+; │┌ @ int.jl:87 within `+`
+    %484 = add i32 %461, %248
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %485 = ashr i32 %484, %.v
+; │└
+; │┌ @ int.jl:87 within `+`
+    %486 = add i32 %462, %253
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %487 = ashr i32 %486, %.v845
+; │└
+; │┌ @ int.jl:87 within `+`
+    %488 = add i32 %463, %253
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %489 = ashr i32 %488, %.v845
+; │└
+; │┌ @ int.jl:87 within `+`
+    %490 = add i32 %464, %253
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %491 = ashr i32 %490, %.v845
+; │└
+; │┌ @ int.jl:87 within `+`
+    %492 = add i32 %465, %253
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %493 = ashr i32 %492, %.v845
+; │└
+; │┌ @ int.jl:87 within `+`
+    %494 = add i32 %466, %253
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %495 = ashr i32 %494, %.v845
+; │└
+; │┌ @ int.jl:87 within `+`
+    %496 = add i32 %467, %253
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %497 = ashr i32 %496, %.v845
+; │└
+; │┌ @ int.jl:87 within `+`
+    %498 = add i32 %468, %253
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %499 = ashr i32 %498, %.v845
+; │└
+; │┌ @ int.jl:87 within `+`
+    %500 = add i32 %469, %253
+; │└
+; │┌ @ int.jl:494 within `>>`
+    %501 = ashr i32 %500, %.v845
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1589 within `macro expansion`
+; │┌ @ math.jl:154 within `clamp` @ math.jl:89
+; ││┌ @ essentials.jl:489 within `ifelse`
+     %502 = icmp sgt i32 %471, -7
+     %503 = select i1 %502, i32 %471, i32 -7
+     %504 = icmp slt i32 %503, 7
+     %505 = select i1 %504, i32 %503, i32 7
+     %506 = icmp sgt i32 %473, -7
+     %507 = select i1 %506, i32 %473, i32 -7
+     %508 = icmp slt i32 %507, 7
+     %509 = select i1 %508, i32 %507, i32 7
+     %510 = icmp sgt i32 %475, -7
+     %511 = select i1 %510, i32 %475, i32 -7
+     %512 = icmp slt i32 %511, 7
+     %513 = select i1 %512, i32 %511, i32 7
+     %514 = icmp sgt i32 %477, -7
+     %515 = select i1 %514, i32 %477, i32 -7
+     %516 = icmp slt i32 %515, 7
+     %517 = select i1 %516, i32 %515, i32 7
+     %518 = icmp sgt i32 %479, -7
+     %519 = select i1 %518, i32 %479, i32 -7
+     %520 = icmp slt i32 %519, 7
+     %521 = select i1 %520, i32 %519, i32 7
+     %522 = icmp sgt i32 %481, -7
+     %523 = select i1 %522, i32 %481, i32 -7
+     %524 = icmp slt i32 %523, 7
+     %525 = select i1 %524, i32 %523, i32 7
+     %526 = icmp sgt i32 %483, -7
+     %527 = select i1 %526, i32 %483, i32 -7
+     %528 = icmp slt i32 %527, 7
+     %529 = select i1 %528, i32 %527, i32 7
+     %530 = icmp sgt i32 %485, -7
+     %531 = select i1 %530, i32 %485, i32 -7
+     %532 = icmp slt i32 %531, 7
+     %533 = select i1 %532, i32 %531, i32 7
+     %534 = icmp sgt i32 %487, -7
+     %535 = select i1 %534, i32 %487, i32 -7
+     %536 = icmp slt i32 %535, 7
+     %537 = select i1 %536, i32 %535, i32 7
+     %538 = icmp sgt i32 %489, -7
+     %539 = select i1 %538, i32 %489, i32 -7
+     %540 = icmp slt i32 %539, 7
+     %541 = select i1 %540, i32 %539, i32 7
+     %542 = icmp sgt i32 %491, -7
+     %543 = select i1 %542, i32 %491, i32 -7
+     %544 = icmp slt i32 %543, 7
+     %545 = select i1 %544, i32 %543, i32 7
+     %546 = icmp sgt i32 %493, -7
+     %547 = select i1 %546, i32 %493, i32 -7
+     %548 = icmp slt i32 %547, 7
+     %549 = select i1 %548, i32 %547, i32 7
+     %550 = icmp sgt i32 %495, -7
+     %551 = select i1 %550, i32 %495, i32 -7
+     %552 = icmp slt i32 %551, 7
+     %553 = select i1 %552, i32 %551, i32 7
+     %554 = icmp sgt i32 %497, -7
+     %555 = select i1 %554, i32 %497, i32 -7
+     %556 = icmp slt i32 %555, 7
+     %557 = select i1 %556, i32 %555, i32 7
+     %558 = icmp sgt i32 %499, -7
+     %559 = select i1 %558, i32 %499, i32 -7
+     %560 = icmp slt i32 %559, 7
+     %561 = select i1 %560, i32 %559, i32 7
+     %562 = icmp sgt i32 %501, -7
+     %563 = select i1 %562, i32 %501, i32 -7
+     %564 = icmp slt i32 %563, 7
+     %565 = select i1 %564, i32 %563, i32 7
+; │└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2991 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:275 within `Int4x8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:360 within `Int8x4`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:433 within `cvt_pack_s8`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %566 = call i32 asm "cvt.pack.sat.s8.s32.b32 $0, $1, $2, 0;", "=r,r,r"(i32 %529, i32 %521) #5
+; ││││└└
+; ││││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:417 within `cvt_pack_s8`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %567 = call i32 asm "cvt.pack.sat.s8.s32.b32 $0, $1, $2, $3;", "=r,r,r,r"(i32 %513, i32 %505, i32 %566) #5
+; ││││└└
+; ││││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:433 within `cvt_pack_s8`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %568 = call i32 asm "cvt.pack.sat.s8.s32.b32 $0, $1, $2, 0;", "=r,r,r"(i32 %533, i32 %525) #5
+; ││││└└
+; ││││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:417 within `cvt_pack_s8`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %569 = call i32 asm "cvt.pack.sat.s8.s32.b32 $0, $1, $2, $3;", "=r,r,r,r"(i32 %517, i32 %509, i32 %568) #5
+; ││└└└└
+; ││┌ @ int.jl:496 within `<<`
+     %570 = shl i32 %569, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:98 within `#bitwise_merge`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; ││││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %571 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %570, i32 %567, i32 -252645136, i32 228) #5
+; ││└└└└└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:360 within `Int8x4`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:433 within `cvt_pack_s8`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %572 = call i32 asm "cvt.pack.sat.s8.s32.b32 $0, $1, $2, 0;", "=r,r,r"(i32 %561, i32 %553) #5
+; ││││└└
+; ││││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:417 within `cvt_pack_s8`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %573 = call i32 asm "cvt.pack.sat.s8.s32.b32 $0, $1, $2, $3;", "=r,r,r,r"(i32 %545, i32 %537, i32 %572) #5
+; ││││└└
+; ││││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:433 within `cvt_pack_s8`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %574 = call i32 asm "cvt.pack.sat.s8.s32.b32 $0, $1, $2, 0;", "=r,r,r"(i32 %565, i32 %557) #5
+; ││││└└
+; ││││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:417 within `cvt_pack_s8`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+        %575 = call i32 asm "cvt.pack.sat.s8.s32.b32 $0, $1, $2, $3;", "=r,r,r,r"(i32 %549, i32 %541, i32 %574) #5
+; ││└└└└
+; ││┌ @ int.jl:496 within `<<`
+     %576 = shl i32 %575, 4
+; ││└
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:98 within `#bitwise_merge`
+; │││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:60 within `lop3`
+; ││││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:55 within `#lop3`
+; │││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+         %577 = call i32 asm "lop3.b32 $0, $1, $2, $3, $4;", "=r,r,r,r,i"(i32 %576, i32 %573, i32 -252645136, i32 228) #5
+; │└└└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1409 within `macro expansion`
+; │┌ @ int.jl:484 within `==` @ promotion.jl:427 @ promotion.jl:477
+    %.not855 = icmp eq i32 %value_phi272, 0
+; │└
+   %value_phi1362 = select i1 %.not855, i32 %571, i32 %value_phi270
+   %value_phi1363 = select i1 %.not855, i32 %571, i32 %value_phi271
+; │┌ @ int.jl:484 within `==` @ promotion.jl:427 @ promotion.jl:477
+    %.not858 = icmp eq i32 %value_phi272, 1
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1286 within `macro expansion`
+   %value_phi268. = select i1 %.not858, i32 %571, i32 %value_phi268
+   %value_phi269. = select i1 %.not858, i32 %571, i32 %value_phi269
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1409 within `macro expansion`
+; │┌ @ int.jl:484 within `==` @ promotion.jl:427 @ promotion.jl:477
+    %.not861 = icmp eq i32 %value_phi272, 2
+; │└
+   %value_phi1366 = select i1 %.not861, i32 %571, i32 %value_phi266
+   %value_phi1367 = select i1 %.not861, i32 %571, i32 %value_phi267
+; │┌ @ int.jl:484 within `==` @ promotion.jl:427 @ promotion.jl:477
+    %.not864 = icmp eq i32 %value_phi272, 3
+; │└
+   %value_phi1370 = select i1 %.not855, i32 %577, i32 %value_phi262
+   %value_phi1371 = select i1 %.not855, i32 %577, i32 %value_phi263
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1286 within `macro expansion`
+   %value_phi260. = select i1 %.not858, i32 %577, i32 %value_phi260
+   %value_phi261. = select i1 %.not858, i32 %577, i32 %value_phi261
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1409 within `macro expansion`
+   %value_phi1374 = select i1 %.not861, i32 %577, i32 %value_phi258
+   %value_phi1375 = select i1 %.not861, i32 %577, i32 %value_phi259
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %578 = add nuw nsw i32 %value_phi272, 1
+; │└
+   br i1 %.not864, label %L6672, label %L676
+
+L6672:                                            ; preds = %L676
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %579 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1362, i32 %value_phi268., i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %580 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1363, i32 %value_phi269., i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %581 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1366, i32 %571, i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %582 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1367, i32 %571, i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %583 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1370, i32 %value_phi260., i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %584 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1371, i32 %value_phi261., i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %585 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1374, i32 %577, i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %586 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1375, i32 %577, i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.10 = select i1 %.not886, i32 %580, i32 %579
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %587 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.10, i32 1, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1398 = select i1 %.not886, i32 %587, i32 %580
+   %value_phi1400 = select i1 %.not886, i32 %579, i32 %587
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.11 = select i1 %.not886, i32 %582, i32 %581
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %588 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.11, i32 1, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1403 = select i1 %.not886, i32 %588, i32 %582
+   %value_phi1405 = select i1 %.not886, i32 %581, i32 %588
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.12 = select i1 %.not886, i32 %584, i32 %583
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %589 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.12, i32 1, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1408 = select i1 %.not886, i32 %589, i32 %584
+   %value_phi1410 = select i1 %.not886, i32 %583, i32 %589
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.13 = select i1 %.not886, i32 %586, i32 %585
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %590 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.13, i32 1, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1413 = select i1 %.not886, i32 %590, i32 %586
+   %value_phi1415 = select i1 %.not886, i32 %585, i32 %590
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %591 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1400, i32 %value_phi1398, i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %592 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1400, i32 %value_phi1398, i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %593 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1405, i32 %value_phi1403, i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %594 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1405, i32 %value_phi1403, i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %595 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1410, i32 %value_phi1408, i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %596 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1410, i32 %value_phi1408, i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2308 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2258 within `get_lo8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %597 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1415, i32 %value_phi1413, i32 25152) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2309 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2259 within `get_hi8`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %598 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1415, i32 %value_phi1413, i32 29521) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.14 = select i1 %.not895, i32 %593, i32 %591
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %599 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.14, i32 2, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1418 = select i1 %.not895, i32 %599, i32 %593
+   %value_phi1420 = select i1 %.not895, i32 %591, i32 %599
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.15 = select i1 %.not895, i32 %594, i32 %592
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %600 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.15, i32 2, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1423 = select i1 %.not895, i32 %600, i32 %594
+   %value_phi1425 = select i1 %.not895, i32 %592, i32 %600
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.16 = select i1 %.not895, i32 %597, i32 %595
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %601 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.16, i32 2, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1428 = select i1 %.not895, i32 %601, i32 %597
+   %value_phi1430 = select i1 %.not895, i32 %595, i32 %601
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.17 = select i1 %.not895, i32 %598, i32 %596
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %602 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.17, i32 2, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1433 = select i1 %.not895, i32 %602, i32 %598
+   %value_phi1435 = select i1 %.not895, i32 %596, i32 %602
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2316 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2263 within `get_lo16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %603 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1420, i32 %value_phi1418, i32 21520) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2317 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2264 within `get_hi16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %604 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1420, i32 %value_phi1418, i32 30258) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2316 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2263 within `get_lo16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %605 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1425, i32 %value_phi1423, i32 21520) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2317 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2264 within `get_hi16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %606 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1425, i32 %value_phi1423, i32 30258) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2316 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2263 within `get_lo16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %607 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1430, i32 %value_phi1428, i32 21520) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2317 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2264 within `get_hi16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %608 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1430, i32 %value_phi1428, i32 30258) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2316 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2263 within `get_lo16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %609 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1435, i32 %value_phi1433, i32 21520) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2317 within `macro expansion`
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2264 within `get_hi16`
+; ││┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:33 within `cuda_prmt` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:29
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `_asmcall`
+; ││││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/asmcall.jl:3 within `macro expansion` @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/base.jl:40
+       %610 = call i32 asm "prmt.b32 $0, $1, $2, $3;", "=r,r,r,i"(i32 %value_phi1435, i32 %value_phi1433, i32 30258) #5
+; │└└└└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.18 = select i1 %.not599, i32 %605, i32 %603
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %611 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.18, i32 4, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1438 = select i1 %.not599, i32 %611, i32 %605
+   %value_phi1440 = select i1 %.not599, i32 %603, i32 %611
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.19 = select i1 %.not599, i32 %606, i32 %604
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %612 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.19, i32 4, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1443 = select i1 %.not599, i32 %612, i32 %606
+   %value_phi1445 = select i1 %.not599, i32 %604, i32 %612
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.20 = select i1 %.not599, i32 %609, i32 %607
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %613 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.20, i32 4, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1448 = select i1 %.not599, i32 %613, i32 %609
+   %value_phi1450 = select i1 %.not599, i32 %607, i32 %613
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %.21 = select i1 %.not599, i32 %610, i32 %608
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %614 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %.21, i32 4, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1453 = select i1 %.not599, i32 %614, i32 %610
+   %value_phi1455 = select i1 %.not599, i32 %608, i32 %614
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %value_phi1445.value_phi1440 = select i1 %.not886, i32 %value_phi1445, i32 %value_phi1440
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %615 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %value_phi1445.value_phi1440, i32 1, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1458 = select i1 %.not886, i32 %615, i32 %value_phi1445
+   %value_phi1459 = select i1 %.not886, i32 %value_phi1440, i32 %615
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %value_phi1443.value_phi1438 = select i1 %.not886, i32 %value_phi1443, i32 %value_phi1438
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %616 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %value_phi1443.value_phi1438, i32 1, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1461 = select i1 %.not886, i32 %616, i32 %value_phi1443
+   %value_phi1462 = select i1 %.not886, i32 %value_phi1438, i32 %616
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %value_phi1455.value_phi1450 = select i1 %.not886, i32 %value_phi1455, i32 %value_phi1450
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %617 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %value_phi1455.value_phi1450, i32 1, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1464 = select i1 %.not886, i32 %617, i32 %value_phi1455
+   %value_phi1465 = select i1 %.not886, i32 %value_phi1450, i32 %617
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+    %value_phi1453.value_phi1448 = select i1 %.not886, i32 %value_phi1453, i32 %value_phi1448
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2438 within `macro expansion`
+; │┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29 within `shfl_xor_sync` @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/intrinsics/warp_shuffle.jl:29
+    %618 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, i32 %value_phi1453.value_phi1448, i32 1, i32 31)
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2440 within `macro expansion`
+   %value_phi1467 = select i1 %.not886, i32 %618, i32 %value_phi1453
+   %value_phi1468 = select i1 %.not886, i32 %value_phi1448, i32 %618
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2138 within `macro expansion`
+; │┌ @ int.jl:496 within `<<`
+    %619 = shl i32 %value_phi238, 7
+; │└
+; │┌ @ operators.jl:591 within `+` @ int.jl:87
+    %620 = or i32 %619, %258
+; ││ @ operators.jl:591 within `+`
+; ││┌ @ operators.jl:548 within `afoldl`
+; │││┌ @ int.jl:87 within `+`
+      %621 = or i32 %620, %260
+; ││└└
+; ││ @ operators.jl:591 within `+` @ int.jl:87
+    %622 = or i32 %621, %261
+    %623 = or i32 %622, %266
+; ││ @ operators.jl:591 within `+`
+; ││┌ @ operators.jl:548 within `afoldl`
+; │││┌ @ int.jl:87 within `+`
+      %624 = or i32 %623, %263
+; ││└└
+; ││ @ int.jl:991 within `+` @ int.jl:87
+    %625 = or i32 %624, %265
+    %626 = or i32 %625, 4
+; │└
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:175 within `unsafe_store4_global!` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:170
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:80 within `pointer`
+; │││┌ @ abstractarray.jl:1194 within `_memory_offset`
+; ││││┌ @ int.jl:88 within `*`
+       %627 = zext i32 %626 to i64
+       %628 = add nsw i64 %627, -4
+; │││└└
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:110 within `+`
+      %629 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract546, i64 %628
+; ││└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:175 within `unsafe_store4_global!` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:170 @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:144
+    %ptr.i2054.repack = bitcast i8 addrspace(1)* %629 to i32 addrspace(1)*
+    store i32 %value_phi1459, i32 addrspace(1)* %ptr.i2054.repack, align 16
+    %ptr.i2054.repack914 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract546, i64 %627
+    %630 = bitcast i8 addrspace(1)* %ptr.i2054.repack914 to i32 addrspace(1)*
+    store i32 %value_phi1462, i32 addrspace(1)* %630, align 4
+    %ptr.i2054.repack916 = getelementptr inbounds i8, i8 addrspace(1)* %629, i64 8
+    %631 = bitcast i8 addrspace(1)* %ptr.i2054.repack916 to i32 addrspace(1)*
+    store i32 %value_phi1458, i32 addrspace(1)* %631, align 8
+    %ptr.i2054.repack918 = getelementptr inbounds i8, i8 addrspace(1)* %629, i64 12
+    %632 = bitcast i8 addrspace(1)* %ptr.i2054.repack918 to i32 addrspace(1)*
+    store i32 %value_phi1461, i32 addrspace(1)* %632, align 4
+; │└
+; │┌ @ int.jl:991 within `+` @ int.jl:87
+    %narrow920 = or i32 %625, 32772
+; │└
+; │┌ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:175 within `unsafe_store4_global!` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:170
+; ││┌ @ /home/eschnett/.julia/packages/CUDA/DfvRa/src/device/array.jl:80 within `pointer`
+; │││┌ @ abstractarray.jl:1194 within `_memory_offset`
+; ││││┌ @ int.jl:88 within `*`
+       %633 = zext i32 %narrow920 to i64
+       %634 = add nsw i64 %633, -4
+; │││└└
+; │││┌ @ /home/eschnett/.julia/packages/LLVM/WjSQG/src/interop/pointer.jl:110 within `+`
+      %635 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract546, i64 %634
+; ││└└
+; ││ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:175 within `unsafe_store4_global!` @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:170 @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:144
+    %ptr.i.repack = bitcast i8 addrspace(1)* %635 to i32 addrspace(1)*
+    store i32 %value_phi1465, i32 addrspace(1)* %ptr.i.repack, align 16
+    %ptr.i.repack921 = getelementptr i8, i8 addrspace(1)* %.fca.0.extract546, i64 %633
+    %636 = bitcast i8 addrspace(1)* %ptr.i.repack921 to i32 addrspace(1)*
+    store i32 %value_phi1468, i32 addrspace(1)* %636, align 4
+    %ptr.i.repack923 = getelementptr inbounds i8, i8 addrspace(1)* %635, i64 8
+    %637 = bitcast i8 addrspace(1)* %ptr.i.repack923 to i32 addrspace(1)*
+    store i32 %value_phi1464, i32 addrspace(1)* %637, align 8
+    %ptr.i.repack925 = getelementptr inbounds i8, i8 addrspace(1)* %635, i64 12
+    %638 = bitcast i8 addrspace(1)* %ptr.i.repack925 to i32 addrspace(1)*
+    store i32 %value_phi1467, i32 addrspace(1)* %638, align 4
+; │└
+; │ @ /home/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:1046 within `macro expansion`
+; │┌ @ range.jl:883 within `iterate`
+; ││┌ @ promotion.jl:477 within `==`
+     %.not927 = icmp eq i32 %value_phi238, 255
+; ││└
+    %639 = add nuw nsw i32 %value_phi238, 1
+; │└
+   br i1 %.not927, label %L7236, label %L657
+
+L7236:                                            ; preds = %L6672
+; └
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/kernels/bb.jl:935 within `runsteps`
+  ret void
+
+L7237:                                            ; preds = %L36
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/kernels/bb.jl:932 within `runsteps`
+  call fastcc void @gpu_report_exception(i64 ptrtoint ([10 x i8]* @exception1 to i64)) #6
+  call fastcc void @gpu_signal_exception([1 x i64] %state)
+  call void asm sideeffect "exit;", ""() #7
+  unreachable
+
+L7240:                                            ; preds = %L11
+;  @ /home/eschnett/src/jl/GPUIndexSpaces.jl/kernels/bb.jl:930 within `runsteps`
+  call fastcc void @gpu_report_exception(i64 ptrtoint ([10 x i8]* @exception1 to i64)) #6
+  call fastcc void @gpu_signal_exception([1 x i64] %state)
+  call void asm sideeffect "exit;", ""() #7
+  unreachable
+}
