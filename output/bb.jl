@@ -1038,48 +1038,84 @@
 #             Polr(0) => Register(5)
 #     Unused: []
 begin
-    begin end
-    begin end
-    begin end
-    begin end
-    begin end
+    begin
+    end
+    begin
+    end
+    begin
+    end
+    begin
+    end
+    begin
+    end
     begin
         begin
-            begin end
-            begin end
-            begin end
             begin
-                begin end
-                begin end
-                begin end
-                begin end
-                begin
-                    begin end
-                    begin end
-                    begin end
-                    begin end
-                    begin end
-                    begin end
-                    begin end
-                    begin end
-                    begin end
-                    begin end
-                    begin end
-                    begin end
-                end
-                begin end
-                begin end
-                begin end
-                begin end
-                begin end
             end
-            begin end
-            begin end
-            begin end
-            begin end
-            begin end
-            begin end
-            begin end
+            begin
+            end
+            begin
+            end
+            begin
+                begin
+                end
+                begin
+                end
+                begin
+                end
+                begin
+                end
+                begin
+                    begin
+                    end
+                    begin
+                    end
+                    begin
+                    end
+                    begin
+                    end
+                    begin
+                    end
+                    begin
+                    end
+                    begin
+                    end
+                    begin
+                    end
+                    begin
+                    end
+                    begin
+                    end
+                    begin
+                    end
+                    begin
+                    end
+                end
+                begin
+                end
+                begin
+                end
+                begin
+                end
+                begin
+                end
+                begin
+                end
+            end
+            begin
+            end
+            begin
+            end
+            begin
+            end
+            begin
+            end
+            begin
+            end
+            begin
+            end
+            begin
+            end
             begin
                 Jper_0 = zero(Int4x8)
                 Jper_1 = zero(Int4x8)
@@ -1091,41 +1127,32 @@ begin
                 Jper_35 = zero(Int4x8)
             end
         end
-        begin end
-        begin end
-        begin end
-        begin end
-        begin end
-        begin end
-        begin end
-        begin end
+        begin
+        end
+        begin
+        end
+        begin
+        end
+        begin
+        end
+        begin
+        end
+        begin
+        end
+        begin
+        end
+        begin
+        end
     end
 end
 begin
     begin
-        s_0 = @inbounds(
-            s_mem[1 + (((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x05 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03)]::Int32
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2013 =#
-        s_32 = @inbounds(
-            s_mem[1 + (((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x05 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + 16 % Int32)]::Int32
-        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2013 =#
+        s_0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2013 =# @inbounds(s_mem[1 + (((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x05 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03)]::Int32)
+        s_32 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2013 =# @inbounds(s_mem[1 + (((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x05 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + 16 % Int32)]::Int32)
     end
     begin
-        (A0_0, A0_1, A0_2, A0_3) = unsafe_load4_global(
-            A_mem,
-            1 + (
-                ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x08 +
-                ((((threadIdx()).x - Int32(1)) % Int32) & 0x04 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1b) << 0x03)
-            ),
-        )::NTuple{4,Int8x4}
-        (A0_4, A0_5, A0_6, A0_7) = unsafe_load4_global(
-            A_mem,
-            1 + (
-                ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x08 +
-                ((((threadIdx()).x - Int32(1)) % Int32) & 0x04 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1b) << 0x03) +
-                32 % Int32
-            ),
-        )::NTuple{4,Int8x4}
+        (A0_0, A0_1, A0_2, A0_3) = unsafe_load4_global(A_mem, 1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x08 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1b) << 0x03)))::NTuple{4, Int8x4}
+        (A0_4, A0_5, A0_6, A0_7) = unsafe_load4_global(A_mem, 1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x08 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1b) << 0x03) + 32 % Int32))::NTuple{4, Int8x4}
     end
     begin
         begin
@@ -1172,10 +1199,10 @@ begin
             A_0 = A3_0
             A_4 = A3_4
             src = if isthread1
-                A3_0
-            else
-                A3_4
-            end
+                    A3_0
+                else
+                    A3_4
+                end
             src′ = src.val::UInt32
             dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
             dst = (Int8x4)(dst′)::Int8x4
@@ -1189,10 +1216,10 @@ begin
             A_1 = A3_1
             A_5 = A3_5
             src = if isthread1
-                A3_1
-            else
-                A3_5
-            end
+                    A3_1
+                else
+                    A3_5
+                end
             src′ = src.val::UInt32
             dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
             dst = (Int8x4)(dst′)::Int8x4
@@ -1206,10 +1233,10 @@ begin
             A_2 = A3_2
             A_6 = A3_6
             src = if isthread1
-                A3_2
-            else
-                A3_6
-            end
+                    A3_2
+                else
+                    A3_6
+                end
             src′ = src.val::UInt32
             dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
             dst = (Int8x4)(dst′)::Int8x4
@@ -1223,10 +1250,10 @@ begin
             A_3 = A3_3
             A_7 = A3_7
             src = if isthread1
-                A3_3
-            else
-                A3_7
-            end
+                    A3_3
+                else
+                    A3_7
+                end
             src′ = src.val::UInt32
             dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
             dst = (Int8x4)(dst′)::Int8x4
@@ -1237,78 +1264,21 @@ begin
             end
         end
     end
-    for loopIdx1 in Int32(0):Int32(32768 ÷ 128 - 1)
-        for loopIdx2 in Int32(0):Int32(128 ÷ 32 - 1)
+    for loopIdx1 = Int32(0):Int32(32768 ÷ 128 - 1)
+        for loopIdx2 = Int32(0):Int32(128 ÷ 32 - 1)
             begin
-                (Ecopy_0, Ecopy_1, Ecopy_2, Ecopy_3) = unsafe_load4_global(
-                    E_mem,
-                    1 + (
-                        ((loopIdx2 % Int32) & 0x03) << 0x11 +
-                        ((loopIdx1 % Int32) & 0xff) << 0x13 +
-                        ((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x05 +
-                        (
-                            ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 +
-                            ((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x10
-                        ) +
-                        (
-                            ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 +
-                            ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) << 0x09 +
-                            ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x0d
-                        )
-                    ),
-                )::NTuple{4,Int4x8}
-                (Ecopy_4, Ecopy_5, Ecopy_6, Ecopy_7) = unsafe_load4_global(
-                    E_mem,
-                    1 + (
-                        ((loopIdx2 % Int32) & 0x03) << 0x11 +
-                        ((loopIdx1 % Int32) & 0xff) << 0x13 +
-                        ((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x05 +
-                        (
-                            ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 +
-                            ((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x10
-                        ) +
-                        (
-                            ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 +
-                            ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) << 0x09 +
-                            ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x0d
-                        ) +
-                        16384 % Int32
-                    ),
-                )::NTuple{4,Int4x8}
+                (Ecopy_0, Ecopy_1, Ecopy_2, Ecopy_3) = unsafe_load4_global(E_mem, 1 + (((loopIdx2 % Int32) & 0x03) << 0x11 + ((loopIdx1 % Int32) & 0xff) << 0x13 + ((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x05 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x10) + (((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) << 0x09 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x0d)))::NTuple{4, Int4x8}
+                (Ecopy_4, Ecopy_5, Ecopy_6, Ecopy_7) = unsafe_load4_global(E_mem, 1 + (((loopIdx2 % Int32) & 0x03) << 0x11 + ((loopIdx1 % Int32) & 0xff) << 0x13 + ((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x05 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x10) + (((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) << 0x09 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x0d) + 16384 % Int32))::NTuple{4, Int4x8}
             end
             begin
-                @inbounds E_shared[
-                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01)),
-                ] = Ecopy_0                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =#
-                @inbounds E_shared[
-                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 1 % Int32),
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01)),
-                ] = Ecopy_1                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =#
-                @inbounds E_shared[
-                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 2 % Int32),
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01)),
-                ] = Ecopy_2                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =#
-                @inbounds E_shared[
-                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 3 % Int32),
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01)),
-                ] = Ecopy_3                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =#
-                @inbounds E_shared[
-                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01) + 4 % Int32),
-                ] = Ecopy_4                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =#
-                @inbounds E_shared[
-                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 1 % Int32),
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01) + 4 % Int32),
-                ] = Ecopy_5                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =#
-                @inbounds E_shared[
-                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 2 % Int32),
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01) + 4 % Int32),
-                ] = Ecopy_6                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =#
-                @inbounds E_shared[
-                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 3 % Int32),
-                    1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01) + 4 % Int32),
-                ] = Ecopy_7                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =#
+                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =# @inbounds E_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01))] = Ecopy_0
+                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =# @inbounds E_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 1 % Int32), 1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01))] = Ecopy_1
+                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =# @inbounds E_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 2 % Int32), 1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01))] = Ecopy_2
+                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =# @inbounds E_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 3 % Int32), 1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01))] = Ecopy_3
+                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =# @inbounds E_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01) + 4 % Int32)] = Ecopy_4
+                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =# @inbounds E_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 1 % Int32), 1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01) + 4 % Int32)] = Ecopy_5
+                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =# @inbounds E_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 2 % Int32), 1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01) + 4 % Int32)] = Ecopy_6
+                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2117 =# @inbounds E_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02 + 3 % Int32), 1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x04 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01) + 4 % Int32)] = Ecopy_7
             end
             sync_threads()
             begin
@@ -1389,13 +1359,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -1403,29 +1368,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -1475,13 +1440,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -1489,29 +1449,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -1561,13 +1521,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -1575,29 +1530,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -1647,13 +1602,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -1661,29 +1611,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -1712,26 +1662,18 @@ begin
                                 Ju_3 = Juim_1
                             end
                             begin
-                                Ju2_0 = ((Ju_0 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_1 = ((Ju_1 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_2 = ((Ju_2 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_3 = ((Ju_3 + Int32(16)) >> UInt32(5))::Int32
+                                Ju2_0 = ((Ju_0 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_1 = ((Ju_1 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_2 = ((Ju_2 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_3 = ((Ju_3 + Int32(2)) >> UInt32(2))::Int32
                             end
                             begin
                                 Ju4_0 = Int16x2(Ju2_0, Ju2_2)
                                 Ju4_1 = Int16x2(Ju2_1, Ju2_3)
                             end
                             begin
-                                @inbounds Ju_shared[
-                                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
-                                    1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01,
-                                ] = Ju4_0                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =#
-                                @inbounds Ju_shared[
-                                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
-                                    1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01,
-                                ] = Ju4_1                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =#
+                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =# @inbounds Ju_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01), 1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01] = Ju4_0
+                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =# @inbounds Ju_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32), 1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01] = Ju4_1
                             end
                         end
                     end
@@ -1813,13 +1755,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -1827,29 +1764,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -1899,13 +1836,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -1913,29 +1845,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -1985,13 +1917,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -1999,29 +1926,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -2071,13 +1998,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -2085,29 +2007,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -2136,26 +2058,18 @@ begin
                                 Ju_3 = Juim_1
                             end
                             begin
-                                Ju2_0 = ((Ju_0 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_1 = ((Ju_1 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_2 = ((Ju_2 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_3 = ((Ju_3 + Int32(16)) >> UInt32(5))::Int32
+                                Ju2_0 = ((Ju_0 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_1 = ((Ju_1 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_2 = ((Ju_2 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_3 = ((Ju_3 + Int32(2)) >> UInt32(2))::Int32
                             end
                             begin
                                 Ju4_0 = Int16x2(Ju2_0, Ju2_2)
                                 Ju4_1 = Int16x2(Ju2_1, Ju2_3)
                             end
                             begin
-                                @inbounds Ju_shared[
-                                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
-                                    1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01,
-                                ] = Ju4_0                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =#
-                                @inbounds Ju_shared[
-                                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
-                                    1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01,
-                                ] = Ju4_1                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =#
+                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =# @inbounds Ju_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01), 1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01] = Ju4_0
+                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =# @inbounds Ju_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32), 1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01] = Ju4_1
                             end
                         end
                     end
@@ -2237,13 +2151,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -2251,29 +2160,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -2323,13 +2232,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -2337,29 +2241,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -2409,13 +2313,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -2423,29 +2322,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -2495,13 +2394,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -2509,29 +2403,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -2560,26 +2454,18 @@ begin
                                 Ju_3 = Juim_1
                             end
                             begin
-                                Ju2_0 = ((Ju_0 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_1 = ((Ju_1 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_2 = ((Ju_2 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_3 = ((Ju_3 + Int32(16)) >> UInt32(5))::Int32
+                                Ju2_0 = ((Ju_0 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_1 = ((Ju_1 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_2 = ((Ju_2 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_3 = ((Ju_3 + Int32(2)) >> UInt32(2))::Int32
                             end
                             begin
                                 Ju4_0 = Int16x2(Ju2_0, Ju2_2)
                                 Ju4_1 = Int16x2(Ju2_1, Ju2_3)
                             end
                             begin
-                                @inbounds Ju_shared[
-                                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
-                                    1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01,
-                                ] = Ju4_0                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =#
-                                @inbounds Ju_shared[
-                                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
-                                    1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01,
-                                ] = Ju4_1                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =#
+                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =# @inbounds Ju_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01), 1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01] = Ju4_0
+                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =# @inbounds Ju_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32), 1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01] = Ju4_1
                             end
                         end
                     end
@@ -2661,13 +2547,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -2675,29 +2556,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -2747,13 +2628,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -2761,29 +2637,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -2833,13 +2709,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -2847,29 +2718,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -2919,13 +2790,8 @@ begin
                                             Are = A11_0
                                             Aim = A11_1
                                         end
-                                        E0 = @inbounds(
-                                            E_shared[
-                                                1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02),
-                                                1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                            ]::Int4x8
-                                        ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =#
-                                        (E2_0, E2_1) = convert(NTuple{2,Int8x4}, E0)
+                                        E0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2011 =# @inbounds(E_shared[1 + ((loopIdx5 % Int32) & 0x03 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02)]::Int4x8)
+                                        (E2_0, E2_1) = convert(NTuple{2, Int8x4}, E0)
                                         begin
                                             E2re = E2_0
                                             E2im = E2_1
@@ -2933,29 +2799,29 @@ begin
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jurepos_0, Jurepos_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jurepos1_0, Jurepos1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Jureneg_0, Jureneg_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Jureneg1_0, Jureneg1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Are::Int8x4
                                             B_frag = E2im::Int8x4
-                                            C_frag = (Juim_0, Juim_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim_0, Juim_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim1_0, Juim1_1) = D_frag
                                         end
                                         begin
                                             A_frag = Aim::Int8x4
                                             B_frag = E2re::Int8x4
-                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2,Int32}
-                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2,Int32}
+                                            C_frag = (Juim1_0, Juim1_1)::NTuple{2, Int32}
+                                            D_frag = mma_m8n8k16(A_frag, B_frag, C_frag)::NTuple{2, Int32}
                                             (Juim2_0, Juim2_1) = D_frag
                                         end
                                         begin
@@ -2984,26 +2850,18 @@ begin
                                 Ju_3 = Juim_1
                             end
                             begin
-                                Ju2_0 = ((Ju_0 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_1 = ((Ju_1 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_2 = ((Ju_2 + Int32(16)) >> UInt32(5))::Int32
-                                Ju2_3 = ((Ju_3 + Int32(16)) >> UInt32(5))::Int32
+                                Ju2_0 = ((Ju_0 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_1 = ((Ju_1 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_2 = ((Ju_2 + Int32(2)) >> UInt32(2))::Int32
+                                Ju2_3 = ((Ju_3 + Int32(2)) >> UInt32(2))::Int32
                             end
                             begin
                                 Ju4_0 = Int16x2(Ju2_0, Ju2_2)
                                 Ju4_1 = Int16x2(Ju2_1, Ju2_3)
                             end
                             begin
-                                @inbounds Ju_shared[
-                                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01),
-                                    1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01,
-                                ] = Ju4_0                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =#
-                                @inbounds Ju_shared[
-                                    1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02),
-                                    1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32),
-                                    1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01,
-                                ] = Ju4_1                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =#
+                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =# @inbounds Ju_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01), 1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01] = Ju4_0
+                                #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2115 =# @inbounds Ju_shared[1 + 0 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x01) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1c) >>> 0x02), 1 + (((loopIdx3 % Int32) & 0x03) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x03) << 0x01 + 1 % Int32), 1 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x02) >>> 0x01] = Ju4_1
                             end
                         end
                     end
@@ -3011,72 +2869,24 @@ begin
             end
             sync_threads()
             begin
-                Ju10_0 = @inbounds(
-                    Ju_shared[
-                        1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                        1 + (((threadIdx()).x - Int32(1)) % Int32) & 0x07,
-                        1 + 0x00,
-                    ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =#
-                Ju10_8 = @inbounds(
-                    Ju_shared[
-                        1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                        1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 8 % Int32),
-                        1 + 0x00,
-                    ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =#
-                Ju10_16 = @inbounds(
-                    Ju_shared[
-                        1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                        1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 16 % Int32),
-                        1 + 0x00,
-                    ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =#
-                Ju10_24 = @inbounds(
-                    Ju_shared[
-                        1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                        1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 24 % Int32),
-                        1 + 0x00,
-                    ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =#
-                Ju10_32 = @inbounds(
-                    Ju_shared[
-                        1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                        1 + (((threadIdx()).x - Int32(1)) % Int32) & 0x07,
-                        1 + 1 % Int32,
-                    ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =#
-                Ju10_40 = @inbounds(
-                    Ju_shared[
-                        1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                        1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 8 % Int32),
-                        1 + 1 % Int32,
-                    ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =#
-                Ju10_48 = @inbounds(
-                    Ju_shared[
-                        1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                        1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 16 % Int32),
-                        1 + 1 % Int32,
-                    ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =#
-                Ju10_56 = @inbounds(
-                    Ju_shared[
-                        1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03),
-                        1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 24 % Int32),
-                        1 + 1 % Int32,
-                    ]::Int16x2
-                ) #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =#
+                Ju10_0 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =# @inbounds(Ju_shared[1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03), 1 + (((threadIdx()).x - Int32(1)) % Int32) & 0x07, 1 + 0x00]::Int16x2)
+                Ju10_8 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =# @inbounds(Ju_shared[1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03), 1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 8 % Int32), 1 + 0x00]::Int16x2)
+                Ju10_16 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =# @inbounds(Ju_shared[1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03), 1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 16 % Int32), 1 + 0x00]::Int16x2)
+                Ju10_24 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =# @inbounds(Ju_shared[1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03), 1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 24 % Int32), 1 + 0x00]::Int16x2)
+                Ju10_32 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =# @inbounds(Ju_shared[1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03), 1 + (((threadIdx()).x - Int32(1)) % Int32) & 0x07, 1 + 1 % Int32]::Int16x2)
+                Ju10_40 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =# @inbounds(Ju_shared[1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03), 1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 8 % Int32), 1 + 1 % Int32]::Int16x2)
+                Ju10_48 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =# @inbounds(Ju_shared[1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03), 1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 16 % Int32), 1 + 1 % Int32]::Int16x2)
+                Ju10_56 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2009 =# @inbounds(Ju_shared[1 + (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03), 1 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x07 + 24 % Int32), 1 + 1 % Int32]::Int16x2)
             end
             begin
-                (Ju11_0, Ju11_4) = convert(NTuple{2,Int32}, Ju10_0)
-                (Ju11_8, Ju11_12) = convert(NTuple{2,Int32}, Ju10_8)
-                (Ju11_16, Ju11_20) = convert(NTuple{2,Int32}, Ju10_16)
-                (Ju11_24, Ju11_28) = convert(NTuple{2,Int32}, Ju10_24)
-                (Ju11_32, Ju11_36) = convert(NTuple{2,Int32}, Ju10_32)
-                (Ju11_40, Ju11_44) = convert(NTuple{2,Int32}, Ju10_40)
-                (Ju11_48, Ju11_52) = convert(NTuple{2,Int32}, Ju10_48)
-                (Ju11_56, Ju11_60) = convert(NTuple{2,Int32}, Ju10_56)
+                (Ju11_0, Ju11_4) = convert(NTuple{2, Int32}, Ju10_0)
+                (Ju11_8, Ju11_12) = convert(NTuple{2, Int32}, Ju10_8)
+                (Ju11_16, Ju11_20) = convert(NTuple{2, Int32}, Ju10_16)
+                (Ju11_24, Ju11_28) = convert(NTuple{2, Int32}, Ju10_24)
+                (Ju11_32, Ju11_36) = convert(NTuple{2, Int32}, Ju10_32)
+                (Ju11_40, Ju11_44) = convert(NTuple{2, Int32}, Ju10_40)
+                (Ju11_48, Ju11_52) = convert(NTuple{2, Int32}, Ju10_48)
+                (Ju11_56, Ju11_60) = convert(NTuple{2, Int32}, Ju10_56)
             end
             begin
                 J_0 = Ju11_0::Int32
@@ -3115,22 +2925,22 @@ begin
                 J2_60 = ((J_60 + Int32(1) << (s_32 % UInt32 - UInt32(1))) >> (s_32 % UInt32))::Int32
             end
             begin
-                J2′_0 = clamp(J2_0, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_4 = clamp(J2_4, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_8 = clamp(J2_8, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_12 = clamp(J2_12, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_16 = clamp(J2_16, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_20 = clamp(J2_20, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_24 = clamp(J2_24, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_28 = clamp(J2_28, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_32 = clamp(J2_32, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_36 = clamp(J2_36, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_40 = clamp(J2_40, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_44 = clamp(J2_44, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_48 = clamp(J2_48, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_52 = clamp(J2_52, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_56 = clamp(J2_56, (-(Int32(0x07))):+(Int32(0x07)))::Int32
-                J2′_60 = clamp(J2_60, (-(Int32(0x07))):+(Int32(0x07)))::Int32
+                J2′_0 = clamp(J2_0, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_4 = clamp(J2_4, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_8 = clamp(J2_8, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_12 = clamp(J2_12, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_16 = clamp(J2_16, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_20 = clamp(J2_20, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_24 = clamp(J2_24, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_28 = clamp(J2_28, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_32 = clamp(J2_32, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_36 = clamp(J2_36, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_40 = clamp(J2_40, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_44 = clamp(J2_44, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_48 = clamp(J2_48, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_52 = clamp(J2_52, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_56 = clamp(J2_56, -(Int32(0x07)):+(Int32(0x07)))::Int32
+                J2′_60 = clamp(J2_60, -(Int32(0x07)):+(Int32(0x07)))::Int32
             end
             begin
                 J3_0 = Int4x8(J2′_0, J2′_4, J2′_8, J2′_12, J2′_16, J2′_20, J2′_24, J2′_28)
@@ -3190,10 +3000,10 @@ begin
                 Jper3_0 = Jper2_0
                 Jper3_1 = Jper2_1
                 src = if isthread1
-                    Jper2_0
-                else
-                    Jper2_1
-                end
+                        Jper2_0
+                    else
+                        Jper2_1
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3207,10 +3017,10 @@ begin
                 Jper3_2 = Jper2_2
                 Jper3_3 = Jper2_3
                 src = if isthread1
-                    Jper2_2
-                else
-                    Jper2_3
-                end
+                        Jper2_2
+                    else
+                        Jper2_3
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3224,10 +3034,10 @@ begin
                 Jper3_32 = Jper2_32
                 Jper3_33 = Jper2_33
                 src = if isthread1
-                    Jper2_32
-                else
-                    Jper2_33
-                end
+                        Jper2_32
+                    else
+                        Jper2_33
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3241,10 +3051,10 @@ begin
                 Jper3_34 = Jper2_34
                 Jper3_35 = Jper2_35
                 src = if isthread1
-                    Jper2_34
-                else
-                    Jper2_35
-                end
+                        Jper2_34
+                    else
+                        Jper2_35
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3282,10 +3092,10 @@ begin
                 Jper5_0 = Jper4_0
                 Jper5_2 = Jper4_2
                 src = if isthread1
-                    Jper4_0
-                else
-                    Jper4_2
-                end
+                        Jper4_0
+                    else
+                        Jper4_2
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3299,10 +3109,10 @@ begin
                 Jper5_1 = Jper4_1
                 Jper5_3 = Jper4_3
                 src = if isthread1
-                    Jper4_1
-                else
-                    Jper4_3
-                end
+                        Jper4_1
+                    else
+                        Jper4_3
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3316,10 +3126,10 @@ begin
                 Jper5_32 = Jper4_32
                 Jper5_34 = Jper4_34
                 src = if isthread1
-                    Jper4_32
-                else
-                    Jper4_34
-                end
+                        Jper4_32
+                    else
+                        Jper4_34
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3333,10 +3143,10 @@ begin
                 Jper5_33 = Jper4_33
                 Jper5_35 = Jper4_35
                 src = if isthread1
-                    Jper4_33
-                else
-                    Jper4_35
-                end
+                        Jper4_33
+                    else
+                        Jper4_35
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3374,10 +3184,10 @@ begin
                 Jper7_0 = Jper6_0
                 Jper7_1 = Jper6_1
                 src = if isthread1
-                    Jper6_0
-                else
-                    Jper6_1
-                end
+                        Jper6_0
+                    else
+                        Jper6_1
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3391,10 +3201,10 @@ begin
                 Jper7_2 = Jper6_2
                 Jper7_3 = Jper6_3
                 src = if isthread1
-                    Jper6_2
-                else
-                    Jper6_3
-                end
+                        Jper6_2
+                    else
+                        Jper6_3
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3408,10 +3218,10 @@ begin
                 Jper7_32 = Jper6_32
                 Jper7_33 = Jper6_33
                 src = if isthread1
-                    Jper6_32
-                else
-                    Jper6_33
-                end
+                        Jper6_32
+                    else
+                        Jper6_33
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3425,10 +3235,10 @@ begin
                 Jper7_34 = Jper6_34
                 Jper7_35 = Jper6_35
                 src = if isthread1
-                    Jper6_34
-                else
-                    Jper6_35
-                end
+                        Jper6_34
+                    else
+                        Jper6_35
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3448,10 +3258,10 @@ begin
                 Jstore_0 = Jper7_0
                 Jstore_2 = Jper7_2
                 src = if isthread1
-                    Jper7_0
-                else
-                    Jper7_2
-                end
+                        Jper7_0
+                    else
+                        Jper7_2
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3465,10 +3275,10 @@ begin
                 Jstore_1 = Jper7_1
                 Jstore_3 = Jper7_3
                 src = if isthread1
-                    Jper7_1
-                else
-                    Jper7_3
-                end
+                        Jper7_1
+                    else
+                        Jper7_3
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3482,10 +3292,10 @@ begin
                 Jstore_32 = Jper7_32
                 Jstore_34 = Jper7_34
                 src = if isthread1
-                    Jper7_32
-                else
-                    Jper7_34
-                end
+                        Jper7_32
+                    else
+                        Jper7_34
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3499,10 +3309,10 @@ begin
                 Jstore_33 = Jper7_33
                 Jstore_35 = Jper7_35
                 src = if isthread1
-                    Jper7_33
-                else
-                    Jper7_35
-                end
+                        Jper7_33
+                    else
+                        Jper7_35
+                    end
                 src′ = src.val::UInt32
                 dst′ = shfl_xor_sync(0xffffffff, src′, mask)::UInt32
                 dst = (Int4x8)(dst′)::Int4x8
@@ -3514,41 +3324,9 @@ begin
             end
         end
         begin
-            unsafe_store4_global!(
-                J_mem,
-                1 +
-                0 +
-                (
-                    ((loopIdx1 % Int32) & 0xff) << 0x05 +
-                    ((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x0e +
-                    ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x17 +
-                    (
-                        ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01 +
-                        ((((threadIdx()).x - Int32(1)) % Int32) & 0x01) << 0x02 +
-                        ((((threadIdx()).x - Int32(1)) % Int32) & 0x02) << 0x03 +
-                        ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) << 0x12
-                    )
-                ),
-                (Jstore_0, Jstore_1, Jstore_2, Jstore_3),
-            )
-            unsafe_store4_global!(
-                J_mem,
-                1 +
-                0 +
-                (
-                    ((loopIdx1 % Int32) & 0xff) << 0x05 +
-                    ((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x0e +
-                    ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x17 +
-                    (
-                        ((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01 +
-                        ((((threadIdx()).x - Int32(1)) % Int32) & 0x01) << 0x02 +
-                        ((((threadIdx()).x - Int32(1)) % Int32) & 0x02) << 0x03 +
-                        ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) << 0x12
-                    ) +
-                    8192 % Int32
-                ),
-                (Jstore_32, Jstore_33, Jstore_34, Jstore_35),
-            )
+            unsafe_store4_global!(J_mem, 1 + 0 + (((loopIdx1 % Int32) & 0xff) << 0x05 + ((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x0e + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x17 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x01) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) << 0x12)), (Jstore_0, Jstore_1, Jstore_2, Jstore_3))
+            unsafe_store4_global!(J_mem, 1 + 0 + (((loopIdx1 % Int32) & 0xff) << 0x05 + ((((blockIdx()).x - Int32(1)) % Int32) & 0x7f) << 0x0e + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x17 + (((((threadIdx()).x - Int32(1)) % Int32) & 0x04) << 0x01 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x01) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x02) << 0x03 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) << 0x12) + 8192 % Int32), (Jstore_32, Jstore_33, Jstore_34, Jstore_35))
         end
     end
 end
+

@@ -42,64 +42,67 @@ const T2 = 32
 @assert T1 % T2 == 0
 @assert T2 % 4 == 0
 
-# macro CHORD(x)
-#     return esc(x)
-# end
-# macro PATHFINDER(x)
-#     return :()
-# end
-# macro CHORDARR(x)
-#     return :([$(esc(x))])
-# end
-# macro PATHFINDERARR(x)
-#     return :([])
-# end
+if false
+    macro CHORD(x)
+        return esc(x)
+    end
+    macro PATHFINDER(x)
+        return :()
+    end
+    macro CHORDARR(x)
+        return :([$(esc(x))])
+    end
+    macro PATHFINDERARR(x)
+        return :([])
+    end
 
-macro CHORD(x)
-    return :()
-end
-macro PATHFINDER(x)
-    return esc(x)
-end
-macro CHORDARR(x)
-    return :([])
-end
-macro PATHFINDERARR(x)
-    return :([$(esc(x))])
+elseif true
+    macro CHORD(x)
+        return :()
+    end
+    macro PATHFINDER(x)
+        return esc(x)
+    end
+    macro CHORDARR(x)
+        return :([])
+    end
+    macro PATHFINDERARR(x)
+        return :([$(esc(x))])
+    end
 end
 
-# # CHORD
-# 
-# # number of beams
-# # const B = 96
-# @CHORD const B = 128
-# 
-# # number of dishes
-# @CHORD const D = 512
-# 
-# # frequency channels per GPU
-# # const F = 16
-# @CHORD const F = 84 ÷ 2
-# # const F = 1
-# 
-# # A matrix tiling
-# # const Wb, Wd, Wp = 6, 4, 1
-# @CHORD const Wb, Wd, Wp = 8, 4, 1
+# CHORD
+
+# number of beams
+# const B = 96
+@CHORD const B = 128
+
+# number of dishes
+@CHORD const D = 512
+
+# frequency channels per GPU
+# const F = 16
+@CHORD const F = 84 ÷ 2
+# const F = 1
+
+# A matrix tiling
+# const Wb, Wd, Wp = 6, 4, 1
+@CHORD const Wb, Wd, Wp = 8, 4, 1
 
 # PATHFINDER
 
 # number of beams
-const B = 16
+@PATHFINDER const B = 16
 
 # number of dishes
-const D = 64
+@PATHFINDER const D = 64
 
 # frequency channels per GPU
-const F = 84
+@PATHFINDER const F = 84
 # const F = 1
 
 # A matrix tiling
-const Wb, Wd, Wp = 2, 1, 2
+@PATHFINDER const Wb, Wd, Wp = 2, 1, 2
 
 @assert B % Wb == 0
 @assert B ÷ Wb % 8 == 0         # for tensor cores
@@ -109,7 +112,7 @@ const Wb, Wd, Wp = 2, 1, 2
 # warps per block
 const W = Wb * Wd * Wp
 
-const σ = 5 - round(Int, log2(Wd))
+const σ = round(Int, log2(D / Wd)) - 4
 
 ################################################################################
 
@@ -576,7 +579,6 @@ end
 function copy_E!(steps::Vector{AbstractStep}, env::Environment)
     load!(steps, env, :Ecopy, map_Ecopy_registers, :E_mem, map_E_global; align=16)
     store!(steps, env, :Ecopy, :E_shared, map_E_shared; align=4)
-    sync_threads!(steps, env)
     return nothing
 end
 
@@ -640,6 +642,7 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
             # TODO: Break ties to even?
             @assert σ ≥ 1
             apply!(steps, env, :Ju2, :Ju, Ju -> :(($Ju + Int32($(1 << (σ - 1)))) >> UInt32($σ)))
+            # apply!(steps, env, :Ju2, :Ju, Ju -> :($Ju))
 
             # Note: `cvs_pack_s16` saturates, so we don't need to clamp
             # apply!(steps, env, :Ju3, :Ju2, J -> :(clamp($J, (-Int32(0x7fff)):(+Int32(0x7fff)))))
@@ -682,7 +685,6 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
 
         nothing
     end                         # LoopT2
-    sync_threads!(steps, env)
 
     return nothing
 end
@@ -734,6 +736,7 @@ function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
     @assert env[:J] == map_J_registers
 
     apply!(steps, env, :J2, :J, :s, (J, s) -> :(($J + (Int32(1) << ($s % UInt32 - UInt32(1)))) >> ($s % UInt32)))
+    # apply!(steps, env, :J2, :J, :s, (J, s) -> :($J))
 
     # TODO: Try this: Shift values left by 4, rely on saturation when converting, then shift right and mask (doesn't work)
     # TODO: Try this: Pack to Int16, the clamp, then pack to Int8 (doesn't work, no efficient 16-bit clamp)
@@ -892,7 +895,9 @@ function bb!(steps::Vector{AbstractStep}, env::Environment)
         @assert T1 ÷ T2 == 4
         loop!(steps, env, loopIdxT1, :(Int32(0):Int32($T1 ÷ $T2 - 1)), [Time(5), Time(6)]) do steps, env
             copy_E!(steps, env)
+            sync_threads!(steps, env)
             multiply_A_E!(steps, env)
+            sync_threads!(steps, env)
             reduce_Ju!(steps, env)
             return nothing
         end
@@ -908,7 +913,7 @@ bb!(bb_steps, bb_env)
 bb_allsteps = Seq(bb_steps)
 
 @assert D % 4 == 0
-const E_shared_size = (D ÷ 4 + 1, T2)
+const E_shared_size = ((D ÷ 4) * Wp + 1, T2)
 const Ju_shared_size = (B + 4, T2, Wd * Wp)
 
 const E_shared_length = prod(E_shared_size)
@@ -976,7 +981,7 @@ function runcuda()
         while true
             aval = rand(-127:+127) + im * rand(-127:+127)
             eval = rand(-7:+7) + im * rand(-7:+7)
-            sval = rand(σ:(σ + 2)) - σ
+            sval = rand(0:2)
             jval = aval * eval
             jval = Complex((real(jval) + (1 << (σ - 1))) >> σ, (imag(jval) + (1 << (σ - 1))) >> σ)
             jval = Complex((real(jval) + (1 << (sval - 1))) >> sval, (imag(jval) + (1 << (sval - 1))) >> sval)
