@@ -329,7 +329,6 @@ const map_E_registers_multiply = let
 end
 
 # Beamforming matrix A
-# TODO: Store Freq in memory, don't ignore it
 const map_A_global = let
     m = -1
     i = -1
@@ -342,7 +341,7 @@ const map_A_global = let
             [Dish(d) => Memory(m += 1) for d in 1:(ceil(Int, log2(D)) - 1)]...,
             [Beam(b) => Memory(m += 1) for b in 0:(ceil(Int, log2(B)) - 1)]...,
             Polr(0) => Memory(m += 1),
-            [Freq(f) => Ignore(i += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
+            [Freq(f) => Memory(m += 1) for f in 0:(ceil(Int, log2(F)) - 1)]...,
             # The internal layout
             # Cplx(0) => Memory(0 + 0),
             # Dish(0) => SIMD(3),
@@ -963,9 +962,9 @@ function runcuda()
         println("Iteration $iter:")
         println("    Setting up inputs...")
 
-        # Cplx, Dish, Beam, Polr
-        A_input = zeros(Int8, 2, nextpow(2, D), nextpow(2, B), 2)
-        # A_input = rand(Int8, 2, nextpow(2, D), nextpow(2, B), 2)
+        # Cplx, Dish, Beam, Polr, Freq
+        A_input = zeros(Int8, 2, nextpow(2, D), nextpow(2, B), 2, nextpow(2, F))
+        # A_input = rand(Int8, 2, nextpow(2, D), nextpow(2, B), 2, nextpow(2,F))
 
         # Dish, Polr, Freq, Time
         E_input = zeros(Int4x2, nextpow(2, D), 2, nextpow(2, F), nextpow(2, T))
@@ -1006,8 +1005,8 @@ function runcuda()
         end
         println("        Using a=$aval e=$eval s=$sval j=$jval...")
 
-        A_input[1, idish, ibeam, ipolr] = real(aval)
-        A_input[2, idish, ibeam, ipolr] = imag(aval)
+        A_input[1, idish, ibeam, ipolr, ifreq] = real(aval)
+        A_input[2, idish, ibeam, ipolr, ifreq] = imag(aval)
 
         E_input[idish, ipolr, ifreq, itime] = Int4x2(Int32(real(eval)), Int32(imag(eval)))
 

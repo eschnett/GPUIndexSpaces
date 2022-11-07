@@ -1268,8 +1268,8 @@ begin
         s_32 = #= /Users/eschnett/src/jl/GPUIndexSpaces.jl/src/GPUIndexSpaces.jl:2013 =# @inbounds(s_mem[(((((blockIdx()).x - Int32(1)) % Int32) & 0x03ff) << 0x05 + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x02 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x18) >>> 0x03 + 16 % Int32) + 1]::Int32)
     end
     begin
-        (A0_0, A0_1, A0_2, A0_3) = unsafe_load4_global(A_mem, (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x08 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1b) << 0x03)) + 1)::NTuple{4, Int8x4}
-        (A0_4, A0_5, A0_6, A0_7) = unsafe_load4_global(A_mem, (((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x08 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1b) << 0x03) + 32 % Int32) + 1)::NTuple{4, Int8x4}
+        (A0_0, A0_1, A0_2, A0_3) = unsafe_load4_global(A_mem, (((((blockIdx()).x - Int32(1)) % Int32) & 0x03ff) << 0x0a + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x08 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1b) << 0x03)) + 1)::NTuple{4, Int8x4}
+        (A0_4, A0_5, A0_6, A0_7) = unsafe_load4_global(A_mem, (((((blockIdx()).x - Int32(1)) % Int32) & 0x03ff) << 0x0a + ((((threadIdx()).y - Int32(1)) % Int32) & 0x03) << 0x08 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x04 + ((((threadIdx()).x - Int32(1)) % Int32) & 0x1b) << 0x03) + 32 % Int32) + 1)::NTuple{4, Int8x4}
     end
     begin
         begin
