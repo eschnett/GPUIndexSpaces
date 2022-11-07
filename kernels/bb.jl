@@ -132,7 +132,7 @@ const σ = round(Int, log2(D / Wd)) - 4
 #     scaled run time 3211.5 μsec (for 16 frequencies)
 #     sampling time 1.7 μs
 #     handling 55705.6 μsec of data
-#     scaled run time 5.8% of a GPU
+#     scaled run time 5.8% of an A40 GPU
 
 # Setup for pathfinder:
 #     T = 32768
@@ -145,10 +145,10 @@ const σ = round(Int, log2(D / Wd)) - 4
 #     Wp = 2
 # Result:
 #     run time 6668.047029 μsec
-#     scaled run time 158.8 μsec (for 16 frequencies) TODO: correct number of frequencies
+#     scaled run time 1270.4 μsec (for 128 frequencies)
 #     sampling time 1.7 μs
 #     handling 55705.6 μsec of data
-#     scaled run time 0.285% of a GPU
+#     scaled run time 2.3% of an A40 GPU
 
 ################################################################################
 
