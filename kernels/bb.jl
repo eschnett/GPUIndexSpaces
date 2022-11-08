@@ -15,7 +15,7 @@ using Random
 #     T = 32768
 #     B = 8 or 16
 #     D = 64
-#     F = ???   (per GPU)
+#     F = 128   (per GPU)
 # Full CHORD:
 #     ts = 1.7 μsec
 #     T = 32768
@@ -98,6 +98,7 @@ end
 @PATHFINDER const D = 64
 
 # frequency channels per GPU
+# const F = 128
 @PATHFINDER const F = 84 * 8
 # const F = 1
 
@@ -594,7 +595,7 @@ end
 # Step 1: transferring global memory to shared memory
 function copy_E!(steps::Vector{AbstractStep}, env::Environment)
     load!(steps, env, :Ecopy, map_Ecopy_registers, :E_mem, map_E_global; align=16)
-    store!(steps, env, :Ecopy, :E_shared, map_E_shared; align=4)
+    store!(steps, env, :Ecopy, :E_shared, map_E_shared)
     return nothing
 end
 
@@ -632,7 +633,7 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                 @PATHFINDER select!(steps, env, :A11, :A10, [Register(1), Register(2)], :($loopIdxD))
                 split!(steps, env, :Are, :Aim, :A11, Cplx(0))
 
-                load!(steps, env, :E0, map_E_registers_load_shared, :E_shared, map_E_shared; align=4)
+                load!(steps, env, :E0, map_E_registers_load_shared, :E_shared, map_E_shared)
 
                 # TODO: Don't undo offset encoding, don't shift right; fold this into a fixup after multiplying by A
                 widen!(steps, env, :E2, :E0, SIMD(2) => Register(0))
@@ -694,7 +695,7 @@ function multiply_A_E!(steps::Vector{AbstractStep}, env::Environment)
                 )
             end
 
-            store!(steps, env, :Ju4, :Ju_shared, map_Ju_shared; align=4)
+            store!(steps, env, :Ju4, :Ju_shared, map_Ju_shared)
 
             nothing
         end                     # LoopB
@@ -707,7 +708,7 @@ end
 
 # Step 3: reduce and quantize
 function reduce_Ju!(steps::Vector{AbstractStep}, env::Environment)
-    load!(steps, env, :Ju10, map_Ju_registers_load_shared, :Ju_shared, map_Ju_shared; align=4)
+    load!(steps, env, :Ju10, map_Ju_registers_load_shared, :Ju_shared, map_Ju_shared)
     widen!(steps, env, :Ju11, :Ju10, SIMD(4) => Register(2))
 
     @CHORD split!(steps, env, :Ju11a, :Ju11b, :Ju11, Register(0))

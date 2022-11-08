@@ -744,7 +744,7 @@ bit(i::Target) = i.bit
 
 Base.show(io::IO, i::Target) = print(io, tag(i), "(", bit(i), ")")
 
-export Ignore, SIMD, Register, Thread, Warp, Block, Loop1, Loop2, Loop3, Loop4, Loop5
+export Ignore, SIMD, Register, Thread, Warp, Block, Loop1, Loop2, Loop3, Loop4, Loop5, Expr1
 const Ignore = Target{:Ignore}
 const SIMD = Target{:SIMD}
 const Register = Target{:Register}
@@ -756,6 +756,7 @@ const Loop2 = Target{:Loop2}
 const Loop3 = Target{:Loop3}
 const Loop4 = Target{:Loop4}
 const Loop5 = Target{:Loop5}
+const Expr1 = Target{:Expr1}
 
 export Memory, Memory2, Memory3
 const Memory = Target{:Memory}
@@ -1117,6 +1118,10 @@ function assemble_int16(x0::Code, x1::Code)
     return :((($x0 % Int16) & 0x0000ffff | (($x1 % Int16) << 0x10) & 0xffff0000) % Int32)
 end
 
+function assemble_float16(x0::Code, x1::Code)
+    return :((($x0 % Int16) & 0x0000ffff | (($x1 % Int16) << 0x10) & 0xffff0000) % Int32)
+end
+
 export constant!
 function constant!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, lhsmap::Layout, value::Code)
     @assert lhs ∉ keys(env)
@@ -1138,15 +1143,20 @@ function constant!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, l
             if simd_bits == 0
                 push!(stmts, :($lhsname = $value::$type))
             elseif simd_bits == 1
-                @assert lhsmap.type ≡ Int32
-                push!(stmts, :($lhsname = Int16x2($(assemble_int16(value, value)) % UInt32)))
-                # if lhsmap.type ≡ Float32
-                #     push!(stmts, :($lhsname = Float16x2($value, $value)))
-                # elseif lhsmap.type ≡ Int32
-                #     push!(stmts, :($lhsname = Int16x2($value, $value)))
-                # else
-                #     @assert false
-                # end
+                if lhsmap.type ≡ Int32
+                    push!(stmts, :($lhsname = Int16x2($(assemble_int16(value, value)) % UInt32)))
+                    # if lhsmap.type ≡ Float32
+                    #     push!(stmts, :($lhsname = Float16x2($value, $value)))
+                    # elseif lhsmap.type ≡ Int32
+                    #     push!(stmts, :($lhsname = Int16x2($value, $value)))
+                    # else
+                    #     @assert false
+                    # end
+                elseif lhsmap.type ≡ Float32
+                    push!(stmts, :($lhsname = Float16x2($value, $value)))
+                else
+                    @assert false
+                end
             elseif simd_bits == 2
                 @assert lhsmap.type ≡ Int32
                 push!(stmts, :($lhsname = Int8x4($(assemble_int8(value, value, value, value)) % UInt32)))
@@ -1720,6 +1730,7 @@ function movebits(code::Code, bitmap::Vector{BitMap}, code_mask::Integer=0)
     @assert length(Set(bm.srcbit for bm in bitmap)) == length(bitmap)
     distances = Set(bm.dist for bm in bitmap)
     exprs = Code[]
+    # TODO: Identify `bitreverse` operations
     for distance in sort!(collect(distances))
         expr = code
         bits = Int[bm.srcbit for bm in bitmap if bm.dist == distance]
@@ -1769,6 +1780,8 @@ end
 function make_indices(
     idxmap::Layout, memmap::Layout; ignore::Set{<:Index}=Set{Index}(), memory::Type{MemoryN}=Memory, offset::Code=Int32(0)
 ) where {MemoryN}
+    exprs1 = [v for (k, v) in idxmap if v isa Expr1]
+    expr1_mask = sum(UInt[1 << lp.bit for lp in exprs1])
     loops1 = [v for (k, v) in idxmap if v isa Loop1]
     loop1_mask = sum(UInt[1 << lp.bit for lp in loops1])
     loops2 = [v for (k, v) in idxmap if v isa Loop2]
@@ -1816,6 +1829,17 @@ function make_indices(
             expressions = Code[]
             # TODO: This assumes a memory layout in CUDA `int`s, not bytes
             # TODO: Check for aligned access
+            push!(
+                expressions,
+                movebits(
+                    :(exprDef5 % $SizeT),
+                    [
+                        BitMap(lp.bit, (memmap[inv_idxmap[lp]]::MemoryN).bit) for
+                        lp in exprs1 if inv_idxmap[lp] ∉ ignore && memmap[inv_idxmap[lp]] isa MemoryN
+                    ],
+                    expr1_mask,
+                ),
+            )
             push!(
                 expressions,
                 movebits(
@@ -1987,15 +2011,26 @@ function load!(
                     lhsname2 = Symbol(lhs, "_$(r | load4_regmask)")
                     lhsname3 = Symbol(lhs, "_$(r | load4_regmask | load2_regmask)")
                     if have_memory3
-                        @assert false
+                        push!(
+                            stmts,
+                            :(
+                                ($lhsname0, $lhsname1, $lhsname2, $lhsname3) = unsafe_load4_global(
+                                    $mem, LinearIndices($mem)[($index) + 1, ($index2) + 1, ($index3) + 1]
+                                )::NTuple{4,$type}
+                            ),
+                        )
                     elseif have_memory2
-                        @assert false
+                        push!(
+                            stmts,
+                            :(
+                                ($lhsname0, $lhsname1, $lhsname2, $lhsname3) =
+                                    unsafe_load4_global($mem, LinearIndices($mem)[($index) + 1, ($index2) + 1])::NTuple{4,$type}
+                            ),
+                        )
                     else
                         push!(
                             stmts,
                             :(
-                                # ($lhsname0, $lhsname1, $lhsname2, $lhsname3) =
-                                #     ($mem[1 + $index], $mem[2 + $index], $mem[3 + $index], $mem[4 + $index])::NTuple{4,$type}
                                 ($lhsname0, $lhsname1, $lhsname2, $lhsname3) =
                                     unsafe_load4_global($mem, ($index) + 1)::NTuple{4,$type}
                             ),
@@ -2087,13 +2122,20 @@ function store!(
                     rhsname3 = Symbol(rhs, "_$(r | store4_regmask | store2_regmask)")
                     if operator === :(=)
                         if have_memory3
-                            @assert false
+                            push!(
+                                stmts,
+                                :(unsafe_store4_global!(
+                                    $mem,
+                                    LinearIndices($mem)[(($index) + $offset) + 1, ($index2) + 1, ($index3) + 1],
+                                    ($rhsname0, $rhsname1, $rhsname2, $rhsname3),
+                                )),
+                            )
                         elseif have_memory2
                             push!(
                                 stmts,
                                 :(unsafe_store4_global!(
                                     $mem,
-                                    ((size($mem, 1) * $index2 + $index) + $offset) + 1,
+                                    LinearIndices($mem)[(($index) + $offset) + 1, ($index2) + 1],
                                     ($rhsname0, $rhsname1, $rhsname2, $rhsname3),
                                 )),
                             )
@@ -2265,6 +2307,12 @@ get_hi16(r0::T, r1::T) where {T<:Union{Int4x8,Int8x4,Int16x2,Float16x2}} = T(cud
 
 function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, index1::Index, index2::Index)
     return permute!(steps, env, lhs, rhs, sort([env[rhs][index1], env[rhs][index2]])...)
+end
+
+function Base.permute!(
+    steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, index_target::Pair{<:Index,<:Target}
+)
+    return permute!(steps, env, lhs, rhs, sort([env[rhs][index_target[1]], index_target[2]])...)
 end
 
 function Base.permute!(steps::Vector{AbstractStep}, env::Environment, lhs::Symbol, rhs::Symbol, register::Register, simd::SIMD)
