@@ -1028,7 +1028,7 @@ function runcuda()
         nthreads = 32
         nwarps = W
         nblocks = 2 ÷ Wp * F            # Polr, Freq
-        @assert shmem_bytes ≤ 99 * 1024 # NVIDIA A10 has 99 kB shared memory
+        @assert shmem_bytes ≤ 99 * 1024 # NVIDIA A10/A40 have 99 kB shared memory
 
         blocks_per_sm = 32 ÷ W
         # maxregs = 65536 ÷ (nthreads * nwarps * blocks_per_sm)
