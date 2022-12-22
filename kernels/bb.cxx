@@ -58,8 +58,8 @@ void bb_simple(const int8_t *__restrict__ const A,
           // This pragma slows things down tenfold
           // #pragma omp simd
           for (int d = 0; d < D; ++d) {
-            const int Are = A[(((f * 2 * p) * B + b) * D + d) * 2 + 0];
-            const int Aim = A[(((f * 2 * p) * B + b) * D + d) * 2 + 1];
+            const int Are = A[(((f * 2 + p) * B + b) * D + d) * 2 + 0];
+            const int Aim = A[(((f * 2 + p) * B + b) * D + d) * 2 + 1];
             const auto [Ere, Eim] = get4(E[((t * F + f) * 2 + p) * D + d]);
             Jre += Are * Ere - Aim * Eim;
             Jim += Are * Eim + Aim * Ere;
